@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+ 
+  <sinks>
+    <consoleSink name="customListener">
+      <sources>
+        <eventSource/>
+      </sources>
+    </consoleSink>
+  </sinks>
+  
+</configuration>

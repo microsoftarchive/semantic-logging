@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw SemanticLogging-svc.xsd">
+  
+  <!-- Optional settings for fine tuning performance and Trace Event Session identification-->
+  <traceEventService/>
+
+  <!-- Sinks reference definitons used by this host to listen ETW events -->
+  <sinks>
+    <!-- The service identity should have security permissions to access the resource according to each event sink -->
+    <flatFileSink name="svcRuntime" fileName="SemanticLogging-svc.runtime.log" >
+      <sources>
+        <!-- The below settings shows a simple configuration sample for the buit-in non-transient fault tracing -->
+        <!-- Remove this eventSource if you'd like, and add your own configuration according to the documentation -->
+        <!-- The name attribute is from the EventSource.Name Property -->
+        <eventSource name="Microsoft-SemanticLogging" level="Warning"/>
+      </sources>
+      <!--[Add any built-in or custom formatter here if the sink supports text formatters]-->
+      <eventTextFormatter header="----------"/>
+    </flatFileSink>
+    
+    <!--[Add any built-in or custom sink definition here]-->
+  
+  </sinks>
+
+</configuration>

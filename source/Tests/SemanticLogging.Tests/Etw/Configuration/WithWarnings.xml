@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <traceEventService sessionNamePrefix=""/> <!--warning, empty sessionNamePrefix-->
+  
+  <sinks>
+    <consoleSink name=""> <!--warning, empty name-->
+      <sources>
+        <eventSource name="MyCompany"/>
+      </sources>
+    </consoleSink>
+    <mySink xmlns="urn:test"/> <!--warning, no schema found-->
+  </sinks>
+  
+</configuration>

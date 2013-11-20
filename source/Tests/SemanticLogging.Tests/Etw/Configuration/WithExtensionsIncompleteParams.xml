@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  
+  <sinks>
+    <customSink name="incompleteParamSink" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects.CustomSink, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests">
+      <sources>
+        <eventSource name="MyCompany"/>
+      </sources>
+      <parameters>
+        <parameter name="required" type="System.String" value="test"/>
+      </parameters>
+    </customSink>
+  </sinks>
+  
+</configuration>

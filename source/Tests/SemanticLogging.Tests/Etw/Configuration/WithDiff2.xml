@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <traceEventService sessionNamePrefix="Microsoft.SemanticLogging.Etw.Diff1" />
+
+  <sinks>
+    <flatFileSink name="FlatFileEventListener1" fileName="FlatFile.log">
+      <sources>
+        <eventSource name="Test" level="Error" matchAnyKeyword="1"/>
+        <eventSource name="Diff2" level="Error" matchAnyKeyword="1"/>
+      </sources>
+      <eventTextFormatter header="Dif3" footer="" verbosityThreshold="Verbose" dateTimeFormat="o"/>
+    </flatFileSink>
+  </sinks>
+
+</configuration>

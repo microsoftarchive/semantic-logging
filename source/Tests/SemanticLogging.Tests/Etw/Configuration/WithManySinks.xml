@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <traceEventService sessionNamePrefix="Microsoft.SemanticLogging.Etw"/>
+  
+  <sinks>
+    <flatFileSink name="FlatFileEventListener1" fileName="FlatFile.log">
+      <sources>
+        <eventSource name="Test" level="Error" matchAnyKeyword="1"/>
+      </sources>
+      <eventTextFormatter header="---" footer="" verbosityThreshold="Verbose" dateTimeFormat="o"/> 
+    </flatFileSink>
+    
+    <consoleSink name="ConsoleEventListener1">
+      <sources>
+        <eventSource name="MyCompany" level="Error"/>
+      </sources>
+      <xmlEventTextFormatter formatting="Indented" dateTimeFormat="o"/>
+    </consoleSink>
+    
+    <customSink name="custom" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects.InMemoryEventListener, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests">
+      <sources>
+        <eventSource name="MyCompany" level="Error"/>
+      </sources>
+      <xmlEventTextFormatter formatting="Indented" dateTimeFormat="o"/>
+      <parameters>
+        <parameter name="formatter" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects.MockFormatter, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests"/>
+      </parameters>
+    </customSink>
+    
+    <windowsAzureTableSink name="azure1" 
+                           connectionString="UseDevelopmentStorage=true" 
+                           instanceName="AzureTableInstance" 
+                           tableAddress="SLABAzureTableLogs">
+      <sources>
+        <eventSource name="MyCompany" level="LogAlways" matchAnyKeyword="123"/>
+      </sources>
+    </windowsAzureTableSink>
+  </sinks>
+  
+</configuration>

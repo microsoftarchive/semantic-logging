@@ -1,0 +1,259 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
+           xmlns:etw="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
+           targetNamespace="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <xs:element name="configuration" type="ConfigurationElement"/>
+  
+  <xs:complexType name="ConfigurationElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="traceEventService" type="TraceEventServiceElement" />
+      <xs:element minOccurs="0" maxOccurs="1" name="sinks" >
+        <xs:complexType>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="flatFileSink" type="FlatFileSinkElement" />
+            <xs:element name="rollingFlatFileSink" type="RollingFlatFileSinkElement" />
+            <xs:element name="windowsAzureTableSink" type="WindowsAzureTableSinkElement" />
+            <xs:element name="sqlDatabaseSink" type="SqlDatabaseSinkElement" />
+            <xs:element name="consoleSink" type="ConsoleSinkElement" />
+            <xs:element name="customSink" type="CustomSinkElement" />
+            <xs:any namespace="##other" processContents="lax"/>
+          </xs:choice>
+        </xs:complexType>
+        <xs:unique name="sinks">
+          <xs:selector xpath="etw:*"/>
+          <xs:field xpath="@name"/>
+        </xs:unique>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="TraceEventServiceElement">
+    <xs:attribute name="sessionNamePrefix" type="NoEmpty200CharsString" use="optional" />
+  </xs:complexType>
+  
+  <xs:complexType name="SinkBaseWithFormatters" abstract="true">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBase">
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="eventTextFormatter" type="TextEventTextFormatterElement" />
+          <xs:element name="xmlEventTextFormatter" type="XmlEventTextFormatterElement" />
+          <xs:element name="jsonEventTextFormatter" type="JsonEventTextFormatterElement" />
+          <xs:element name="customEventTextFormatter" type="CustomEventTextFormatterElement" />
+          <xs:any namespace="##other" processContents="lax"/>
+        </xs:choice>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SinkBase" abstract="true">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="1" name="sources" type="SourcesElement">
+        <xs:unique name="eventSourceUniqueName">
+          <xs:selector xpath="etw:*"/>
+          <xs:field xpath="@name"/>
+        </xs:unique>
+        <xs:unique name="eventSourceUniqueId">
+          <xs:selector xpath="etw:*"/>
+          <xs:field xpath="@id"/>
+        </xs:unique>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="name" type="NoEmpty200CharsString" use="required" />
+  </xs:complexType>
+
+  <xs:complexType name="SourcesElement">
+    <xs:choice minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="eventSource" type="EventSourceElement"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="EventSourceElement">
+    <xs:attribute name="name" type="NoEmptyString" use="optional"/>
+    <xs:attribute name="id" type="Guid" use="optional"/>
+    <xs:attribute name="level" type="EventLevel"/>
+    <xs:attribute name="matchAnyKeyword" type="xs:long"/>
+  </xs:complexType>
+  
+  <xs:complexType name="FlatFileSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBaseWithFormatters">
+        <xs:attribute name="fileName" type="NoEmptyString" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+ 
+  <xs:complexType name="RollingFlatFileSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBaseWithFormatters">
+        <xs:attribute name="fileName" type="NoEmptyString" use="required" />
+        <xs:attribute name="rollSizeKB" type="PositiveInteger" use="optional" />
+        <xs:attribute name="timeStampPattern" type="NoEmptyString" use="optional" />
+        <xs:attribute name="rollFileExistsBehavior" type="RollFileExistsBehavior" use="optional" default="Increment" />
+        <xs:attribute name="rollInterval" type="RollInterval" use="optional" default="None" />
+        <xs:attribute name="maxArchivedFiles" type="PositiveInteger" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="WindowsAzureTableSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBase">
+        <xs:attribute name="instanceName" type="NoEmptyString" use="required" />
+        <xs:attribute name="connectionString" type="NoEmptyString" use="required" />
+        <xs:attribute name="tableAddress" type="NoEmptyString" use="optional" />
+        <xs:attribute name="sortKeysAscending" type="xs:boolean" use="optional" />
+        <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
+        <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
+        <xs:attribute name="bufferingFlushAllTimeoutInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="SqlDatabaseSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBase">
+        <xs:attribute name="instanceName" type="NoEmptyString" use="required" />
+        <xs:attribute name="connectionString" type="NoEmptyString" use="required" />
+        <xs:attribute name="tableName" type="NoEmptyString" use="optional" />
+        <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
+        <xs:attribute name="bufferingCount" type="PositiveInteger" use="optional" />
+        <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
+        <xs:attribute name="bufferingFlushAllTimeoutInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="ConsoleSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBaseWithFormatters">
+        <xs:attribute name="colorMapperType" type="NoEmptyString" use="optional" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <xs:complexType name="CustomSinkElement">
+    <xs:complexContent mixed="false">
+      <xs:extension base="SinkBaseWithFormatters">
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="1" name="parameters" type="ArrayOfParameterElement" />
+        </xs:choice>
+        <xs:attribute name="type" type="NoEmptyString" use="required" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="JsonEventTextFormatterElement">
+    <xs:attribute name="formatting" type="EventTextFormatting" use="optional" default="None" />
+    <xs:attribute name="dateTimeFormat" type="NoEmptyString" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="XmlEventTextFormatterElement">
+    <xs:attribute name="formatting" type="EventTextFormatting" use="optional" default="None"/>
+    <xs:attribute name="dateTimeFormat" type="NoEmptyString" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="TextEventTextFormatterElement">
+    <xs:attribute name="header" type="xs:string" use="optional" />
+    <xs:attribute name="footer" type="xs:string" use="optional" />
+    <xs:attribute name="verbosityThreshold" type="EventLevel" use="optional" default="Error" />
+    <xs:attribute name="dateTimeFormat" type="NoEmptyString" use="optional" />
+  </xs:complexType>
+
+  <xs:complexType name="CustomEventTextFormatterElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="parameters" type="ArrayOfParameterElement" />
+    </xs:sequence>
+    <xs:attribute name="type" type="NoEmptyString" use="required" />
+  </xs:complexType>
+  
+  <xs:complexType name="ArrayOfParameterElement">
+    <xs:sequence>
+      <xs:element minOccurs="1" maxOccurs="unbounded" name="parameter" nillable="true" type="ParameterElement" />
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="ParameterElement">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="1" name="parameters" type="ArrayOfParameterElement" />
+    </xs:sequence>
+    <xs:attribute name="name" type="NoEmptyString" />
+    <xs:attribute name="type" type="NoEmptyString" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="optional" />    
+  </xs:complexType>
+  
+  <xs:simpleType name="EventTextFormatting">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Indented" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="EventLevel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LogAlways" />
+      <xs:enumeration value="Critical" />
+      <xs:enumeration value="Error" />
+      <xs:enumeration value="Warning" />
+      <xs:enumeration value="Informational" />
+      <xs:enumeration value="Verbose" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RollFileExistsBehavior">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Overwrite" />
+      <xs:enumeration value="Increment" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RollInterval">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Minute" />
+      <xs:enumeration value="Hour" />
+      <xs:enumeration value="Day" />
+      <xs:enumeration value="Week" />
+      <xs:enumeration value="Month" />
+      <xs:enumeration value="Year" />
+      <xs:enumeration value="Midnight" />
+    </xs:restriction>
+  </xs:simpleType>
+ 
+  <xs:simpleType name="Guid">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NoEmptyString">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:pattern value=".*[^\s].*" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NoEmpty200CharsString">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1" />
+      <xs:maxLength value="200" />
+      <xs:pattern value=".*[^\s].*" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+ <xs:simpleType name="PositiveInteger">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="^[0-9]+$" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PositiveAndMinusOneInteger">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="^-[1]+$|^[0-9]+$" />
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <noxsd:mySink xmlns:noxsd ="urn:no_schema" name="my" attr="Indented">
+      <sources>
+        <eventSource name="MyCompany"/>          
+      </sources>
+      <jsonEventTextFormatter formatting="Indented"/>
+    </noxsd:mySink>  
+  </sinks>
+  
+</configuration>

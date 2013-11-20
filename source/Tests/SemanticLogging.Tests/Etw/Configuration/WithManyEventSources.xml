@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <customSink name="sink1" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects.InMemoryEventListener, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests">
+      <sources>
+        <eventSource name="MyCompany" level="Error"/>
+      </sources>
+    </customSink>
+    <consoleSink name="sink2">
+      <sources>
+        <eventSource name="Test" level="Warning"/>
+      </sources>
+    </consoleSink>
+  </sinks>
+  
+</configuration>

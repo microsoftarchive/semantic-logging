@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:test"
+           xmlns:etw="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
+           targetNamespace="urn:test"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+
+  <!--<xs:import namespace="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
+             schemaLocation="C:\Microsoft\EntLib\EL-V6\Source\Blocks\SemanticLogging\Src\SemanticLogging.Etw.WindowsService\SemanticLogging-svc.xsd"/>-->
+  
+  <xs:element name="mySink">
+    <xs:complexType>
+      <!--<xs:complexContent mixed="false">
+        <xs:extension base="etw:SinkBaseWithFormatters">
+          <xs:attribute name="attr" type="EventTextFormatting" use="required" />
+        </xs:extension>
+      </xs:complexContent>-->
+      <xs:sequence>       
+        <xs:any minOccurs="0" maxOccurs="unbounded" processContents="skip"/>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required" />
+      <xs:attribute name="attr" type="EventTextFormatting" use="required" />
+    </xs:complexType>    
+  </xs:element>
+  
+  <xs:simpleType name="EventTextFormatting">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="None" />
+      <xs:enumeration value="Indented" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>

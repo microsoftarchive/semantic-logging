@@ -1,0 +1,2 @@
+﻿Dia2Lib.I*
+Dia2Lib.SymTagEnum

@@ -1,0 +1,228 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="event_BufferedEventPublisherCapacityOverloaded" xml:space="preserve">
+    <value>The buffering capacity of {0} events for the sink {1} has been reached. New entries will be discarded.</value>
+  </data>
+  <data name="event_BufferedEventPublisherCapacityRestored" xml:space="preserve">
+    <value>The buffering capacity for the sink {0} was restored.</value>
+  </data>
+  <data name="event_BufferedEventPublisherEventsLostWhileDisposing" xml:space="preserve">
+    <value>{0} events could not be sent to the sink {1} and will be lost.</value>
+  </data>
+  <data name="event_BufferedEventPublisherUnobservedTaskFault" xml:space="preserve">
+    <value>An unobserved fault was detected in the sink {0}. Message: {1}</value>
+  </data>
+  <data name="event_ConsoleSinkWriteFailed" xml:space="preserve">
+    <value>The console sink failed to write an event. Message: {0}</value>
+  </data>
+  <data name="event_CustomFormatterUnhandledFault" xml:space="preserve">
+    <value>Unhandled fault in a custom formatter. Message: {0}</value>
+  </data>
+  <data name="event_CustomSinkUnhandledFault" xml:space="preserve">
+    <value>Unhandled fault in a custom sink. Message: {0}</value>
+  </data>
+  <data name="event_DatabaseSinkPublishEventsFailed" xml:space="preserve">
+    <value>A database sink failed to publish events. Message: {0}</value>
+  </data>
+  <data name="event_DatabaseSinkPublishEventsFailedAndDiscardsEntries" xml:space="preserve">
+    <value>A database sink discarded {0} events due to failures while attempting to publish a batch.</value>
+  </data>
+  <data name="event_DatabaseSinkPublishEventsFailedAndDiscardSingleEntry" xml:space="preserve">
+    <value>A database sink discarded an event with index {1} due to a failure while attempting to publish a batch. Message: {0}</value>
+  </data>
+  <data name="event_DatabaseSinkPublishEventsTransientError" xml:space="preserve">
+    <value>A transient fault occurred in a database sink. Message: {0}</value>
+  </data>
+  <data name="event_EventEntryJsonWriterFailed" xml:space="preserve">
+    <value>The JSON writer failed to handle an event. Message: {0}</value>
+  </data>
+  <data name="event_EventEntrySerializePayloadFailed" xml:space="preserve">
+    <value>The payload for an event could not be serialized. Message: {0}</value>
+  </data>
+  <data name="event_EventEntryTextWriterFailed" xml:space="preserve">
+    <value>The text formatter failed to format an event. Message: {0}</value>
+  </data>
+  <data name="event_EventEntryXmlWriterFailed" xml:space="preserve">
+    <value>The XML formatter failed to format an event. Message: {0}</value>
+  </data>
+  <data name="event_FlatFileSinkWriteFailed" xml:space="preserve">
+    <value>A flat file sink failed to write an event. Message: {0}</value>
+  </data>
+  <data name="event_FormatEntryAsStringFailed" xml:space="preserve">
+    <value>Formatting an entry failed. Message: {0}</value>
+  </data>
+  <data name="event_MapEntryLevelToColorFailed" xml:space="preserve">
+    <value>Mapping the event level {0} to a color failed. Message: {0}</value>
+  </data>
+  <data name="event_ParsingEventSourceManifestFailed" xml:space="preserve">
+    <value>Parsing the manifest for provider '{0}' to handle the event with ID {1} failed. Message: {2}</value>
+  </data>
+  <data name="event_RollingFlatFileSinkWriteFailed" xml:space="preserve">
+    <value>A rolling flat file sink failed to write an event. Message: {0}</value>
+  </data>
+  <data name="event_TraceEventServiceConfigurationChanged" xml:space="preserve">
+    <value>The configuration changed for the element '{0}'. Message: {1}</value>
+  </data>
+  <data name="event_TraceEventServiceConfigurationFault" xml:space="preserve">
+    <value>A fault was detected while processing the configuration for the element '{0}'. Message: {1}</value>
+  </data>
+  <data name="event_TraceEventServiceConfigurationFileLoadFault" xml:space="preserve">
+    <value>A fault was detected while loading the configuration file. Message: {0}</value>
+  </data>
+  <data name="event_TraceEventServiceConfigurationShutdownFault" xml:space="preserve">
+    <value>A fault was detected while shutting down the configured listeners. Message: {0}</value>
+  </data>
+  <data name="event_TraceEventServiceConfigurationWithFaults" xml:space="preserve">
+    <value>The configuration was partially successfully loaded. Check logs for further error details.</value>
+  </data>
+  <data name="event_TraceEventServiceEventsWillBeLost" xml:space="preserve">
+    <value>Some events will be lost because of buffer overruns or schema synchronization delays in trace session: {0}.</value>
+  </data>
+  <data name="event_TraceEventServiceManifestGenerationFault" xml:space="preserve">
+    <value>An improperly generated manifest was received for provider {0}. Message: {1}</value>
+  </data>
+  <data name="event_TraceEventServiceProcessEventsLost" xml:space="preserve">
+    <value>The loss of {1} events was detected in trace session '{0}'.</value>
+  </data>
+  <data name="event_TraceEventServiceProcessTaskFault" xml:space="preserve">
+    <value>An unhandled fault was detected in the processing task for the trace session '{0}'. Message: {1}</value>
+  </data>
+  <data name="event_TraceEventServiceSessionRemoved" xml:space="preserve">
+    <value>The trace session with the name '{0}' was removed.</value>
+  </data>
+  <data name="event_TraceEventServiceSinkUnhandledFault" xml:space="preserve">
+    <value>An unhandled exception occurred for the trace session '{0}'. Message: {1}</value>
+  </data>
+  <data name="event_WindowsAzureTableSinkEntityCreationFailed" xml:space="preserve">
+    <value>A Windows Azure Table sink failed to create an entity. Message: {0}</value>
+  </data>
+  <data name="event_WindowsAzureTableSinkPublishEventsFailed" xml:space="preserve">
+    <value>A Windows Azure Table sink failed to write a batch of events. Message: {0}</value>
+  </data>
+  <data name="event_WindowsAzureTableSinkPublishEventsFailedAndDiscardsEntries" xml:space="preserve">
+    <value>A Windows Azure Table sink discarded {0} events due to failures while attempting to publish a batch.</value>
+  </data>
+  <data name="event_WindowsAzureTableSinkTableCreationFailed" xml:space="preserve">
+    <value>A Windows Azure Table sink failed to create a table. Message: {0}</value>
+  </data>
+  <data name="event_WindowsAzureTableSinkTransientError" xml:space="preserve">
+    <value>A transient fault occurred in a Windows Azure Table sink. Message: {0}</value>
+  </data>
+</root>

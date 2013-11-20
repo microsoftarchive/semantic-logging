@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <traceEventService sessionNamePrefix="Microsoft.SemanticLogging.Etw" />
+
+  <sinks>
+    <flatFileSink name="FlatFileEventListener1" fileName="FlatFile.log">
+      <sources>
+        <eventSource name="Test" level="Error" matchAnyKeyword="1"/>
+      </sources>
+      <eventTextFormatter header="---" footer="" verbosityThreshold="Verbose" dateTimeFormat="o"/>
+    </flatFileSink>
+  </sinks>
+  
+</configuration>

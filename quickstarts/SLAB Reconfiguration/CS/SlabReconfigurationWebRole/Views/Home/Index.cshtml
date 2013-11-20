@@ -1,0 +1,33 @@
+﻿@model SlabReconfigurationWebRole.Models.MessageModel
+
+@{
+    ViewBag.Title = "Send a message!";
+}
+
+<h2>Send a message</h2>
+@using (Html.BeginForm("SendMessage", "Home"))
+{
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Recipient)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Recipient)
+            @Html.ValidationMessageFor(model => model.Recipient)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Message)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Message)
+            @Html.ValidationMessageFor(model => model.Message)
+        </div>
+
+        <p>
+            <input id="Send" type="submit" value="Send!" />
+        </p>
+    </fieldset>
+}
