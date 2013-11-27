@@ -111,12 +111,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 writer.WriteLine(format, PropertyNames.Payload, FormatPayload(eventEntry));
                 writer.WriteLine(format, PropertyNames.EventName, eventEntry.Schema.EventName);
                 writer.WriteLine(format, PropertyNames.Timestamp, eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+
+                writer.WriteLine(format, PropertyNames.ActivityId, eventEntry.ActivityId);
+                writer.WriteLine(format, PropertyNames.RelatedActivityId, eventEntry.RelatedActivityId);
             }
             else
             {
                 // Write with summary format
                 writer.WriteLine(
-                    "{0} : {1}, {2} : {3}, {4} : {5}, {6} : {7}, {8} : {9}, {10} : {11}",
+                    "{0} : {1}, {2} : {3}, {4} : {5}, {6} : {7}, {8} : {9}, {10} : {11} : {12} : {13}",
                     PropertyNames.EventId,
                     eventEntry.EventId,
                     PropertyNames.Level,
@@ -128,7 +131,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                     PropertyNames.EventName,
                     eventEntry.Schema.EventName,
                     PropertyNames.Timestamp,
-                    eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+                    eventEntry.GetFormattedTimestamp(this.DateTimeFormat),
+                    eventEntry.ActivityId,
+                    eventEntry.RelatedActivityId);
             }
 
             // Write footer

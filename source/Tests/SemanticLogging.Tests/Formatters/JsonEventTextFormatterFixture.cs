@@ -105,6 +105,110 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("Info", entry.Payload["payload1"]);
                 Assert.IsTrue(entry.Payload.ContainsKey("payload2"));
                 Assert.AreEqual((long)100, entry.Payload["payload2"]);
+                Assert.AreEqual(Guid.Empty, entry.ActivityId);
+                Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
+            }
+        }
+
+        [TestClass]
+        public class when_receiving_event_with_payload_and_message_with_enviroment_activity_id : given_json_event_text_formatter
+        {
+            private Guid activityId;
+            private Guid previousActivityId;
+
+            protected override void Given()
+            {
+                base.Given();
+
+                this.activityId = Guid.NewGuid();
+                EventSource.SetCurrentThreadActivityId(this.activityId, out this.previousActivityId);
+            }
+
+            protected override void When()
+            {
+                logger.EventWithPayloadAndMessage("Info", 100);
+            }
+
+            protected override void OnCleanup()
+            {
+                base.OnCleanup();
+
+                EventSource.SetCurrentThreadActivityId(this.previousActivityId);
+            }
+
+            [TestMethod]
+            public void then_writes_event_data()
+            {
+                var entry = this.Entries.SingleOrDefault();
+
+                Assert.IsNotNull(entry);
+                Assert.IsFalse(this.RawOutput.StartsWith("{\r\n")); // No Formatting (Default)
+                Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, entry.EventId);
+                Assert.AreEqual<Guid>(TestEventSource.Log.Guid, entry.ProviderId);
+                Assert.AreEqual<int>((int)EventLevel.Warning, entry.Level);
+                Assert.AreEqual<long>((long)EventKeywords.None, entry.EventKeywords);
+                Assert.AreEqual<int>((int)EventOpcode.Info, entry.Opcode);
+                Assert.AreEqual<int>(0, entry.Version);
+                Assert.AreEqual<int>(65331, entry.Task);
+                Assert.AreEqual<string>("Test message Info 100", entry.Message);
+                Assert.IsTrue(entry.Payload.ContainsKey("payload1"));
+                Assert.AreEqual("Info", entry.Payload["payload1"]);
+                Assert.IsTrue(entry.Payload.ContainsKey("payload2"));
+                Assert.AreEqual((long)100, entry.Payload["payload2"]);
+                Assert.AreEqual(this.activityId, entry.ActivityId);
+                Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
+            }
+        }
+
+        [TestClass]
+        public class when_receiving_event_with_payload_and_message_with_enviroment_activity_id_and_related_activity_id : given_json_event_text_formatter
+        {
+            private Guid activityId;
+            private Guid relatedActivityId;
+            private Guid previousActivityId;
+
+            protected override void Given()
+            {
+                base.Given();
+
+                this.activityId = Guid.NewGuid();
+                this.relatedActivityId = Guid.NewGuid();
+                EventSource.SetCurrentThreadActivityId(this.activityId, out this.previousActivityId);
+            }
+
+            protected override void When()
+            {
+                logger.EventWithPayloadAndMessageAndRelatedActivityId(this.relatedActivityId, "Info", 100);
+            }
+
+            protected override void OnCleanup()
+            {
+                base.OnCleanup();
+
+                EventSource.SetCurrentThreadActivityId(this.previousActivityId);
+            }
+
+            [TestMethod]
+            public void then_writes_event_data()
+            {
+                var entry = this.Entries.SingleOrDefault();
+
+                Assert.IsNotNull(entry);
+                Assert.IsFalse(this.RawOutput.StartsWith("{\r\n")); // No Formatting (Default)
+                Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageAndRelatedActivityIdId, entry.EventId);
+                Assert.AreEqual<Guid>(TestEventSource.Log.Guid, entry.ProviderId);
+                Assert.AreEqual<int>((int)EventLevel.Warning, entry.Level);
+                Assert.AreEqual<long>((long)EventKeywords.None, entry.EventKeywords);
+                Assert.AreEqual<int>((int)EventOpcode.Send, entry.Opcode);
+                Assert.AreEqual<int>(0, entry.Version);
+                Assert.AreEqual<int>((int)TestEventSource.Tasks.Other, entry.Task);
+                Assert.AreEqual<string>("Test message Info 100", entry.Message);
+                Assert.IsTrue(entry.Payload.ContainsKey("payload1"));
+                Assert.AreEqual("Info", entry.Payload["payload1"]);
+                Assert.IsTrue(entry.Payload.ContainsKey("payload2"));
+                Assert.AreEqual((long)100, entry.Payload["payload2"]);
+                Assert.AreEqual(this.activityId, entry.ActivityId);
+                Assert.AreEqual(this.relatedActivityId, entry.RelatedActivityId);
             }
         }
 

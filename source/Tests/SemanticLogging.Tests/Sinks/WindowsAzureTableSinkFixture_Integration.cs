@@ -138,7 +138,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
                                  Opcode = 4,
                                  Task = 24,
                                  Version = 2,
-                                 Payload = { { "arg1", "value arg1" } }
+                                 Payload = { { "arg1", "value arg1" } },
+                                 ActivityId = Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}"),
+                                 RelatedActivityId = Guid.Parse("{23408E19-3133-47E1-9307-C99A4F9AC8CC}")
                              };
             sink.OnNext(this.entry);
         }
@@ -166,6 +168,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             StringAssert.Contains(actual.Payload, "arg1");
             StringAssert.Contains(actual.Payload, (string)entry.Payload["arg1"]);
             Assert.AreEqual("value arg1", actual.RawPayloadProperties["Payload_arg1"].StringValue);
+            Assert.AreEqual(entry.ActivityId, actual.ActivityId);
+            Assert.AreEqual(entry.RelatedActivityId, actual.RelatedActivityId);
         }
     }
 

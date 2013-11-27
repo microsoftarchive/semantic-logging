@@ -154,7 +154,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                     Version = 2,
                     InstanceName = "Custom instance name",
                     FormattedMessage = "Test" + i,
-                    Payload = "{arg0:Test}"
+                    Payload = "{arg0:Test}",
+                    ActivityId = Guid.NewGuid(),
+                    RelatedActivityId = Guid.NewGuid(),
                 };
 
                 this.sink.OnNext(entry);
@@ -199,6 +201,41 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                     Assert.AreEqual<string>(entry.InstanceName, (string)reader["InstanceName"]);
                     Assert.AreEqual<string>(entry.FormattedMessage, (string)reader["FormattedMessage"]);
                     Assert.AreEqual<string>(entry.Payload, (string)reader["Payload"]);
+                    Assert.AreEqual<Guid>(Guid.Empty, (Guid)reader["ActivityId"]);
+                    Assert.AreEqual<Guid>(Guid.Empty, (Guid)reader["RelatedActivityId"]);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void then_should_write_properties_with_activity_id()
+        {
+            var entry = CreateValidEntry();
+            entry.ActivityId = Guid.Parse("{D6A8536E-398F-4AD5-BB0A-3BFFD05EF5CB}");
+            entry.RelatedActivityId = Guid.Parse("{28ED52F1-1AB2-4B8C-9F30-4382BE2928AA}");
+            this.sink.OnNext(entry);
+
+            this.sink.FlushAsync().Wait();
+
+            using (var cmd = new SqlCommand("SELECT * FROM Traces", this.localDbConnection))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    Assert.IsTrue(reader.Read());
+
+                    Assert.AreEqual<Guid>(entry.ProviderId, (Guid)reader["ProviderId"]);
+                    Assert.AreEqual<string>(entry.ProviderName, (string)reader["ProviderName"]);
+                    Assert.AreEqual<int>(entry.EventId, (int)reader["EventId"]);
+                    Assert.AreEqual<int>(entry.Level, (int)reader["Level"]);
+                    Assert.AreEqual<int>(entry.Opcode, (int)reader["Opcode"]);
+                    Assert.AreEqual<int>(entry.Task, (int)reader["Task"]);
+                    Assert.AreEqual<DateTimeOffset>(entry.Timestamp, (DateTimeOffset)reader["Timestamp"]);
+                    Assert.AreEqual<int>(entry.Version, (int)reader["Version"]);
+                    Assert.AreEqual<string>(entry.InstanceName, (string)reader["InstanceName"]);
+                    Assert.AreEqual<string>(entry.FormattedMessage, (string)reader["FormattedMessage"]);
+                    Assert.AreEqual<string>(entry.Payload, (string)reader["Payload"]);
+                    Assert.AreEqual<Guid>(entry.ActivityId, (Guid)reader["ActivityId"]);
+                    Assert.AreEqual<Guid>(entry.RelatedActivityId, (Guid)reader["RelatedActivityId"]);
                 }
             }
         }

@@ -15,5 +15,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
         internal const string Payload = "Payload";
         internal const string EventName = "EventName";
         internal const string Timestamp = "Timestamp";
+        internal const string ActivityId = "ActivityId";
+        internal const string RelatedActivityId = "RelatedActivityId";
     }
 }

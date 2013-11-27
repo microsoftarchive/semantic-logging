@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects
@@ -11,11 +12,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
         public const int ErrorEventId = 5;
         public const int CriticalEventId = 6;
         public const int VerboseEventId = 100;
-        public const int NonDefaultOpcodeNonDefaultVersionEventId = 103; 
+        public const int NonDefaultOpcodeNonDefaultVersionEventId = 103;
         public const int EventWithoutPayloadNorMessageId = 200;
         public const int EventWithPayloadId = 201;
         public const int EventWithMessageId = 202;
-        public const int EventWithPayloadAndMessageId = 203;        
+        public const int EventWithPayloadAndMessageId = 203;
+        public const int EventWithPayloadAndMessageAndRelatedActivityIdId = 204;
         public const int EventWithHighIdId = (int)ushort.MaxValue + 100;
         public const int EventWithLowIdId = -100;
 
@@ -64,7 +66,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
             if (IsEnabled()) { WriteEvent(EventWithPayloadAndMessageId, payload1, payload2); }
         }
 
-        [Event(NonDefaultOpcodeNonDefaultVersionEventId, Opcode = EventOpcode.Reply, Version = 0x02, Task = Tasks.DBQuery, 
+        [Event(EventWithPayloadAndMessageAndRelatedActivityIdId, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test message {0} {1}", Task = Tasks.Other, Opcode = EventOpcode.Send)]
+        public void EventWithPayloadAndMessageAndRelatedActivityId(Guid relatedActivityId, string payload1, int payload2)
+        {
+            if (IsEnabled()) { WriteEventWithRelatedActivityId(EventWithPayloadAndMessageAndRelatedActivityIdId, relatedActivityId, payload1, payload2); }
+        }
+
+        [Event(NonDefaultOpcodeNonDefaultVersionEventId, Opcode = EventOpcode.Reply, Version = 0x02, Task = Tasks.DBQuery,
             Message = "arg1- {0},arg2- {1},arg3- {2}")]
         public void NonDefaultOpcodeNonDefaultVersionEvent(int arg1, int arg2, int arg3)
         {
@@ -79,8 +87,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
 
         [Event(50)]
         public void FastEvent(int arg)
-        { 
-            WriteEvent(50, arg); 
+        {
+            WriteEvent(50, arg);
         }
 
         public static readonly TestEventSource Log = new TestEventSource();
@@ -89,6 +97,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
         {
             public const EventTask Page = (EventTask)1;
             public const EventTask DBQuery = (EventTask)2;
+            public const EventTask Other = (EventTask)3;
         }
     }
 }

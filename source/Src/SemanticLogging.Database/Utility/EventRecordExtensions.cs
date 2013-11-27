@@ -32,7 +32,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 new SqlMetaData("Timestamp", SqlDbType.DateTimeOffset),
                 new SqlMetaData("Version", SqlDbType.Int),
                 new SqlMetaData("FormattedMessage", SqlDbType.NVarChar, 4000),
-                new SqlMetaData("Payload", SqlDbType.NVarChar, 4000)
+                new SqlMetaData("Payload", SqlDbType.NVarChar, 4000),
+                new SqlMetaData("ActivityId", SqlDbType.UniqueIdentifier),
+                new SqlMetaData("RelatedActivityId", SqlDbType.UniqueIdentifier)
             };
 
             Fields = SqlMetaData.Select(x => x.Name).ToArray();
@@ -72,7 +74,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 Timestamp = entry.Timestamp,
                 Version = entry.Schema.Version,
                 FormattedMessage = entry.FormattedMessage,
-                Payload = EventEntryUtil.JsonSerializePayload(entry)
+                Payload = EventEntryUtil.JsonSerializePayload(entry),
+                ActivityId = entry.ActivityId,
+                RelatedActivityId = entry.RelatedActivityId
             };
 
             return entity;
@@ -94,6 +98,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             sqlDataRecord.SetValue(9, record.Version);
             sqlDataRecord.SetValue(10, (object)record.FormattedMessage ?? DBNull.Value);
             sqlDataRecord.SetValue(11, (object)record.Payload ?? DBNull.Value);
+            sqlDataRecord.SetValue(12, record.ActivityId);
+            sqlDataRecord.SetValue(13, record.RelatedActivityId);
 
             return sqlDataRecord;
         }

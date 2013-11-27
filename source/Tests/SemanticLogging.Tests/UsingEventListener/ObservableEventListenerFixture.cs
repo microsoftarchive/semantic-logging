@@ -70,6 +70,55 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
         }
 
         [TestMethod]
+        public void when_subscribing_then_receives_activity_id()
+        {
+            var sink = new MockSink();
+            listener.Subscribe(sink);
+            listener.EnableEvents(Logger, EventLevel.LogAlways);
+
+            var activityId = Guid.NewGuid();
+            Guid previousActivityId;
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+
+            try
+            {
+                Logger.Informational("Test");
+            }
+            finally
+            {
+                EventSource.SetCurrentThreadActivityId(previousActivityId);
+            }
+
+            Assert.AreEqual(activityId, sink.OnNextCalls.ElementAt(0).ActivityId);
+            Assert.AreEqual(Guid.Empty, sink.OnNextCalls.ElementAt(0).RelatedActivityId);
+        }
+
+        [TestMethod]
+        public void when_subscribing_then_receives_related_activity_id()
+        {
+            var sink = new MockSink();
+            listener.Subscribe(sink);
+            listener.EnableEvents(Logger, EventLevel.LogAlways);
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            Guid previousActivityId;
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+
+            try
+            {
+                Logger.EventWithPayloadAndMessageAndRelatedActivityId(relatedActivityId, "Test", 100);
+            }
+            finally
+            {
+                EventSource.SetCurrentThreadActivityId(previousActivityId);
+            }
+
+            Assert.AreEqual(activityId, sink.OnNextCalls.ElementAt(0).ActivityId);
+            Assert.AreEqual(relatedActivityId, sink.OnNextCalls.ElementAt(0).RelatedActivityId);
+        }
+
+        [TestMethod]
         public void can_subscribe_multiple_sinks()
         {
             var sink1 = new MockSink();

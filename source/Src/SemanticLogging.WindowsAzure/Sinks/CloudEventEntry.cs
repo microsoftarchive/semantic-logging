@@ -120,6 +120,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzu
         public Dictionary<string, object> Payload { get; set; }
 
         /// <summary>
+        /// Gets or sets the activity id for the event.
+        /// </summary>
+        /// <value>
+        /// The activity id.
+        /// </value>
+        public Guid ActivityId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the related activity id for the event.
+        /// </summary>
+        /// <value>
+        /// The related activity id.
+        /// </value>
+        public Guid RelatedActivityId { get; set; }
+
+        /// <summary>
         /// Gets or sets the entity's partition key.
         /// </summary>
         /// <value>

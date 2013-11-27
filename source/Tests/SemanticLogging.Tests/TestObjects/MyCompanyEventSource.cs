@@ -55,6 +55,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
         [Event(10, Keywords = Keywords.DataBase | Keywords.Perf)]
         public void MultipleKeywords(int arg1) { WriteEvent(10, arg1); }
 
+        [Event(11, Opcode = EventOpcode.Send)]
+        public void WithRelatedActivityId(Guid relatedActivityId) { WriteEventWithRelatedActivityId(11, relatedActivityId); }
+
         public static readonly MyCompanyEventSource Log = new MyCompanyEventSource();
     }
 }

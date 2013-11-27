@@ -12,7 +12,9 @@ CREATE TABLE [dbo].[Traces](
 	[Version] [int] NOT NULL,
 	[FormattedMessage] [nvarchar](4000) NULL,
 	[Payload] [nvarchar](4000) NULL,
- CONSTRAINT [PK_Traces] PRIMARY KEY CLUSTERED 
+    [ActivityId] [char](36) NULL, 
+    [RelatedActivityId] [char](36) NULL, 
+CONSTRAINT [PK_Traces] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF)

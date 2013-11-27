@@ -95,6 +95,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 jsonWriter.WriteValue(eventEntry.Schema.EventName);
                 jsonWriter.WritePropertyName(PropertyNames.Timestamp);
                 jsonWriter.WriteValue(eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+
+                jsonWriter.WritePropertyName(PropertyNames.ActivityId);
+                jsonWriter.WriteValue(eventEntry.ActivityId);
+                jsonWriter.WritePropertyName(PropertyNames.RelatedActivityId);
+                jsonWriter.WriteValue(eventEntry.RelatedActivityId);
+
                 jsonWriter.WriteEndObject();
 
                 // Write an entry separator so all the logs can be read as an array, 

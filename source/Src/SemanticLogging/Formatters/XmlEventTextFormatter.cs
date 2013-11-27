@@ -106,6 +106,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 xmlWriter.WriteStartElement("TimeCreated");
                 xmlWriter.WriteAttributeString("SystemTime", eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
                 xmlWriter.WriteEndElement();
+
+                xmlWriter.WriteStartElement("Correlation");
+                xmlWriter.WriteAttributeString("ActivityID", eventEntry.ActivityId.ToString("B"));
+                xmlWriter.WriteAttributeString("RelatedActivityID", eventEntry.RelatedActivityId.ToString("B"));
+                xmlWriter.WriteEndElement();
+
                 xmlWriter.WriteElementString("Computer", this.machine);
                 xmlWriter.WriteEndElement(); // System
 

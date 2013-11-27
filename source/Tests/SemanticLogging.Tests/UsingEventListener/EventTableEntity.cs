@@ -28,6 +28,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
         public string Payload { get; set; }
         public Dictionary<string, object> DeserializedPayload { get; private set; }
         public Dictionary<string, EntityProperty> RawPayloadProperties { get; private set; }
+        public Guid ActivityId { get; set; }
+        public Guid RelatedActivityId { get; set; }
 
         public override void ReadEntity(IDictionary<string, EntityProperty> properties, OperationContext operationContext)
         {

@@ -1,4 +1,4 @@
-CREATE TABLE [dbo].[Traces] (
+CREATE TABLE [dbo].[Traces](
 	[id] [bigint] IDENTITY(1,1) NOT NULL,
 	[InstanceName] [nvarchar](1000) NOT NULL,
 	[ProviderId] [uniqueidentifier] NOT NULL,
@@ -12,6 +12,8 @@ CREATE TABLE [dbo].[Traces] (
 	[Version] [int] NOT NULL,
 	[FormattedMessage] [nvarchar](4000) NULL,
 	[Payload] [nvarchar](4000) NULL,
+    [ActivityId] [uniqueidentifier], 
+    [RelatedActivityId] [uniqueidentifier], 
 	-- only used for testing, not in prod schema
 	[ExtraColumn] [uniqueidentifier] NULL,
 	[ExtraColumn2] [uniqueidentifier] NULL,

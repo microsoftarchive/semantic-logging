@@ -175,6 +175,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                 traceEvent.FormattedMessage,
                 this.CreatePayload(traceEvent),
                 DateTimeOffset.FromFileTime(traceEvent.TimeStamp100ns),
+                traceEvent.ActivityID,
+                traceEvent.RelatedActivityID,
                 this.schemaCache.GetSchema(traceEvent));
         }
 
