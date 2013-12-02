@@ -110,6 +110,7 @@
     <DefineConstants Condition=" '$(SignAssembly)' == 'true' ">$(DefineConstants);SIGN</DefineConstants>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\..\build\stylecop.targets" />
   <PropertyGroup>
     <PostBuildEvent>%25windir%25\system32\xcopy.exe /y "$(ProjectDir)SupportDlls\*.dll" "$(TargetDir)"
 </PostBuildEvent>
