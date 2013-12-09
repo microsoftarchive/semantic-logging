@@ -13,6 +13,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
             public const EventOpcode CustomOpcode2 = (EventOpcode)101;
         }
 
+        public class Keywords
+        {
+            public const EventKeywords LongKeyword = (EventKeywords)(1L << 60);
+        }
+
         public static readonly SimpleEventSource Log = new SimpleEventSource();
 
         [Event(1, Level = EventLevel.Warning, Version = 1)]
@@ -85,5 +90,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
 
         [Event(26, Level = EventLevel.Verbose)]
         public void LevelVerbose() { }
+
+        [Event(27, Keywords = Keywords.LongKeyword)]
+        public void EventWithLongKeywords() { }
     }
 }

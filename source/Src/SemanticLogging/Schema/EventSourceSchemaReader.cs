@@ -81,7 +81,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
 
                 var keywordNames = (string)@event.Attribute("keywords");
 
-                int keywordsMask = 0;
+                long keywordsMask = 0;
                 if (!string.IsNullOrWhiteSpace(keywordNames))
                 {
                     foreach (var keywordName in keywordNames.Split())
@@ -94,7 +94,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
 
                         if (keywordsMaskAtt != null)
                         {
-                            keywordsMask |= Convert.ToInt32(keywordsMaskAtt.Value, 16);
+                            keywordsMask |= Convert.ToInt64(keywordsMaskAtt.Value, 16);
                         }
                     }
                 }
