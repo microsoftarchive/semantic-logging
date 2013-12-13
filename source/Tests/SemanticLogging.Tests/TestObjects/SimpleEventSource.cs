@@ -15,7 +15,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
 
         public class Keywords
         {
-            public const EventKeywords LongKeyword = (EventKeywords)(1L << 60);
+            public const EventKeywords LongKeyword = (EventKeywords)(1L << 33);
         }
 
         public static readonly SimpleEventSource Log = new SimpleEventSource();
