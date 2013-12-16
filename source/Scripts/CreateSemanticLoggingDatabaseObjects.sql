@@ -17,8 +17,8 @@ CREATE TYPE TracesType AS TABLE
 	[Version] [int],
 	[FormattedMessage] [nvarchar](4000),
 	[Payload] [nvarchar](4000),
-    [ActivityId] [uniqueidentifier], 
-    [RelatedActivityId] [uniqueidentifier] 
+	[ActivityId] [uniqueidentifier], 
+	[RelatedActivityId] [uniqueidentifier] 
 );
 
 GO
@@ -38,8 +38,8 @@ CREATE PROCEDURE [dbo].[WriteTrace]
 	@Version [int],
 	@FormattedMessage [nvarchar](4000),
 	@Payload [nvarchar](4000),
-    @ActivityId [uniqueidentifier], 
-    @RelatedActivityId [uniqueidentifier],
+	@ActivityId [uniqueidentifier], 
+	@RelatedActivityId [uniqueidentifier],
 	@TraceId [bigint] OUTPUT
 )
 AS
@@ -124,8 +124,8 @@ CREATE TABLE [dbo].[Traces](
 	[Version] [int] NOT NULL,
 	[FormattedMessage] [nvarchar](4000) NULL,
 	[Payload] [nvarchar](4000) NULL,
-    [ActivityId] [uniqueidentifier],
-    [RelatedActivityId] [uniqueidentifier],
+	[ActivityId] [uniqueidentifier],
+	[RelatedActivityId] [uniqueidentifier],
  CONSTRAINT [PK_Traces] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC

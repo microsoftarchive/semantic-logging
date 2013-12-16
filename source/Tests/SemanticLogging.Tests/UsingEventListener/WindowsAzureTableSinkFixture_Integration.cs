@@ -155,7 +155,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
             listener.EnableEvents(Logger, EventLevel.LogAlways);
 
             Logger.Informational("Information message");
-            Logger.EventWithPayloadAndMessageAndRelatedActivityId(this.relatedActivityId, "", 0);
+            Logger.EventWithPayloadAndMessageAndRelatedActivityId(this.relatedActivityId, string.Empty, 0);
         }
 
         protected override void Teardown()

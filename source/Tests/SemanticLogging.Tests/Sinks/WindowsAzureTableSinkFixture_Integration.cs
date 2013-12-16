@@ -168,8 +168,117 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             StringAssert.Contains(actual.Payload, "arg1");
             StringAssert.Contains(actual.Payload, (string)entry.Payload["arg1"]);
             Assert.AreEqual("value arg1", actual.RawPayloadProperties["Payload_arg1"].StringValue);
-            Assert.AreEqual(entry.ActivityId, actual.ActivityId);
-            Assert.AreEqual(entry.RelatedActivityId, actual.RelatedActivityId);
+            Assert.AreEqual(entry.ActivityId, actual.ActivityId.Value);
+            Assert.AreEqual(entry.RelatedActivityId, actual.RelatedActivityId.Value);
+        }
+    }
+
+    [TestClass]
+    public class when_writing_single_entry_without_activity_ids : given_empty_account
+    {
+        private CloudEventEntry entry;
+
+        protected override void Act()
+        {
+            base.Act();
+            this.entry = new CloudEventEntry
+            {
+                EventId = 12,
+                ProviderId = Guid.NewGuid(),
+                ProviderName = "Provider Name",
+                EventDate = new DateTime(2013, 4, 10, 16, 0, 0, DateTimeKind.Utc),
+                Keywords = 16,
+                InstanceName = "Instance Name",
+                Level = (int)EventLevel.Informational,
+                Message = "My message",
+                Opcode = 4,
+                Task = 24,
+                Version = 2,
+                Payload = { { "arg1", "value arg1" } },
+            };
+            sink.OnNext(this.entry);
+        }
+
+        [TestMethod]
+        public void then_all_properties_are_written()
+        {
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
+
+            var table = client.GetTableReference(tableName);
+            var query = new TableQuery<TestCloudTableEntry>();
+            var actual = table.ExecuteQuery(query).Single();
+
+            Assert.AreEqual(entry.EventId, actual.EventId);
+            Assert.AreEqual(entry.ProviderId, actual.ProviderId);
+            Assert.AreEqual(entry.ProviderName, actual.ProviderName);
+            Assert.AreEqual(entry.EventDate, actual.EventDate);
+            Assert.AreEqual(entry.Keywords, actual.Keywords);
+            Assert.AreEqual(entry.InstanceName, actual.InstanceName);
+            Assert.AreEqual(entry.Level, actual.Level);
+            Assert.AreEqual(entry.Message, actual.Message);
+            Assert.AreEqual(entry.Opcode, actual.Opcode);
+            Assert.AreEqual(entry.Task, actual.Task);
+            Assert.AreEqual(entry.Version, actual.Version);
+            StringAssert.Contains(actual.Payload, "arg1");
+            StringAssert.Contains(actual.Payload, (string)entry.Payload["arg1"]);
+            Assert.AreEqual("value arg1", actual.RawPayloadProperties["Payload_arg1"].StringValue);
+            Assert.AreEqual(null, actual.ActivityId);
+            Assert.AreEqual(null, actual.RelatedActivityId);
+        }
+    }
+
+    [TestClass]
+    public class when_writing_single_entry_with_activity_id : given_empty_account
+    {
+        private CloudEventEntry entry;
+
+        protected override void Act()
+        {
+            base.Act();
+            this.entry = new CloudEventEntry
+            {
+                EventId = 12,
+                ProviderId = Guid.NewGuid(),
+                ProviderName = "Provider Name",
+                EventDate = new DateTime(2013, 4, 10, 16, 0, 0, DateTimeKind.Utc),
+                Keywords = 16,
+                InstanceName = "Instance Name",
+                Level = (int)EventLevel.Informational,
+                Message = "My message",
+                Opcode = 4,
+                Task = 24,
+                Version = 2,
+                Payload = { { "arg1", "value arg1" } },
+                ActivityId = Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}"),
+            };
+            sink.OnNext(this.entry);
+        }
+
+        [TestMethod]
+        public void then_all_properties_are_written()
+        {
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
+
+            var table = client.GetTableReference(tableName);
+            var query = new TableQuery<TestCloudTableEntry>();
+            var actual = table.ExecuteQuery(query).Single();
+
+            Assert.AreEqual(entry.EventId, actual.EventId);
+            Assert.AreEqual(entry.ProviderId, actual.ProviderId);
+            Assert.AreEqual(entry.ProviderName, actual.ProviderName);
+            Assert.AreEqual(entry.EventDate, actual.EventDate);
+            Assert.AreEqual(entry.Keywords, actual.Keywords);
+            Assert.AreEqual(entry.InstanceName, actual.InstanceName);
+            Assert.AreEqual(entry.Level, actual.Level);
+            Assert.AreEqual(entry.Message, actual.Message);
+            Assert.AreEqual(entry.Opcode, actual.Opcode);
+            Assert.AreEqual(entry.Task, actual.Task);
+            Assert.AreEqual(entry.Version, actual.Version);
+            StringAssert.Contains(actual.Payload, "arg1");
+            StringAssert.Contains(actual.Payload, (string)entry.Payload["arg1"]);
+            Assert.AreEqual("value arg1", actual.RawPayloadProperties["Payload_arg1"].StringValue);
+            Assert.AreEqual(entry.ActivityId, actual.ActivityId.Value);
+            Assert.AreEqual(null, actual.RelatedActivityId);
         }
     }
 

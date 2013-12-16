@@ -91,7 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 var timeCreated = element.Descendants(EventNS + "TimeCreated").Single();
                 var payload = element.Descendants(EventNS + "EventData").Single();
                 var message = element.Descendants(EventNS + "Message").Single();
-                var correlation = element.Descendants(EventNS + "Correlation").Single();
+                var correlation = element.Descendants(EventNS + "Correlation").SingleOrDefault();
 
                 Assert.AreEqual<Guid>(TestEventSource.Log.Guid, Guid.Parse(provider.Attribute("Guid").Value));
                 Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, Convert.ToInt32(eventId.Value));
@@ -108,8 +108,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("payload2", payload.Elements().Last().Attribute("Name").Value);
                 Assert.AreEqual("100", payload.Elements().Last().Value);
                 Assert.AreEqual("Test message Info 100", message.Value);
-                Assert.AreEqual(Guid.Empty, Guid.Parse(correlation.Attribute("ActivityID").Value));
-                Assert.AreEqual(Guid.Empty, Guid.Parse(correlation.Attribute("RelatedActivityID").Value));
+                Assert.IsNull(correlation);
             }
         }
 
@@ -172,7 +171,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("100", payload.Elements().Last().Value);
                 Assert.AreEqual("Test message Info 100", message.Value);
                 Assert.AreEqual(this.activityId, Guid.Parse(correlation.Attribute("ActivityID").Value));
-                Assert.AreEqual(Guid.Empty, Guid.Parse(correlation.Attribute("RelatedActivityID").Value));
+                Assert.IsNull(correlation.Attribute("RelatedActivityID"));
             }
         }
 

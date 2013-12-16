@@ -1,8 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using System.IO;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 using Newtonsoft.Json;
+using System;
+using System.IO;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
 {
@@ -96,10 +97,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 jsonWriter.WritePropertyName(PropertyNames.Timestamp);
                 jsonWriter.WriteValue(eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
 
-                jsonWriter.WritePropertyName(PropertyNames.ActivityId);
-                jsonWriter.WriteValue(eventEntry.ActivityId);
-                jsonWriter.WritePropertyName(PropertyNames.RelatedActivityId);
-                jsonWriter.WriteValue(eventEntry.RelatedActivityId);
+                if (eventEntry.ActivityId != Guid.Empty)
+                {
+                    jsonWriter.WritePropertyName(PropertyNames.ActivityId);
+                    jsonWriter.WriteValue(eventEntry.ActivityId);
+                }
+
+                if (eventEntry.RelatedActivityId != Guid.Empty)
+                {
+                    jsonWriter.WritePropertyName(PropertyNames.RelatedActivityId);
+                    jsonWriter.WriteValue(eventEntry.RelatedActivityId);
+                }
 
                 jsonWriter.WriteEndObject();
 

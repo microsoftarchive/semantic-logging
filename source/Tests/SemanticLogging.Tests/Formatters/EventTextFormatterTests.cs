@@ -219,7 +219,7 @@ EventName : FailureInfo");
         }
 
         [TestMethod]
-        public void WritesNonNullActivityIds()
+        public void WritesNonEmptyActivityIds()
         {
             var formatter = new EventTextFormatter();
             using (var writer = new StringWriter())
@@ -241,11 +241,218 @@ EventName : FailureInfo");
 
                 var message = writer.ToString();
 
-                var activityIdMatch = Regex.Match(message, "ActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
-                var relatedActivityIdMatch = Regex.Match(message, "RelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
 
                 Assert.AreEqual(activityId.ToString(), activityIdMatch);
                 Assert.AreEqual(relatedActivityId.ToString(), relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesNonEmptyActivityId()
+        {
+            var formatter = new EventTextFormatter();
+            using (var writer = new StringWriter())
+            {
+                var activityId = Guid.NewGuid();
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        activityId,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(activityId.ToString(), activityIdMatch);
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesNonEmptyRelatedActivityId()
+        {
+            var formatter = new EventTextFormatter();
+            using (var writer = new StringWriter())
+            {
+                var relatedActivityId = Guid.NewGuid();
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        Guid.Empty,
+                        relatedActivityId,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(string.Empty, activityIdMatch);
+                Assert.AreEqual(relatedActivityId.ToString(), relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void SkipsEmptyActivityIds()
+        {
+            var formatter = new EventTextFormatter();
+            using (var writer = new StringWriter())
+            {
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        Guid.Empty,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesNonEmptyActivityIdsOnSummary()
+        {
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.Critical);
+            using (var writer = new StringWriter())
+            {
+                var activityId = Guid.NewGuid();
+                var relatedActivityId = Guid.NewGuid();
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        activityId,
+                        relatedActivityId,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(activityId.ToString(), activityIdMatch);
+                Assert.AreEqual(relatedActivityId.ToString(), relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesNonEmptyActivityIdOnSummary()
+        {
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.Critical);
+            using (var writer = new StringWriter())
+            {
+                var activityId = Guid.NewGuid();
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        activityId,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(activityId.ToString(), activityIdMatch);
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesNonEmptyRelatedActivityIdOnSummary()
+        {
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.Critical);
+            using (var writer = new StringWriter())
+            {
+                var relatedActivityId = Guid.NewGuid();
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        Guid.Empty,
+                        relatedActivityId,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(string.Empty, activityIdMatch);
+                Assert.AreEqual(relatedActivityId.ToString(), relatedActivityIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void SkipsEmptyActivityIdsOnSummary()
+        {
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.Critical);
+            using (var writer = new StringWriter())
+            {
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        Guid.Empty,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var activityIdMatch = Regex.Match(message, "\\bActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+                var relatedActivityIdMatch = Regex.Match(message, "\\bRelatedActivityId : (?<id>[-A-Fa-f0-9]+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
+                Assert.AreEqual(string.Empty, relatedActivityIdMatch);
             }
         }
 
