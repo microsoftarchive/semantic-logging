@@ -202,6 +202,107 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 Assert.AreEqual("loading page test activityID=10", entry.FormattedMessage);
                 Assert.AreEqual(EventOpcode.Start, entry.Schema.Opcode);
                 Assert.AreEqual(3, entry.EventId);
+                Assert.AreEqual(Guid.Empty, entry.ActivityId);
+                Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_an_event_with_activity_id : given_traceEventService
+        {
+            private Guid activityId;
+
+            protected override void Given()
+            {
+                base.Given();
+                this.sut.Start();
+
+                this.activityId = Guid.NewGuid();
+            }
+
+            protected override void When()
+            {
+                Guid previousActivityId = Guid.Empty;
+
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(this.activityId, out previousActivityId);
+
+                    MyCompanyEventSource.Log.PageStart(10, "test");
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            [TestMethod]
+            public void then_event_is_collected_and_processed()
+            {
+                // Wait for event to be processed
+                inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout);
+
+                Assert.AreEqual(1, inMemoryListener.EventWrittenCount);
+                var entry = formatter.WriteEventCalls.FirstOrDefault();
+                Assert.IsNotNull(entry);
+
+                Assert.AreEqual(MyCompanyEventSource.Log.Name, entry.Schema.ProviderName);
+                Assert.AreEqual(sourceSettings.EventSourceId, entry.ProviderId);
+                Assert.AreEqual("loading page test activityID=10", entry.FormattedMessage);
+                Assert.AreEqual(EventOpcode.Start, entry.Schema.Opcode);
+                Assert.AreEqual(3, entry.EventId);
+                Assert.AreEqual(this.activityId, entry.ActivityId);
+                Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_an_event_with_activity_id_and_related_activity_id : given_traceEventService
+        {
+            private Guid activityId;
+            private Guid relatedActivityId;
+
+            protected override void Given()
+            {
+                base.Given();
+                this.sut.Start();
+
+                this.activityId = Guid.NewGuid();
+                this.relatedActivityId = Guid.NewGuid();
+            }
+
+            protected override void When()
+            {
+                Guid previousActivityId = Guid.Empty;
+
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(this.activityId, out previousActivityId);
+
+                    MyCompanyEventSource.Log.WithRelatedActivityId(this.relatedActivityId);
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            [TestMethod]
+            public void then_event_is_collected_and_processed()
+            {
+                // Wait for event to be processed
+                inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout);
+
+                Assert.AreEqual(1, inMemoryListener.EventWrittenCount);
+                var entry = formatter.WriteEventCalls.FirstOrDefault();
+                Assert.IsNotNull(entry);
+
+                Assert.AreEqual(MyCompanyEventSource.Log.Name, entry.Schema.ProviderName);
+                Assert.AreEqual(sourceSettings.EventSourceId, entry.ProviderId);
+                Assert.AreEqual(EventOpcode.Send, entry.Schema.Opcode);
+                Assert.AreEqual(11, entry.EventId);
+                Assert.AreEqual(this.activityId, entry.ActivityId);
+                Assert.AreEqual(this.relatedActivityId, entry.RelatedActivityId);
             }
         }
 
@@ -592,7 +693,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 this.domain2 = new DisposableDomain();
 
                 var initialManifest = EventSource.GenerateManifest(typeof(MyNewCompanyEventSource), null);
-                this.sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyNewCompanyEventSource)));                               
+                this.sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyNewCompanyEventSource)));
                 base.Given();
 
                 // We expect 2 events

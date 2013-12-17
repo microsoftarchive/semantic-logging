@@ -80,5 +80,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database
         /// </summary>
         /// <value>The event payload.</value>
         public string Payload { get; set; }
+
+        /// <summary>
+        /// Gets or sets the activity id.
+        /// </summary>
+        /// <value>The activity id.</value>
+        public Guid ActivityId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the related activity id.
+        /// </summary>
+        /// <value>The related activity id.</value>
+        public Guid RelatedActivityId { get; set; }
     }
 }

@@ -97,7 +97,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
 
             if (eventEntry.Schema.Level <= this.VerbosityThreshold || this.VerbosityThreshold == EventLevel.LogAlways)
             {
-                string format = "{0} : {1}";
+                const string format = "{0} : {1}";
 
                 // Write with verbosityThreshold format 
                 writer.WriteLine(format, PropertyNames.ProviderId, eventEntry.ProviderId);
@@ -111,11 +111,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 writer.WriteLine(format, PropertyNames.Payload, FormatPayload(eventEntry));
                 writer.WriteLine(format, PropertyNames.EventName, eventEntry.Schema.EventName);
                 writer.WriteLine(format, PropertyNames.Timestamp, eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+
+                if (eventEntry.ActivityId != Guid.Empty)
+                {
+                    writer.WriteLine(format, PropertyNames.ActivityId, eventEntry.ActivityId);
+                }
+
+                if (eventEntry.RelatedActivityId != Guid.Empty)
+                {
+                    writer.WriteLine(format, PropertyNames.RelatedActivityId, eventEntry.RelatedActivityId);
+                }
             }
             else
             {
                 // Write with summary format
-                writer.WriteLine(
+                writer.Write(
                     "{0} : {1}, {2} : {3}, {4} : {5}, {6} : {7}, {8} : {9}, {10} : {11}",
                     PropertyNames.EventId,
                     eventEntry.EventId,
@@ -129,6 +139,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                     eventEntry.Schema.EventName,
                     PropertyNames.Timestamp,
                     eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+
+                if (eventEntry.ActivityId != Guid.Empty)
+                {
+                    writer.Write(", {0} : {1}", PropertyNames.ActivityId, eventEntry.ActivityId);
+                }
+
+                if (eventEntry.RelatedActivityId != Guid.Empty)
+                {
+                    writer.Write(", {0} : {1}", PropertyNames.RelatedActivityId, eventEntry.RelatedActivityId);
+                }
+
+                writer.WriteLine();
             }
 
             // Write footer

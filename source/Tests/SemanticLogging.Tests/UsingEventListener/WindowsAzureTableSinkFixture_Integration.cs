@@ -134,6 +134,67 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
     }
 
     [TestClass]
+    public class when_writing_to_storage_with_activity_id : given_empty_account
+    {
+        private Guid activityId, relatedActivityId, previousActivityId;
+
+        protected override void Arrange()
+        {
+            base.Arrange();
+
+            this.activityId = Guid.NewGuid();
+            this.relatedActivityId = Guid.NewGuid();
+
+            EventSource.SetCurrentThreadActivityId(this.activityId, out this.previousActivityId);
+        }
+
+        protected override void Act()
+        {
+            base.Act();
+
+            listener.EnableEvents(Logger, EventLevel.LogAlways);
+
+            Logger.Informational("Information message");
+            Logger.EventWithPayloadAndMessageAndRelatedActivityId(this.relatedActivityId, string.Empty, 0);
+        }
+
+        protected override void Teardown()
+        {
+            base.Teardown();
+
+            EventSource.SetCurrentThreadActivityId(this.previousActivityId);
+        }
+
+        [TestMethod]
+        public void then_includes_activity_id_in_all_events()
+        {
+            var table = client.GetTableReference(tableName);
+            var query = new TableQuery<TestCloudTableEntry>();
+
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
+
+            var list = table.ExecuteQuery(query).ToArray();
+
+            Assert.AreEqual<int>(2, list.Count());
+            Assert.IsTrue(list.All(x => x.ActivityId == this.activityId));
+        }
+
+        [TestMethod]
+        public void then_includes_related_activity_id_in_event()
+        {
+            var table = client.GetTableReference(tableName);
+            var query = new TableQuery<TestCloudTableEntry>();
+
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
+
+            var list = table.ExecuteQuery(query).ToArray();
+
+            Assert.AreEqual<int>(2, list.Count());
+            Assert.AreEqual(this.relatedActivityId, list.First(x => x.EventId == TestEventSource.EventWithPayloadAndMessageAndRelatedActivityIdId).RelatedActivityId);
+        }
+    }
+
+    [TestClass]
     public class when_writing_with_version_opcode_level : given_empty_account
     {
         protected override void Act()

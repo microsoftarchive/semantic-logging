@@ -16,7 +16,9 @@ BEGIN
 		[Timestamp],
 		[Version],
 		[FormattedMessage],
-		[Payload]
+		[Payload],
+		[ActivityId],
+		[RelatedActivityId]
 	)
   SELECT * FROM @InsertTraces;
 END

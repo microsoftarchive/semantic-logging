@@ -240,6 +240,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 sqlBulkCopy.ColumnMappings.Add("Version", "Version");
                 sqlBulkCopy.ColumnMappings.Add("FormattedMessage", "FormattedMessage");
                 sqlBulkCopy.ColumnMappings.Add("Payload", "Payload");
+                sqlBulkCopy.ColumnMappings.Add("ActivityId", "ActivityId");
+                sqlBulkCopy.ColumnMappings.Add("RelatedActivityId", "RelatedActivityId");
 
                 await this.retryPolicy.ExecuteAsync(() => sqlBulkCopy.WriteToServerAsync(reader, token), token).ConfigureAwait(false);
             }
@@ -251,23 +253,23 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
             await this.retryPolicy.ExecuteAsync(
                 async () =>
+                {
+                    using (var conn = new SqlConnection(this.connectionString))
                     {
-                        using (var conn = new SqlConnection(this.connectionString))
+                        await conn.SuppressTransactionOpenAsync(token).ConfigureAwait(false);
+
+                        using (var reader = new EventEntryDataReader(collection))
+                        using (var cmd = new SqlCommand("dbo.WriteTraces", conn))
                         {
-                            await conn.SuppressTransactionOpenAsync(token).ConfigureAwait(false);
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.Add(new SqlParameter("@InsertTraces", SqlDbType.Structured));
+                            cmd.Parameters[0].Value = reader;
+                            cmd.Parameters[0].TypeName = "dbo.TracesType";
 
-                            using (var reader = new EventEntryDataReader(collection))
-                            using (var cmd = new SqlCommand("dbo.WriteTraces", conn))
-                            {
-                                cmd.CommandType = CommandType.StoredProcedure;
-                                cmd.Parameters.Add(new SqlParameter("@InsertTraces", SqlDbType.Structured));
-                                cmd.Parameters[0].Value = reader;
-                                cmd.Parameters[0].TypeName = "dbo.TracesType";
-
-                                return await cmd.ExecuteNonQueryAsync(token).ConfigureAwait(false);
-                            }
+                            return await cmd.ExecuteNonQueryAsync(token).ConfigureAwait(false);
                         }
-                    },
+                    }
+                },
                 token).ConfigureAwait(false);
         }
 

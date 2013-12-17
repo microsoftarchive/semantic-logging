@@ -91,6 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 var timeCreated = element.Descendants(EventNS + "TimeCreated").Single();
                 var payload = element.Descendants(EventNS + "EventData").Single();
                 var message = element.Descendants(EventNS + "Message").Single();
+                var correlation = element.Descendants(EventNS + "Correlation").SingleOrDefault();
 
                 Assert.AreEqual<Guid>(TestEventSource.Log.Guid, Guid.Parse(provider.Attribute("Guid").Value));
                 Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, Convert.ToInt32(eventId.Value));
@@ -107,6 +108,135 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("payload2", payload.Elements().Last().Attribute("Name").Value);
                 Assert.AreEqual("100", payload.Elements().Last().Value);
                 Assert.AreEqual("Test message Info 100", message.Value);
+                Assert.IsNull(correlation);
+            }
+        }
+
+        [TestClass]
+        public class when_receiving_event_with_payload_and_message_with_ambient_activity_id : given_xml_event_text_formatter
+        {
+            private Guid activityId;
+            private Guid previousActivityId;
+
+            protected override void Given()
+            {
+                base.Given();
+
+                this.activityId = Guid.NewGuid();
+                EventSource.SetCurrentThreadActivityId(this.activityId, out this.previousActivityId);
+            }
+
+            protected override void When()
+            {
+                logger.EventWithPayloadAndMessage("Info", 100);
+            }
+
+            protected override void OnCleanup()
+            {
+                base.OnCleanup();
+
+                EventSource.SetCurrentThreadActivityId(this.previousActivityId);
+            }
+
+            [TestMethod]
+            public void then_writes_event_data()
+            {
+                var element = this.Entries.Single();
+
+                var provider = element.Descendants(EventNS + "Provider").Single();
+                var eventId = element.Descendants(EventNS + "EventID").Single();
+                var version = element.Descendants(EventNS + "Version").Single();
+                var level = element.Descendants(EventNS + "Level").Single();
+                var task = element.Descendants(EventNS + "Task").Single();
+                var opcode = element.Descendants(EventNS + "Opcode").Single();
+                var keywords = element.Descendants(EventNS + "Keywords").Single();
+                var timeCreated = element.Descendants(EventNS + "TimeCreated").Single();
+                var payload = element.Descendants(EventNS + "EventData").Single();
+                var message = element.Descendants(EventNS + "Message").Single();
+                var correlation = element.Descendants(EventNS + "Correlation").Single();
+
+                Assert.AreEqual<Guid>(TestEventSource.Log.Guid, Guid.Parse(provider.Attribute("Guid").Value));
+                Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, Convert.ToInt32(eventId.Value));
+                Assert.AreEqual<byte>(0, Convert.ToByte(version.Value));
+                Assert.AreEqual<int>((int)EventLevel.Warning, Int32.Parse(level.Value));
+                Assert.AreEqual<int>(65331, Int32.Parse(task.Value));
+                Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(keywords.Value.Replace("0x", string.Empty)));
+                Assert.AreEqual<int>((int)EventOpcode.Info, Int32.Parse(opcode.Value));
+                DateTime dt;
+                Assert.IsTrue(DateTime.TryParseExact(timeCreated.Attribute("SystemTime").Value, formatter.DateTimeFormat ?? EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
+                Assert.AreEqual(2, payload.Elements().Count());
+                Assert.AreEqual("payload1", payload.Elements().First().Attribute("Name").Value);
+                Assert.AreEqual("Info", payload.Elements().First().Value);
+                Assert.AreEqual("payload2", payload.Elements().Last().Attribute("Name").Value);
+                Assert.AreEqual("100", payload.Elements().Last().Value);
+                Assert.AreEqual("Test message Info 100", message.Value);
+                Assert.AreEqual(this.activityId, Guid.Parse(correlation.Attribute("ActivityID").Value));
+                Assert.IsNull(correlation.Attribute("RelatedActivityID"));
+            }
+        }
+
+        [TestClass]
+        public class when_receiving_event_with_payload_and_message_and_related_activity_id_with_ambient_activity_id : given_xml_event_text_formatter
+        {
+            private Guid activityId;
+            private Guid relatedActivityId;
+            private Guid previousActivityId;
+
+            protected override void Given()
+            {
+                base.Given();
+
+                this.activityId = Guid.NewGuid();
+                this.relatedActivityId = Guid.NewGuid();
+                EventSource.SetCurrentThreadActivityId(this.activityId, out this.previousActivityId);
+            }
+
+            protected override void When()
+            {
+                logger.EventWithPayloadAndMessageAndRelatedActivityId(this.relatedActivityId, "Info", 100);
+            }
+
+            protected override void OnCleanup()
+            {
+                base.OnCleanup();
+
+                EventSource.SetCurrentThreadActivityId(this.previousActivityId);
+            }
+
+            [TestMethod]
+            public void then_writes_event_data()
+            {
+                var element = this.Entries.Single();
+
+                var provider = element.Descendants(EventNS + "Provider").Single();
+                var eventId = element.Descendants(EventNS + "EventID").Single();
+                var version = element.Descendants(EventNS + "Version").Single();
+                var level = element.Descendants(EventNS + "Level").Single();
+                var task = element.Descendants(EventNS + "Task").Single();
+                var opcode = element.Descendants(EventNS + "Opcode").Single();
+                var keywords = element.Descendants(EventNS + "Keywords").Single();
+                var timeCreated = element.Descendants(EventNS + "TimeCreated").Single();
+                var payload = element.Descendants(EventNS + "EventData").Single();
+                var message = element.Descendants(EventNS + "Message").Single();
+                var correlation = element.Descendants(EventNS + "Correlation").Single();
+
+                Assert.AreEqual<Guid>(TestEventSource.Log.Guid, Guid.Parse(provider.Attribute("Guid").Value));
+                Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageAndRelatedActivityIdId, Convert.ToInt32(eventId.Value));
+                Assert.AreEqual<byte>(0, Convert.ToByte(version.Value));
+                Assert.AreEqual<int>((int)EventLevel.Warning, Int32.Parse(level.Value));
+                Assert.AreEqual<int>((int)TestEventSource.Tasks.Other, Int32.Parse(task.Value));
+                Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(keywords.Value.Replace("0x", string.Empty)));
+                Assert.AreEqual<int>((int)EventOpcode.Send, Int32.Parse(opcode.Value));
+                DateTime dt;
+                Assert.IsTrue(DateTime.TryParseExact(timeCreated.Attribute("SystemTime").Value, formatter.DateTimeFormat ?? EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
+                Assert.AreEqual(2, payload.Elements().Count());
+                Assert.AreEqual("payload1", payload.Elements().First().Attribute("Name").Value);
+                Assert.AreEqual("Info", payload.Elements().First().Value);
+                Assert.AreEqual("payload2", payload.Elements().Last().Attribute("Name").Value);
+                Assert.AreEqual("100", payload.Elements().Last().Value);
+                Assert.AreEqual("Test message Info 100", message.Value);
+                Assert.AreEqual(this.activityId, Guid.Parse(correlation.Attribute("ActivityID").Value));
+                Assert.AreEqual(this.relatedActivityId, Guid.Parse(correlation.Attribute("RelatedActivityID").Value));
             }
         }
 

@@ -11,5 +11,7 @@ CREATE TYPE TracesType AS TABLE
 	[Timestamp] [datetimeoffset](7),
 	[Version] [int],
 	[FormattedMessage] [nvarchar](4000),
-	[Payload] [nvarchar](4000)
+	[Payload] [nvarchar](4000),
+    [ActivityId] [uniqueidentifier], 
+    [RelatedActivityId] [uniqueidentifier]
 );

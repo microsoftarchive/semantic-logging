@@ -277,13 +277,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
             private void CheckParametersOrder()
             {
+                MethodInfo eventMethod = this.analyzer.GetMethodFromSchema(this.EventData.EventSource, this.eventSchema);
+                ParameterInfo[] eventParameters = eventMethod.GetParameters();
+                int payloadParameterOffset = 0;
+                if (this.HasRelatedActivityId(eventParameters))
+                {
+                    if (this.TypeOrderOffset == 0)
+                    {
+                        // ignore the relatedActivityId parameter (first by convention)
+                        return;
+                    }
+
+                    payloadParameterOffset = 1;
+                }
+
                 //// If we get the default value then order is wrong becase 
                 //// we should get a value != default
-                if (this.EventData.Payload[this.TypeOrderOffset].IsDefault())
+                if (this.EventData.Payload[this.TypeOrderOffset - payloadParameterOffset].IsDefault())
                 {
-                    MethodInfo eventMethod = this.analyzer.GetMethodFromSchema(this.EventData.EventSource, this.eventSchema);
-                    ParameterInfo[] eventParameters = eventMethod.GetParameters();
-
                     this.Error = new EventSourceAnalyzerException(string.Format(CultureInfo.CurrentCulture,
                         Properties.Resources.EventSourceAnalyzerMismatchParametersOrder,
                         eventParameters[this.TypeOrderOffset].Name,
@@ -295,14 +306,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             {
                 MethodInfo eventMethod = this.analyzer.GetMethodFromSchema(this.EventData.EventSource, this.eventSchema);
                 ParameterInfo[] eventParameters = eventMethod.GetParameters();
+                int payloadParameterOffset = HasRelatedActivityId(eventParameters) ? 1 : 0;
 
-                if (eventParameters.Length != this.EventData.Payload.Count)
+                if (eventParameters.Length != this.EventData.Payload.Count + payloadParameterOffset)
                 {
                     this.Error = new EventSourceAnalyzerException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.EventSourceAnalyzerDifferentParameterCount, eventMethod.Name));
                     return;
                 }
 
-                for (int i = 0; i < eventParameters.Length; i++)
+                for (int i = 0; i < this.EventData.Payload.Count; i++)
                 {
                     if (this.EventData.Payload[i] == null)
                     {
@@ -310,7 +322,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                         this.Error = new EventSourceAnalyzerException(string.Format(CultureInfo.CurrentCulture,
                             Properties.Resources.EventSourceAnalyzerNullPayloadValue,
                             i,
-                            eventParameters[i].Name,
+                            eventParameters[i + payloadParameterOffset].Name,
                             eventMethod.Name));
                         break;
                     }
@@ -319,17 +331,30 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
                     //// Check that event args types matches WriteEvent arg types
                     if (!this.analyzer.ExcludeWriteEventTypeMapping &&
-                        !EqualTypes(eventParameters[i].ParameterType, payloadType))
+                        !EqualTypes(eventParameters[i + payloadParameterOffset].ParameterType, payloadType))
                     {
                         this.Error = new EventSourceAnalyzerException(string.Format(CultureInfo.CurrentCulture,
                             Properties.Resources.EventSourceAnalyzerMismatchParametersType,
-                            eventParameters[i].Name,
-                            eventParameters[i].ParameterType,
+                            eventParameters[i + payloadParameterOffset].Name,
+                            eventParameters[i + payloadParameterOffset].ParameterType,
                             payloadType,
                             eventMethod.Name));
                         break;
                     }
                 }
+            }
+
+            private bool HasRelatedActivityId(ParameterInfo[] eventParameters)
+            {
+                if (eventParameters.Length > 0
+                    && eventParameters[0].ParameterType == typeof(Guid)
+                    && string.Equals(eventParameters[0].Name, "relatedActivityId", StringComparison.Ordinal)
+                    && (this.eventSchema.Opcode == EventOpcode.Send || this.eventSchema.Opcode == EventOpcode.Receive))
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
     }

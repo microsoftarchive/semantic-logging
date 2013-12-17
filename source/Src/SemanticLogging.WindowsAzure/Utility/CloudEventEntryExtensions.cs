@@ -49,7 +49,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 Opcode = (int)entry.Schema.Opcode,
                 Task = (int)entry.Schema.Task,
                 Version = entry.Schema.Version,
-                EventDate = entry.Timestamp.UtcDateTime
+                EventDate = entry.Timestamp.UtcDateTime,
+                ActivityId = entry.ActivityId,
+                RelatedActivityId = entry.RelatedActivityId
             };
 
             if (!InitializePayload(entity, entry.Payload, entry.Schema))
