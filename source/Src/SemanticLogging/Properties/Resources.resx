@@ -192,4 +192,7 @@ Manifest:
   <data name="EventSourceAnalyzerBadFormedManifestError" xml:space="preserve">
     <value>An event type argument could not be properly serialized into an event source manifest. Verify any use of Enums whose base type is other than Int32 or Int64 and replace it with any of these allowed types. For more infromation about issues using Enums read: http://connect.microsoft.com/VisualStudio/feedback/details/785409/eventsource-manifest-generation-creates-wrong-map-values-for-enum-types-other-than-int32-or-int64</value>
   </data>
+  <data name="ArgumentMustBeObservableEventListener" xml:space="preserve">
+    <value>The argument must be an instance of ObservableEventListener.</value>
+  </data>
 </root>

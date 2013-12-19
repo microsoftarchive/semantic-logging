@@ -54,6 +54,7 @@
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ConsoleLog.cs" />
+    <Compile Include="EventListenerExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="SemanticLoggingEventSourceResources.Designer.cs">
       <AutoGen>True</AutoGen>

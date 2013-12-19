@@ -97,29 +97,29 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
 
             if (eventEntry.Schema.Level <= this.VerbosityThreshold || this.VerbosityThreshold == EventLevel.LogAlways)
             {
-                const string format = "{0} : {1}";
+                const string Format = "{0} : {1}";
 
                 // Write with verbosityThreshold format 
-                writer.WriteLine(format, PropertyNames.ProviderId, eventEntry.ProviderId);
-                writer.WriteLine(format, PropertyNames.EventId, eventEntry.EventId);
-                writer.WriteLine(format, PropertyNames.Keywords, eventEntry.Schema.Keywords);
-                writer.WriteLine(format, PropertyNames.Level, eventEntry.Schema.Level);
-                writer.WriteLine(format, PropertyNames.Message, eventEntry.FormattedMessage);
-                writer.WriteLine(format, PropertyNames.Opcode, eventEntry.Schema.Opcode);
-                writer.WriteLine(format, PropertyNames.Task, eventEntry.Schema.Task);
-                writer.WriteLine(format, PropertyNames.Version, eventEntry.Schema.Version);
-                writer.WriteLine(format, PropertyNames.Payload, FormatPayload(eventEntry));
-                writer.WriteLine(format, PropertyNames.EventName, eventEntry.Schema.EventName);
-                writer.WriteLine(format, PropertyNames.Timestamp, eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+                writer.WriteLine(Format, PropertyNames.ProviderId, eventEntry.ProviderId);
+                writer.WriteLine(Format, PropertyNames.EventId, eventEntry.EventId);
+                writer.WriteLine(Format, PropertyNames.Keywords, eventEntry.Schema.Keywords);
+                writer.WriteLine(Format, PropertyNames.Level, eventEntry.Schema.Level);
+                writer.WriteLine(Format, PropertyNames.Message, eventEntry.FormattedMessage);
+                writer.WriteLine(Format, PropertyNames.Opcode, eventEntry.Schema.Opcode);
+                writer.WriteLine(Format, PropertyNames.Task, eventEntry.Schema.Task);
+                writer.WriteLine(Format, PropertyNames.Version, eventEntry.Schema.Version);
+                writer.WriteLine(Format, PropertyNames.Payload, FormatPayload(eventEntry));
+                writer.WriteLine(Format, PropertyNames.EventName, eventEntry.Schema.EventName);
+                writer.WriteLine(Format, PropertyNames.Timestamp, eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
 
                 if (eventEntry.ActivityId != Guid.Empty)
                 {
-                    writer.WriteLine(format, PropertyNames.ActivityId, eventEntry.ActivityId);
+                    writer.WriteLine(Format, PropertyNames.ActivityId, eventEntry.ActivityId);
                 }
 
                 if (eventEntry.RelatedActivityId != Guid.Empty)
                 {
-                    writer.WriteLine(format, PropertyNames.RelatedActivityId, eventEntry.RelatedActivityId);
+                    writer.WriteLine(Format, PropertyNames.RelatedActivityId, eventEntry.RelatedActivityId);
                 }
             }
             else
