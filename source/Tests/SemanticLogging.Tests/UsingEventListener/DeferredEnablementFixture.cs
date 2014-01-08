@@ -346,8 +346,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
     [EventSource(Name = "SensingEventSource")]
     public sealed class SensingEventSource : EventSource
     {
-        public static SensingEventSource Log { get { return LogHolder.Value; } }
-        private static Lazy<SensingEventSource> LogHolder = new Lazy<SensingEventSource>(() => new SensingEventSource());
+        public static SensingEventSource Log { get { return logHolder.Value; } }
+        private static Lazy<SensingEventSource> logHolder = new Lazy<SensingEventSource>(() => new SensingEventSource());
 
         public readonly List<IDictionary<string, string>> Commands = new List<IDictionary<string, string>>();
 
@@ -366,8 +366,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
     [EventSource(Name = "DeferredEventSource1")]
     public sealed class DeferredEventSource1 : EventSource
     {
-        public static DeferredEventSource1 Log { get { return LogHolder.Value; } }
-        private static Lazy<DeferredEventSource1> LogHolder = new Lazy<DeferredEventSource1>(() => new DeferredEventSource1());
+        public static DeferredEventSource1 Log { get { return logHolder.Value; } }
+        private static Lazy<DeferredEventSource1> logHolder = new Lazy<DeferredEventSource1>(() => new DeferredEventSource1());
 
         private DeferredEventSource1()
         {
@@ -377,8 +377,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
     [EventSource(Name = "DeferredEventSource2")]
     public sealed class DeferredEventSource2 : EventSource
     {
-        public static DeferredEventSource2 Log { get { return LogHolder.Value; } }
-        private static Lazy<DeferredEventSource2> LogHolder = new Lazy<DeferredEventSource2>(() => new DeferredEventSource2());
+        public static DeferredEventSource2 Log { get { return logHolder.Value; } }
+        private static Lazy<DeferredEventSource2> logHolder = new Lazy<DeferredEventSource2>(() => new DeferredEventSource2());
 
         private DeferredEventSource2()
         {
@@ -388,8 +388,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
     [EventSource(Name = "DeferredEventSource3")]
     public sealed class DeferredEventSource3 : EventSource
     {
-        public static DeferredEventSource3 Log { get { return LogHolder.Value; } }
-        private static Lazy<DeferredEventSource3> LogHolder = new Lazy<DeferredEventSource3>(() => new DeferredEventSource3());
+        public static DeferredEventSource3 Log { get { return logHolder.Value; } }
+        private static Lazy<DeferredEventSource3> logHolder = new Lazy<DeferredEventSource3>(() => new DeferredEventSource3());
 
         private DeferredEventSource3()
         {
