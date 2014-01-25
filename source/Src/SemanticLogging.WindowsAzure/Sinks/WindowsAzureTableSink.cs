@@ -157,8 +157,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
         internal virtual Task<IList<TableResult>> ExecuteBatchAsync(TableBatchOperation batch)
         {
-            this.cancellationTokenSource.Token.ThrowIfCancellationRequested();
-            return FromCancellableAsync(this.table.BeginExecuteBatch, this.table.EndExecuteBatch, batch, this.cancellationTokenSource.Token);
+            return this.table.ExecuteBatchAsync(batch, this.cancellationTokenSource.Token);
         }
 
         internal virtual async Task<bool> EnsureTableExistsAsync()
@@ -171,7 +170,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
             try
             {
-                await FromCancellableAsync(this.table.BeginCreateIfNotExists, this.table.EndCreateIfNotExists, token).ConfigureAwait(false);
+                await this.table.CreateIfNotExistsAsync(token).ConfigureAwait(false);
                 return true;
             }
             catch (OperationCanceledException)
@@ -300,30 +299,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
 
             return approximateEntitySize;
-        }
-
-        private static Task<TResult> FromCancellableAsync<TResult>(Func<AsyncCallback, object, ICancellableAsyncResult> beginMethod, Func<IAsyncResult, TResult> endMethod, CancellationToken token)
-        {
-            ICancellableAsyncResult result = beginMethod(null, null);
-            var cancellationRegistration = token.Register(result.Cancel);
-
-            return Task.Factory.FromAsync(result, asyncResult =>
-            {
-                cancellationRegistration.Dispose();
-                return endMethod(asyncResult);
-            });
-        }
-
-        private static Task<TResult> FromCancellableAsync<TArg1, TResult>(Func<TArg1, AsyncCallback, object, ICancellableAsyncResult> beginMethod, Func<IAsyncResult, TResult> endMethod, TArg1 arg1, CancellationToken token)
-        {
-            ICancellableAsyncResult result = beginMethod(arg1, null, null);
-            var cancellationRegistration = token.Register(result.Cancel);
-
-            return Task.Factory.FromAsync(result, asyncResult =>
-            {
-                cancellationRegistration.Dispose();
-                return endMethod(asyncResult);
-            });
         }
 
         private static bool IsOperationCanceled(StorageException ex)
