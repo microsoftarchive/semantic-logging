@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30110.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging", "Src\SemanticLogging\SemanticLogging.csproj", "{2CD4105B-0DD6-4C18-9B37-05D8E8F57303}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Tests", "Tests\SemanticLogging.Tests\SemanticLogging.Tests.csproj", "{1735E7F3-65BA-4E29-B319-6C2CA03659D1}"
@@ -14,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.WindowsAzure", "Src\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj", "{D7979E9B-7978-48FE-B345-3C767A20F9A1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Database", "Src\SemanticLogging.Database\SemanticLogging.Database.csproj", "{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.ElasticSearch", "SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj", "{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +53,10 @@ Global
 		{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
