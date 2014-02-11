@@ -90,12 +90,6 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>SupportDlls\Interop.Dia2Lib.dll</HintPath>
     </Reference>
-    <Reference Include="StyleCop">
-      <HintPath>..\..\packages\StyleCop.4.7.44.0\lib\net35\StyleCop.dll</HintPath>
-    </Reference>
-    <Reference Include="StyleCop.CSharp">
-      <HintPath>..\..\packages\StyleCop.4.7.44.0\lib\net35\StyleCop.CSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
@@ -111,9 +105,6 @@
     <Content Include="SupportDlls\x86\dbghelp.dll" />
     <Content Include="SupportDlls\x86\KernelTraceControl.dll" />
     <Content Include="SupportDlls\x86\symsrv.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <DefineConstants Condition=" '$(SignAssembly)' == 'true' ">$(DefineConstants);SIGN</DefineConstants>
