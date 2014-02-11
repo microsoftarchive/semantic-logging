@@ -32,8 +32,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
             var subject = new EventEntrySubject();
             subject.LogToElasticSearch(
                 (string) element.Attribute("instanceName"),
-                (string) element.Attribute("hostName"),
-                (int) element.Attribute("portNumber"),
+                (string) element.Attribute("esUrl"),
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ??
                 Constants.DefaultBufferingFlushAllTimeout,

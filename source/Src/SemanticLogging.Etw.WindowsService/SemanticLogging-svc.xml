@@ -9,16 +9,11 @@
   <!-- Sinks reference definitons used by this host to listen ETW events -->
   <sinks>
     <!-- The service identity should have security permissions to access the resource according to each event sink -->
-    <flatFileSink name="svcRuntime" fileName="SemanticLogging-svc.runtime.log" >
+    <elasticSearchSink name="ElasticSearch" bufferingIntervalInSeconds="5" instanceName="SLAB" esUrl="http://localhost:9200/">
       <sources>
-        <!-- The below settings shows a simple configuration sample for the buit-in non-transient fault tracing -->
-        <!-- Remove this eventSource if you'd like, and add your own configuration according to the documentation -->
-        <!-- The name attribute is from the EventSource.Name Property -->
-        <eventSource name="Microsoft-SemanticLogging" level="Warning"/>
+        <eventSource name="Proactima-UXRisk" level="LogAlways"/>
       </sources>
-      <!--[Add any built-in or custom formatter here if the sink supports text formatters]-->
-      <eventTextFormatter header="----------"/>
-    </flatFileSink>
+    </elasticSearchSink>
     
     <!--[Add any built-in or custom sink definition here]-->
   

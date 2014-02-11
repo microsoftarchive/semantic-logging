@@ -20,10 +20,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private readonly string hostName;
+        private readonly string esUrl;
         private readonly string instanceName;
         private readonly TimeSpan onCompletedTimeout;
-        private readonly int portNumber;
 
 
         /// <summary>
@@ -38,18 +37,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public ElasticSearchSink(string instanceName, string hostName, int portNumber, TimeSpan bufferInterval,
+        public ElasticSearchSink(string instanceName, string esUrl, TimeSpan bufferInterval,
             int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
-            Guard.ArgumentNotNullOrEmpty(hostName, "hostName");
+            Guard.ArgumentNotNullOrEmpty(esUrl, "esUrl");
             Guard.ArgumentIsValidTimeout(onCompletedTimeout, "onCompletedTimeout");
 
             this.onCompletedTimeout = onCompletedTimeout;
 
             this.instanceName = instanceName;
-            this.hostName = hostName;
-            this.portNumber = portNumber;
+            this.esUrl = esUrl;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
             bufferedPublisher = new BufferedEventPublisher<JsonEventEntry>(sinkId, PublishEventsAsync, bufferInterval,
                 BufferCountTrigger, maxBufferSize, cancellationTokenSource.Token);
@@ -128,15 +126,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
             var bulkMessage = new StringBuilder();
 
-            var es = new ElasticSearchLogEntry {Index = "ind", Type = "slab"};
+            var es = new ElasticSearchLogEntry { Type = "etw" };
             foreach (var entry in collection)
             {
+                es.Index = GetIndexName(instanceName, entry.EventDate);
                 es.LogEntry = entry;
                 bulkMessage.Append(JsonConvert.SerializeObject(es));
             }
 
             var client = new HttpClient();
-            var uri = new Uri(String.Format("http://{0}:{1}/_bulk", hostName, portNumber));
+            var uri = new Uri(String.Format("{0}/_bulk", esUrl));
             var content = new StringContent(bulkMessage.ToString());
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             try
@@ -156,6 +155,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             {
                 return 0;
             }
+        }
+
+        private static string GetIndexName(string instanceName, DateTime entryDateTime)
+        {
+            return String.Format("{0}-{1}", instanceName, entryDateTime.ToString("yyyy.MM.dd"));
         }
 
         private void FlushSafe()
