@@ -14,6 +14,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             EventDate = DateTime.UtcNow;
         }
 
+        public string Id { get; set; }
+
         /// <summary>
         /// Gets or sets the event identifier.
         /// </summary>

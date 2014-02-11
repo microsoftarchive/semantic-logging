@@ -51,6 +51,12 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="StyleCop">
+      <HintPath>..\..\packages\StyleCop.4.7.44.0\lib\net35\StyleCop.dll</HintPath>
+    </Reference>
+    <Reference Include="StyleCop.CSharp">
+      <HintPath>..\..\packages\StyleCop.4.7.44.0\lib\net35\StyleCop.CSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -88,6 +94,7 @@
     <Compile Include="Configuration\SinkSettingsEqualityComparer.cs" />
     <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="Configuration\TraceEventServiceElement.cs" />
+    <Compile Include="Configuration\ElasticSearchSinkElement.cs" />
     <Compile Include="Configuration\WindowsAzureTableSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="TraceEventSchemaCache.cs" />
@@ -128,6 +135,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
+      <Name>SemanticLogging.ElasticSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
       <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>
       <Name>SemanticLogging.WindowsAzure</Name>
