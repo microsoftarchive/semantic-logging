@@ -20,7 +20,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private readonly string esUrl;
+        private readonly string connectionString;
+        private readonly string index;
+        private readonly string type;
         private readonly string instanceName;
         private readonly TimeSpan onCompletedTimeout;
 
@@ -29,25 +31,30 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Initializes a new instance of the <see cref="WindowsAzureTableSink"/> class with the specified connection string and table address.
         /// </summary>
         /// <param name="instanceName">The name of the instance originating the entries.</param>
-        /// <param name="hostName">The connection string for the storage account.</param>
-        /// <param name="portNumber">Default 9200, specify...</param>
+        /// <param name="connectionString">The connection string for the storage account.</param>
+        /// <param name="index">Default logstash</param>
+        /// <param name="type">Default etw</param>
         /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Windows Azure Storage.</param>
         /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="OnCompleted"/> call is received and before disposing the sink.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public ElasticSearchSink(string instanceName, string esUrl, TimeSpan bufferInterval,
+        public ElasticSearchSink(string instanceName, string connectionString,string index, string type, TimeSpan bufferInterval,
             int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
-            Guard.ArgumentNotNullOrEmpty(esUrl, "esUrl");
+            Guard.ArgumentNotNullOrEmpty(connectionString, "connectionString");
+            Guard.ArgumentNotNullOrEmpty(index, "index");
+            Guard.ArgumentNotNullOrEmpty(type, "type");
             Guard.ArgumentIsValidTimeout(onCompletedTimeout, "onCompletedTimeout");
 
             this.onCompletedTimeout = onCompletedTimeout;
 
             this.instanceName = instanceName;
-            this.esUrl = esUrl;
+            this.connectionString = connectionString;
+            this.index = index;
+            this.type = type;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
             bufferedPublisher = new BufferedEventPublisher<JsonEventEntry>(sinkId, PublishEventsAsync, bufferInterval,
                 BufferCountTrigger, maxBufferSize, cancellationTokenSource.Token);
@@ -126,16 +133,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
             var bulkMessage = new StringBuilder();
 
-            var es = new ElasticSearchLogEntry { Type = "etw" };
+            var es = new ElasticSearchLogEntry { Type = type };
             foreach (var entry in collection)
             {
-                es.Index = GetIndexName(instanceName, entry.EventDate);
+                es.Index = GetIndexName(index, entry.EventDate);
                 es.LogEntry = entry;
                 bulkMessage.Append(JsonConvert.SerializeObject(es));
             }
 
             var client = new HttpClient();
-            var uri = new Uri(String.Format("{0}/_bulk", esUrl));
+            var uri = new Uri(String.Format("{0}/_bulk", connectionString));
             var content = new StringContent(bulkMessage.ToString());
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             try
@@ -157,9 +164,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private static string GetIndexName(string instanceName, DateTime entryDateTime)
+        private static string GetIndexName(string indexName, DateTime entryDateTime)
         {
-            return String.Format("{0}-{1}", instanceName, entryDateTime.ToString("yyyy.MM.dd"));
+            return String.Format("{0}-{1}", indexName, entryDateTime.ToString("yyyy.MM.dd"));
         }
 
         private void FlushSafe()

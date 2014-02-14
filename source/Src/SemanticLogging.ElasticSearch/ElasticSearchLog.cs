@@ -12,11 +12,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
     public static class ElasticSearchLog
     {
         public static SinkSubscription<ElasticSearchSink> LogToElasticSearch(this IObservable<EventEntry> eventStream,
-            string instanceName, string esUrl, TimeSpan? bufferingInterval = null,
+            string instanceName, string connectionString, string index, string type ,TimeSpan? bufferingInterval = null,
             TimeSpan? onCompletedTimeout = null,
             int maxBufferSize = Buffering.DefaultMaxBufferSize)
         {
-            var sink = new ElasticSearchSink(instanceName, esUrl,
+            var sink = new ElasticSearchSink(instanceName, connectionString, index, type,
                 bufferingInterval ?? Buffering.DefaultBufferingInterval,
                 maxBufferSize,
                 onCompletedTimeout ?? Timeout.InfiniteTimeSpan);
@@ -25,11 +25,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             return new SinkSubscription<ElasticSearchSink>(subscription, sink);
         }
 
-        public static EventListener CreateListener(string instanceName, string esUrl,
+        public static EventListener CreateListener(string instanceName, string connectionString,string index, string type,
             TimeSpan? bufferingInterval = null, TimeSpan? listenerDisposeTimeout = null, int maxBufferSize = Buffering.DefaultMaxBufferSize)
         {
             var listener = new ObservableEventListener();
-            listener.LogToElasticSearch(instanceName, esUrl, bufferingInterval,
+            listener.LogToElasticSearch(instanceName, connectionString,index, type, bufferingInterval,
                 listenerDisposeTimeout, maxBufferSize);
             return listener;
         }
