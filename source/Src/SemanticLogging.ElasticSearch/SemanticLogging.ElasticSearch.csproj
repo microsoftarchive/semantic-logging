@@ -63,7 +63,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Src\SemanticLogging\SemanticLogging.csproj">
+    <ProjectReference Include="..\SemanticLogging\SemanticLogging.csproj">
       <Project>{2cd4105b-0dd6-4c18-9b37-05d8e8f57303}</Project>
       <Name>SemanticLogging</Name>
     </ProjectReference>

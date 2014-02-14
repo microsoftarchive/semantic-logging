@@ -160,7 +160,7 @@
     <Compile Include="TestSupport\PollingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+    <ProjectReference Include="..\..\Src\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
       <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
       <Name>SemanticLogging.ElasticSearch</Name>
     </ProjectReference>
