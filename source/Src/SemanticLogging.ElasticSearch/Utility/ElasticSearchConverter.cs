@@ -18,7 +18,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             
             writer.WriteStartObject();
             writer.WritePropertyName("_index");
-            writer.WriteValue(logEntry.Index);
+            writer.WriteValue(logEntry.Index.ToLower());
             writer.WritePropertyName("_type");
             writer.WriteValue(logEntry.Type);
             writer.WriteEndObject();
