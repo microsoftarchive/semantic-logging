@@ -13,8 +13,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         private readonly XName sinkName = XName.Get("elasticSearchSink", Constants.Namespace);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-            "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard class"
-            )]
+            "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard class")]
         public bool CanCreateSink(XElement element)
         {
             Guard.ArgumentNotNull(element, "element");
@@ -23,22 +22,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-            "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard class"
-            )]
+            "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard class")]
         public IObserver<EventEntry> CreateSink(XElement element)
         {
             Guard.ArgumentNotNull(element, "element");
 
             var subject = new EventEntrySubject();
             subject.LogToElasticSearch(
-                (string) element.Attribute("instanceName"),
-                (string) element.Attribute("connectionString"),
+                (string)element.Attribute("instanceName"),
+                (string)element.Attribute("connectionString"),
                 (string)element.Attribute("index") ?? "logstash",
                 (string)element.Attribute("type") ?? "etw",
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ??
                 Constants.DefaultBufferingFlushAllTimeout,
-                (int?) element.Attribute("maxBufferSize") ?? Buffering.DefaultMaxBufferSize);
+                (int?)element.Attribute("maxBufferSize") ?? Buffering.DefaultMaxBufferSize);
 
             return subject;
         }

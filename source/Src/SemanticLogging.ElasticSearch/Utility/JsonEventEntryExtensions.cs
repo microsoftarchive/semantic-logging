@@ -77,7 +77,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             }
             catch (Exception e)
             {
-               // TODO SemanticLoggingEventSource.Log.WindowsAzureTableSinkEntityCreationFailed(e.ToString());
+                SemanticLoggingEventSource.Log.ElasticSearchSinkEntityCreationFailed(e.ToString());
                 return false;
             }
         }
