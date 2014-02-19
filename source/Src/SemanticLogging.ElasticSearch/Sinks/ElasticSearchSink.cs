@@ -28,7 +28,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WindowsAzureTableSink"/> class with the specified connection string and table address.
+        /// Initializes a new instance of the <see cref="ElasticSearchSink"/> class with the specified connection string and table address.
         /// </summary>
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
@@ -61,7 +61,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         }
 
         /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="WindowsAzureTableSink"/> class.
+        /// Releases all resources used by the current instance of the <see cref="ElasticSearchSink"/> class.
         /// </summary>
         public void Dispose()
         {
@@ -97,7 +97,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="WindowsAzureTableSink"/> class.
+        /// Finalizes an instance of the <see cref="ElasticSearchSink"/> class.
         /// </summary>
         ~ElasticSearchSink()
         {
@@ -110,7 +110,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// </summary>
         /// <param name="disposing">A value indicating whether or not the class is disposing.</param>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2213:DisposableFieldsShouldBeDisposed",
-            MessageId = "cancellationTokenSource", Justification = "Token is cancelled")]
+            MessageId = "cancellationTokenSource", Justification = "Token is canceled")]
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -147,15 +147,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             try
             {
+                // NOTE:  One things that needs to be considered is that some of the items in the bulk service operation can succeed
                 var response = await client.PostAsync(uri, content, cancellationTokenSource.Token).ConfigureAwait(false);
-                if (response.StatusCode != HttpStatusCode.OK) return 0;
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    return 0;
+                }
 
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var responseObject = JObject.Parse(responseString);
                 var items = responseObject["items"] as JArray;
 
+                //TODO: This needs to be updated to support < 1.0 releases of elasticsearch
                 return items != null
-                    ? items.Count(t => t["create"]["ok"].Value<bool>().Equals(true))
+                    ? items.Count(t => t["create"]["status"].Value<int>().Equals(201))
                     : 0;
             }
             catch (OperationCanceledException)

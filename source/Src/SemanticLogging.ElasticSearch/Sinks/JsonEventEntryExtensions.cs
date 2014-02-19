@@ -14,13 +14,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
             var dictionary = new JObject
             {
-                {"EventId", entry.EventId},
-                {"EventDate", entry.EventDate},
-                {"Keywords", entry.Keywords},
-                {"ProviderId", entry.ProviderId},
-                {"ProviderName", entry.ProviderName},
-                {"InstanceName", entry.InstanceName},
-                {"Level", entry.Level}
+                {"EventId", entry.EventId },
+                {"EventDate", entry.EventDate },
+                {"Keywords", entry.Keywords },
+                {"ProviderId", entry.ProviderId },
+                {"ProviderName", entry.ProviderName },
+                {"InstanceName", entry.InstanceName },
+                {"Level", entry.Level }
             };
 
             if (entry.Message != null)
@@ -52,46 +52,49 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 foreach (var item in entry.Payload.Take(MaxPayloadItems))
                 {
                     var value = item.Value;
-                    if (value == null) continue;
+                    if (value == null)
+                    {
+                        continue;
+                    }
 
                     JToken property = null;
                     var type = value.GetType();
 
-                    if (type == typeof (string))
+                    if (type == typeof(string))
                     {
-                        property = (string) value;
+                        property = (string)value;
                     }
-                    else if (type == typeof (int))
+                    else if (type == typeof(int))
                     {
-                        property = (int) value;
+                        property = (int)value;
                     }
-                    else if (type == typeof (long))
+                    else if (type == typeof(long))
                     {
-                        property = (long) value;
+                        property = (long)value;
                     }
-                    else if (type == typeof (double))
+                    else if (type == typeof(double))
                     {
-                        property = (double) value;
+                        property = (double)value;
                     }
-                    else if (type == typeof (Guid))
+                    else if (type == typeof(Guid))
                     {
-                        property = (Guid) value;
+                        property = (Guid)value;
                     }
-                    else if (type == typeof (bool))
+                    else if (type == typeof(bool))
                     {
-                        property = (bool) value;
+                        property = (bool)value;
                     }
                     else if (type.IsEnum)
                     {
-                        var typeCode = ((Enum) value).GetTypeCode();
+                        var typeCode = ((Enum)value).GetTypeCode();
                         property = typeCode <= TypeCode.Int32
                             ? Convert.ToInt32(value, CultureInfo.InvariantCulture)
                             : Convert.ToInt64(value, CultureInfo.InvariantCulture);
                     }
-                    else if (type == typeof (byte[]))
+                    else if (type == typeof(byte[]))
                     {
                         // TODO: Handle as best as we can
-                        property = (byte[]) value;
+                        property = (byte[])value;
                     }
 
                     // TODO: add & review DateTimeOffset if it's supported
