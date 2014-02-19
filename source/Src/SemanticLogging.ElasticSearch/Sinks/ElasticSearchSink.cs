@@ -14,16 +14,22 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
+    using System.IO;
+
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
         private const int BufferCountTrigger = 100;
+
+        private const string BulkServiceOperationPath = "/_bulk";
+
         private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-        private readonly string connectionString;
         private readonly string index;
         private readonly string type;
         private readonly string instanceName;
+
+        private readonly Uri elasticSearchUrl;
         private readonly TimeSpan onCompletedTimeout;
 
 
@@ -52,7 +58,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.onCompletedTimeout = onCompletedTimeout;
 
             this.instanceName = instanceName;
-            this.connectionString = connectionString;
+            this.elasticSearchUrl = new Uri(new Uri(connectionString), BulkServiceOperationPath);
             this.index = index;
             this.type = type;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
@@ -142,13 +148,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
 
             var client = new HttpClient();
-            var uri = new Uri(String.Format("{0}/_bulk", connectionString));
             var content = new StringContent(bulkMessage.ToString());
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             try
             {
                 // NOTE:  One things that needs to be considered is that some of the items in the bulk service operation can succeed
-                var response = await client.PostAsync(uri, content, cancellationTokenSource.Token).ConfigureAwait(false);
+                var response = await client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     return 0;
