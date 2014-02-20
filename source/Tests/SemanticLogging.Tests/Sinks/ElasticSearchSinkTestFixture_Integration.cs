@@ -72,7 +72,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         }
     }
 
-
     [TestClass]
     public class when_writing_multiple_entries : given_empty_index
     {
