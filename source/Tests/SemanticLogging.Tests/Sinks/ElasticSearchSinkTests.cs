@@ -1,27 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {
+    using System;
+    using System.Collections.Generic;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+    using Newtonsoft.Json;
+
     [TestClass]
-    public class DescribeElasticSearchSink
+    public class given_elasticsearch_configuration
     {
-        //[TestMethod]
-        //public void ItShouldReturnInsertedItems()
-        //{
-        //    var sink = new ElasticSearchSink("instance", "localhost.", 9200, TimeSpan.FromSeconds(1), 600,
-        //        TimeSpan.FromMinutes(1));
-
-        //    var count = sink.PublishEventsAsync(new[] {CreateJson(), CreateJson(), CreateJson()}).Result;
-        //    Assert.AreEqual(count, 3);
-        //}
-
+        private const string DevelopmentElasticSearchEndpoint = "http://localhost:9200";
 
         [TestMethod]
-        public void ItShouldSerializeLogEntryObject()
+        public void when_serializing_a_log_entry_then_object_can_serialize()
         {
             // g
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
@@ -41,10 +34,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         }
 
         [TestMethod]
-        public void ItShouldSerializeLogEntryObjects()
+        public void when_serializing_multiple_log_entries_then_objects_can_serialize()
         {
             // g
-            var logObject = CreateJson();
+            var logObject = CreateJsonEventEntry();
             var logEntry1 = new ElasticSearchLogEntry { Index = "log", Type = "slab", LogEntry = logObject };
             var logEntry2 = new ElasticSearchLogEntry { Index = "log", Type = "slab", LogEntry = logObject };
 
@@ -55,9 +48,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             Assert.IsNotNull(actual);
         }
 
-        private static JsonEventEntry CreateJson()
+        private static JsonEventEntry CreateJsonEventEntry()
         {
-            var payload = new Dictionary<string, object> {{"msg", "the message"}, {"date", DateTime.UtcNow}};
+            var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
             var logObject = new JsonEventEntry
             {
                 EventDate = DateTime.UtcNow,

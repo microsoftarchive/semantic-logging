@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
-    using System.IO;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Net;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
@@ -38,15 +38,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// </summary>
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
-        /// <param name="index">Default logstash</param>
-        /// <param name="type">Default etw</param>
+        /// <param name="index">Index name prefix the default is logstash</param>
+        /// <param name="type">ElasticSearch entry type, the default is etw</param>
         /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Windows Azure Storage.</param>
         /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="OnCompleted"/> call is received and before disposing the sink.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public ElasticSearchSink(string instanceName, string connectionString,string index, string type, TimeSpan bufferInterval,
+        public ElasticSearchSink(string instanceName, string connectionString, string index, string type, TimeSpan bufferInterval,
             int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
@@ -135,7 +135,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             return bufferedPublisher.FlushAsync();
         }
 
-        internal async Task<int> PublishEventsAsync(IList<JsonEventEntry> collection)
+        internal async Task<int> PublishEventsAsync(IEnumerable<JsonEventEntry> collection)
         {
             var bulkMessage = new StringBuilder();
 
