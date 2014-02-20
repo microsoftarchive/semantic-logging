@@ -9,7 +9,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
     /// <summary>
-    /// Extensions for <see cref="EventEntry"/>.
+    /// Extensions for <see cref="JsonEventEntry"/>.
     /// </summary>
     public static class JsonEventEntryExtensions
     {

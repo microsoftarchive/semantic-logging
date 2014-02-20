@@ -14,13 +14,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
             var dictionary = new JObject
             {
-                {"EventId", entry.EventId },
-                {"EventDate", entry.EventDate },
-                {"Keywords", entry.Keywords },
-                {"ProviderId", entry.ProviderId },
-                {"ProviderName", entry.ProviderName },
-                {"InstanceName", entry.InstanceName },
-                {"Level", entry.Level }
+                { "EventId", entry.EventId },
+                { "EventDate", entry.EventDate },
+                { "Keywords", entry.Keywords },
+                { "ProviderId", entry.ProviderId },
+                { "ProviderName", entry.ProviderName },
+                { "InstanceName", entry.InstanceName },
+                { "Level", entry.Level }
             };
 
             if (entry.Message != null)
@@ -96,8 +96,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                         // TODO: Handle as best as we can
                         property = (byte[])value;
                     }
-
-                    // TODO: add & review DateTimeOffset if it's supported
 
                     if (property != null)
                     {

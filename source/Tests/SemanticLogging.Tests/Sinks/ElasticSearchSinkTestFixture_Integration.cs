@@ -79,7 +79,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void then_correct_count_is_returned_and_all_entries_and_properties_are_written()
         {
-            //These are writting to the property "msg"
+            //These are writing to the property "msg"
             var msgPropValues = new[] { "1", "2", "3" };
             var eventEntries = msgPropValues.Select(this.CreateEventEntry);
 
@@ -105,7 +105,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var results = this.QueryAllEntriesByIndex();
 
             //Compare the message property values to make sure they match
-            var queryMsgPropValues = results.Hits.Hits.Select(hit => hit.Source["payload_msg"].ToString()).ToArray();
+            var queryMsgPropValues = results.Hits.Hits.Select(hit => hit.Source["Payload_msg"].ToString()).ToArray();
             var areMsgPropertiesEqual = (queryMsgPropValues.Length == msgPropValues.Length && queryMsgPropValues.Intersect(msgPropValues).Count() == queryMsgPropValues.Length);
 
             Assert.IsTrue(GetIndexCount() == msgPropValues.Length);
