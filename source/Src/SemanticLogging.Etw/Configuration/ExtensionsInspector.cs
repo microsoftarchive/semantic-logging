@@ -1,13 +1,14 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
-
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+
     /// <summary>
     /// Inspect extensions without loading assemblies into the current domain.
     /// </summary>

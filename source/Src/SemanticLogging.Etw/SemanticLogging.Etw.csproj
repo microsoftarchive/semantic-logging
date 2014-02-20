@@ -73,8 +73,6 @@
     <Compile Include="Configuration\ConfigurationReader.cs" />
     <Compile Include="Configuration\ConsoleSinkElement.cs" />
     <Compile Include="Configuration\EventSourceSettingsEqualityComparer.cs" />
-    <Compile Include="Configuration\IFormatterElement.cs" />
-    <Compile Include="Configuration\ISinkElement.cs" />
     <Compile Include="Configuration\RollingFlatFileSinkElement.cs" />
     <Compile Include="Configuration\JsonEventTextFormatterElement.cs" />
     <Compile Include="Configuration\CustomFormatterElement.cs" />

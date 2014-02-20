@@ -53,6 +53,8 @@
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\IFormatterElement.cs" />
+    <Compile Include="Configuration\ISinkElement.cs" />
     <Compile Include="ConsoleLog.cs" />
     <Compile Include="EventListenerExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
