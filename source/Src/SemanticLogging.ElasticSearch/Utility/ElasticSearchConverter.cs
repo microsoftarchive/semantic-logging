@@ -6,6 +6,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
     public class ElasticSearchConverter : JsonConverter
     {
+        public readonly string PayloadFlattenFormatString = "Payload_{0}";
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             var logEntry = value as ElasticSearchLogEntry;
@@ -25,7 +26,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             WriteValue(writer, "_type", logEntry.Type);
             writer.WriteEndObject();
             writer.WriteEndObject();
-            writer.WriteRaw("\n");  //ES requires this \n seperator
+            writer.WriteRaw("\n");  //ES requires this \n separator
 
             writer.WriteStartObject();
             WriteValue(writer, "EventId", logEntry.LogEntry.EventId);
@@ -50,10 +51,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 WriteValue(writer, "RelatedActivityId", logEntry.LogEntry.RelatedActivityId);
             }
 
-            //Alernatively we should consider option to preserve scructure and not flatten the payload
+            //Alternatively we should consider option to preserve structure and not flatten the payload
             foreach (var payload in logEntry.LogEntry.Payload)
             {
-                WriteValue(writer, "Payload_" + payload.Key, payload.Value);
+                WriteValue(writer, string.Format(this.PayloadFlattenFormatString, payload.Key), payload.Value);
             }
 
             writer.WriteEndObject();
