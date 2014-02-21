@@ -176,7 +176,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
         private static string GetIndexName(string indexName, DateTime entryDateTime)
         {
-            return String.Format("{0}-{1}", indexName, entryDateTime.ToString("yyyy.MM.dd"));
+            return String.Format("{0}-{1:yyyy.MM.dd}", indexName, entryDateTime);
         }
 
         private void FlushSafe()
