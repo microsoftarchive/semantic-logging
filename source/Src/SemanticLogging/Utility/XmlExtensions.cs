@@ -6,8 +6,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
     using System.Threading;
     using System.Xml.Linq;
 
+    /// <summary>
+    /// Xml extensions for configuration extensibility support
+    /// </summary>
     public static class XmlExtensions
     {
+        /// <summary>
+        /// XAttribute configuration extension to convert seconds to a TimeSpan format
+        /// </summary>
+        /// <param name="attribute"></param>
+        /// <returns></returns>
         public static TimeSpan? ToTimeSpan(this XAttribute attribute)
         {
             int? bufferingIntervalInSeconds = (int?)attribute;
