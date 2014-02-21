@@ -4,15 +4,13 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+
     [TestClass]
     public class given_xmlUtil
     {

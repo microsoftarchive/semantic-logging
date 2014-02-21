@@ -52,6 +52,7 @@
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Sinks\EventRecord.cs" />
     <Compile Include="Sinks\SqlDatabaseSink.cs" />

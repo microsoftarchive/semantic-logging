@@ -4,6 +4,8 @@ using System.Xml.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     internal class TraceEventServiceElement
     {
         internal TraceEventServiceElement()

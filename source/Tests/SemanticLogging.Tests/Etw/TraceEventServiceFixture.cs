@@ -14,6 +14,8 @@ using Tracing = TraceEvent::Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     [TestClass]
     public class given_traceEventService_instance
     {

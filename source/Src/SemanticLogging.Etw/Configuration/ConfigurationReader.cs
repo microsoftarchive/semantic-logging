@@ -15,6 +15,8 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     internal class ConfigurationReader
     {
         private const string SchemaFileName = "SemanticLogging-svc.xsd";

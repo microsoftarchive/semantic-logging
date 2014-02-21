@@ -14,6 +14,8 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     /// <summary>
     /// Represents one or more errors that occur during loading the <see cref="TraceEventService"/> configuration file.
     /// </summary>
