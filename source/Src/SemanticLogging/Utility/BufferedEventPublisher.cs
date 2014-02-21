@@ -13,10 +13,10 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
     /// <summary>
-    /// Buffering and batching capabilities for database sinks.
+    /// Buffering and batching utility for sinks that can benefit from batched writes
     /// </summary>
     /// <typeparam name="TEntry">The type of the entry to buffer.</typeparam>
-    internal sealed class BufferedEventPublisher<TEntry> : IDisposable
+    public class BufferedEventPublisher<TEntry> : IDisposable
     {
         private static readonly TimeSpan MinimumInterval = TimeSpan.FromMilliseconds(500);
         private readonly string sinkId;
