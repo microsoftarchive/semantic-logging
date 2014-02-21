@@ -39,9 +39,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             WriteValue(writer, "Opcode", logEntry.LogEntry.Opcode);
             WriteValue(writer, "Task", logEntry.LogEntry.Task);
             WriteValue(writer, "Version", logEntry.LogEntry.Version);
-            WriteValue(writer, "ActivityId", logEntry.LogEntry.ActivityId);
-            WriteValue(writer, "RelatedActivityId", logEntry.LogEntry.RelatedActivityId);
+            
+            if (logEntry.LogEntry.ActivityId != Guid.Empty)
+            {
+                WriteValue(writer, "ActivityId", logEntry.LogEntry.ActivityId);
+            }
 
+            if (logEntry.LogEntry.RelatedActivityId != Guid.Empty)
+            {
+                WriteValue(writer, "RelatedActivityId", logEntry.LogEntry.RelatedActivityId);
+            }
+
+            //Alernatively we should consider option to preserve scructure and not flatten the payload
             foreach (var payload in logEntry.LogEntry.Payload)
             {
                 WriteValue(writer, "Payload_" + payload.Key, payload.Value);

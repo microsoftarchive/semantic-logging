@@ -56,7 +56,6 @@
     <Compile Include="Utility\ElasticSearchConverter.cs" />
     <Compile Include="Sinks\ElasticSearchSink.cs" />
     <Compile Include="Sinks\JsonEventEntry.cs" />
-    <Compile Include="Sinks\JsonEventEntryExtensions.cs" />
     <Compile Include="ElasticSearchLog.cs" />
   </ItemGroup>
   <ItemGroup>

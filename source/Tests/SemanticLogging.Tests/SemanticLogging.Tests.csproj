@@ -85,6 +85,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Etw\ElasticSearchSinkElementFixture.cs" />
     <Compile Include="Etw\ConfigurationReaderFixture.cs" />
     <Compile Include="Etw\ConsoleSinkElementFixture.cs" />
     <Compile Include="Etw\TraceEventServiceWorkerFixture.cs" />
