@@ -1,21 +1,24 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
+    /// <summary>
+    /// Sink that asynchronously writes entries to a ElasticSearch server.
+    /// </summary>
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
         private const int BufferCountTrigger = 100;
@@ -84,6 +87,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             Dispose();
         }
 
+        /// <summary>
+        /// Provides the sink with new data to write.
+        /// </summary>
+        /// <param name="value">The current entry to write to Windows Azure.</param>
         public void OnNext(JsonEventEntry value)
         {
             if (value == null)
@@ -96,6 +103,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             bufferedPublisher.TryPost(value);
         }
 
+        /// <summary>
+        /// Notifies the observer that the provider has experienced an error condition.
+        /// </summary>
+        /// <param name="error">An object that provides additional information about the error.</param>
         public void OnError(Exception error)
         {
             FlushSafe();
@@ -176,7 +187,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
         private static string GetIndexName(string indexName, DateTime entryDateTime)
         {
-            return String.Format("{0}-{1:yyyy.MM.dd}", indexName, entryDateTime);
+            return string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", indexName, entryDateTime);
         }
 
         private void FlushSafe()

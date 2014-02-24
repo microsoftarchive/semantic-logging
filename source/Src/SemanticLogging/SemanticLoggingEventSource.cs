@@ -165,7 +165,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         {
             if (this.IsEnabled())
             {
-                this.WriteEvent(503, message);
+                this.WriteEvent(600, message);
             }
         }
 

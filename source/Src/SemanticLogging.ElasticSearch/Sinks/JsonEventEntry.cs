@@ -1,8 +1,13 @@
-﻿using System;
+﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+
+using System;
 using System.Collections.Generic;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
+    /// <summary>
+    /// EventEntry formatted for use with ElasticSearch
+    /// </summary>
     public sealed class JsonEventEntry
     {
         /// <summary>
@@ -14,6 +19,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             EventDate = DateTime.UtcNow;
         }
 
+        /// <summary>
+        /// Gets or sets the event identifier.
+        /// </summary>
+        /// <value>
+        /// The event id.
+        /// </value>
         public string Id { get; set; }
 
         /// <summary>
