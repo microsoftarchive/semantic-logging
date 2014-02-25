@@ -132,7 +132,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
         }
 
         [TestMethod]
-        public void WhenExceptinOCcursInCustomFormater1()
+        public void WhenExceptinOccursInCustomFormater1()
         {
             string filename = "customFormatterException.log";
             File.Delete(filename);
