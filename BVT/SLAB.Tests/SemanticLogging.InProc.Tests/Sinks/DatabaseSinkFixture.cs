@@ -1071,7 +1071,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
 
                     // Wait for the buffer to flush at end of interval
-                    Task.Delay(bufferingInterval).Wait();
+                    Task.Delay(new TimeSpan(0,0,0,1,800)).Wait();
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(150, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval1'").Count());

@@ -34,9 +34,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventsWithDifferentLevelsToAzure()
+        public void WhenEventsWithDifferentLevels()
         {
-            this.tableName = "WhenEventsWithDifferentLevelsToAzure";
+            this.tableName = "WhenEventsWithDifferentLevels";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -65,9 +65,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenLoggingMultipleMessagesToAzure()
+        public void WhenLoggingMultipleMessages()
         {
-            this.tableName = "WhenLoggingMultipleMessagesToAzure";
+            this.tableName = "WhenLoggingMultipleMessages";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -94,9 +94,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenNoPayloadToAzure()
+        public void WhenNoPayload()
         {
-            this.tableName = "WhenNoPayloadToAzure";
+            this.tableName = "WhenNoPayload";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -121,9 +121,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventHasAllValuesForAttributeToAzure()
+        public void WhenEventHasAllValuesForAttribute()
         {
-            this.tableName = "WhenEventHasAllValuesForAttributeToAzure";
+            this.tableName = "WhenEventHasAllValuesForAttribute";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -148,9 +148,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenSourceIsEnabledAndDisabledToAzure()
+        public void WhenSourceIsEnabledAndDisabled()
         {
-            this.tableName = "WhenSourceIsEnabledAndDisabledToAzure";
+            this.tableName = "WhenSourceIsEnabledAndDisabled";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -179,9 +179,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventHasMultiplePayloadsToAzure()
+        public void WhenEventHasMultiplePayloads()
         {
-            this.tableName = "WhenEventHasMultiplePayloadsToAzure";
+            this.tableName = "WhenEventHasMultiplePayloads";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -208,7 +208,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenDefaultTableNameIsUsedToAzure()
+        public void WhenDefaultTableNameIsUsed()
         {
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, WindowsAzureTableLog.DefaultTableName);
@@ -233,7 +233,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenTableNameIsNullToAzure()
+        public void WhenTableNameIsNull()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
             {
@@ -251,7 +251,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenTableNameIsEmptyToAzure()
+        public void WhenTableNameIsEmpty()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
             {
@@ -269,7 +269,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenTableNameIsInvalidToAzure()
+        public void WhenTableNameIsInvalid()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
             {
@@ -287,7 +287,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenConnectionStringIsEmptyToAzure()
+        public void WhenConnectionStringIsEmpty()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
             {
@@ -302,7 +302,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenConnectionStringIsNullToAzure()
+        public void WhenConnectionStringIsNull()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
             {
@@ -317,7 +317,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenInstanceIsEmptyToAzure()
+        public void WhenInstanceIsEmpty()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
             {
@@ -334,7 +334,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenInstanceIsNullToAzure()
+        public void WhenInstanceIsNull()
         {
             var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
             {
@@ -351,9 +351,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenBatchSizeIsExceededToAzure()
+        public void WhenBatchSizeIsExceeded()
         {
-            this.tableName = "WhenBatchSizeIsExceededToAzure";
+            this.tableName = "WhenBatchSizeIsExceeded";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -401,9 +401,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenBufferingWithMinimumNonDefaultIntervalToAzure()
+        public void WhenBufferingWithMinimumNonDefaultInterval()
         {
-            this.tableName = "WhenBufferingWithMinimalNonDefaultIntervalToAzure";
+            this.tableName = "WhenBufferingWithMinimalNonDefaultInterval";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -439,9 +439,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenUsingNonDefaultBufferIntervalToAzure()
+        public void WhenUsingNonDefaultBufferInterval()
         {
-            this.tableName = "WhenUsingNonDefaultBufferIntervalToAzure";
+            this.tableName = "WhenUsingNonDefaultBufferInterval";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -482,9 +482,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenInternalBufferCountIsExceededAndIntervalExceededToAzure()
+        public void WhenInternalBufferCountIsExceededAndIntervalExceeded()
         {
-            this.tableName = "WhenInternalBufferCountIsExceededAndIntervalExceededToAzure";
+            this.tableName = "WhenInternalBufferCountIsExceededAndIntervalExceeded";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -520,9 +520,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenBufferIntervalExceedsAndLessEntriesThanBufferCountToAzure()
+        public void WhenBufferIntervalExceedsAndLessEntriesThanBufferCount()
         {
-            this.tableName = "WhenBufferIntervalExceedsAndLessEntriesThanBufferCountToAzure";
+            this.tableName = "WhenBufferIntervalExceedsAndLessEntriesThanBufferCount";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -554,9 +554,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventsInThreeConsecutiveIntervalsToAzure()
+        public void WhenEventsInThreeConsecutiveIntervals()
         {
-            this.tableName = "WhenEventsInThreeConsecutiveIntervalsToAzure";
+            this.tableName = "WhenEventsInThreeConsecutiveIntervals";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -629,9 +629,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenSourceEnabledWitKeywordsAllToAzure()
+        public void WhenSourceEnabledWitKeywordsAll()
         {
-            this.tableName = "WhenSourceEnabledWitKeywordsAllToAzure";
+            this.tableName = "WhenSourceEnabledWitKeywordsAll";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -658,7 +658,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenNotEnabledWithKeywordsAndEventWithSpecificKeywordIsRaisedToAzure()
+        public void WhenNotEnabledWithKeywordsAndEventWithSpecificKeywordIsRaised()
         {
             this.tableName = "WhenNotEnabledWithKeywordsAndEventWithSpecificKeywordIsRaised";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
@@ -684,9 +684,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenListenerIsDisposedToAzure()
+        public void WhenListenerIsDisposed()
         {
-            this.tableName = "WhenListenerIsDisposedToAzure";
+            this.tableName = "WhenListenerIsDisposed";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -728,9 +728,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventWithTaskNameInAttributeIsRaisedToAzure()
+        public void WhenEventWithTaskNameInAttributeIsRaised()
         {
-            this.tableName = "WhenEventWithTaskNameInAttributeIsRaisedToAzure";
+            this.tableName = "WhenEventWithTaskNameInAttributeIsRaised";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
@@ -757,9 +757,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenEventWithEnumsInPayloadIsRaisedToAzure()
+        public void WhenEventWithEnumsInPayloadIsRaised()
         {
-            this.tableName = "WhenEventWithEnumsInPayloadIsRaisedToAzure";
+            this.tableName = "WhenEventWithEnumsInPayloadIsRaised";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = MockEventSourceInProcEnum.Logger;

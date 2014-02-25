@@ -13,7 +13,7 @@ using System.ServiceProcess;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.WindowsService
 {
     [TestClass]
-    public class TraceEventWinServiceFixture
+    public class IntegrationFixture
     {
         private static readonly string SemanticLoggingServiceExecutableFilePath = Path.Combine(Environment.CurrentDirectory, "SemanticLogging-svc.exe");
         private string tableName;
@@ -45,7 +45,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         }
 
         [TestMethod]
-        public void ServiceCanStartWithVeryBasicConfig()
+        public void WhenUsingBasicConfig()
         {
             string configFile = "Configurations\\WinService\\VeryBasicConfig.xml";
 
@@ -63,7 +63,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         }
 
         [TestMethod]
-        public void FlatFileUsingWindowsService()
+        public void WhenUsingFlatFile()
         {
             string fileName = "FlatFileOutProcCfgWS.log";
             File.Delete(fileName);
@@ -90,35 +90,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         }
 
         [TestMethod]
-        public void RollingFlatFileUsingWindowsService()
-        {
-            var fileNameWithoutExtension = "RollingFlatFileOutProcCfgWS";
-            FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
-            string configFile = "Configurations\\WinService\\RollingFlatFileWinService.xml";
-            
-            try
-            {
-                StartServiceWithConfig(configFile);
-                var logger = MockEventSourceOutProc.Logger;
-
-                for (int i = 0; i < 10; i++)
-                {
-                    logger.LogSomeMessage("logging to the windows service " + i);
-                }
-
-                FlatFileHelper.PollUntilFilesAreCreated(".", "RollingFlatFileOutProcCfgWS", 2);
-            }
-            finally
-            {
-                StopService();
-            }
-
-            Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-            Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
-        }
-
-        [TestMethod]
-        public void SqlDatabaseUsingWindowsService()
+        public void WhenUsingDatabase()
         {
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
             DatabaseHelper.CleanLoggingDB(validConnectionString);
@@ -160,7 +132,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         }
 
         [TestMethod]
-        public void AzureTablesUsingWindowsService()
+        public void WhenUsingAzureTable()
         {
             this.tableName = "azuretablese2eusingwindowsservice";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];

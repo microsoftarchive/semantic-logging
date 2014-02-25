@@ -128,29 +128,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.AreEqual(4, dt.Rows.Count);
 
-            var dr = dt.Rows[0];
-            Assert.AreEqual(4, (int)dr["Level"]);
-            Assert.AreEqual(8, (int)dr["EventID"]);
-            Assert.AreEqual("testInstance", dr["InstanceName"].ToString());
-            StringAssert.Contains((string)dr["Payload"], message);
-
-            dr = dt.Rows[1];
-            Assert.AreEqual(4, (int)dr["Level"]);
-            Assert.AreEqual(8, (int)dr["EventID"]);
-            Assert.AreEqual("testInstance", dr["InstanceName"].ToString());
-            StringAssert.Contains((string)dr["Payload"], message2);
-
-            dr = dt.Rows[2];
-            Assert.AreEqual(4, (int)dr["Level"]);
-            Assert.AreEqual(8, (int)dr["EventID"]);
-            Assert.AreEqual("testCustom", dr["InstanceName"].ToString());
-            StringAssert.Contains((string)dr["Payload"], message);
-
-            dr = dt.Rows[3];
-            Assert.AreEqual(4, (int)dr["Level"]);
-            Assert.AreEqual(8, (int)dr["EventID"]);
-            Assert.AreEqual("testCustom", dr["InstanceName"].ToString());
-            StringAssert.Contains((string)dr["Payload"], message2);
+            
         }
 
         [TestMethod]

@@ -94,14 +94,14 @@
     <Compile Include="Formatters\JsonEventTextFormatterFixture.cs" />
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceConfiguration\TraceEventServiceReconfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\RollingFlatFileTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\FlatFileTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\ConsoleTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\DatabaseTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\AzureTablesTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\MixedTraceEventServiceConfigurationFixture.cs" />
-    <Compile Include="ServiceConfiguration\TraceEventServiceConfigurationFixture.cs" />
+    <Compile Include="ServiceConfiguration\ReconfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\RFFLSinkConfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\FlatFileSinkConfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\ConsoleSinkConfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\DatabaseSinkConfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\AzureSinkConfigFixture.cs" />
+    <Compile Include="ServiceConfiguration\ConfigIntegrationFixture.cs" />
+    <Compile Include="ServiceConfiguration\TraceEventServiceConfigFixture.cs" />
     <Compile Include="Sinks\WindowsAzureTableSinkFixture.cs" />
     <Compile Include="Sinks\DatabaseSinkFixture.cs" />
     <Compile Include="Sinks\FlatFileSinkFixture.cs" />
@@ -120,7 +120,7 @@
     <Compile Include="TestObjects\TestEventEntry.cs" />
     <Compile Include="TestObjects\TestEventSource.cs" />
     <Compile Include="TestObjects\TestEventSourceNoAttributes.cs" />
-    <Compile Include="WindowsService\TraceEventWinServiceFixture.cs" />
+    <Compile Include="End2End\IntegrationFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

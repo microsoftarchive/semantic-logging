@@ -36,7 +36,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void OutProcAzureTablesConnectionTakesTooLong()
+        public void WhenConnectionTakesTooLong()
         {
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             var subject = new EventEntrySubject();
@@ -46,7 +46,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void OutProcAzureTablesProgrammatically()
+        public void WhenConfiguringProgrammatically()
         {
             this.tableName = "testoutofprocazuretables";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
@@ -84,7 +84,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void OutProcAzureTablesUsingConfig()
+        public void WhenUsingExternalConfig()
         {
             this.tableName = "outProcazuretablesusingconfig";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];

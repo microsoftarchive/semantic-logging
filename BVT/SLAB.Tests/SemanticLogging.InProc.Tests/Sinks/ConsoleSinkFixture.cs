@@ -16,7 +16,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
     public class ConsoleSinkFixture
     {
         [TestMethod]
-        public void DefaultColorMappingForInformationalToConsole()
+        public void WhenDefaultColorMappingForInformational()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -35,7 +35,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void DefaultColorMappingForErrorToConsole()
+        public void WhenDefaultColorMappingForError()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -54,7 +54,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void DefaultColorMappingForCriticalToConsole()
+        public void WhenDefaultColorMappingForCritical()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -73,7 +73,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void DefaultColorMappingForVerboseToConsole()
+        public void WhenDefaultColorMappingForVerbose()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -92,7 +92,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void OneSourceTwoListenersToConsole()
+        public void WhenOneSourceTwoListeners()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -117,7 +117,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void OneListenerTwoSourcesToConsole()
+        public void WhenOneListenerTwoSources()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -141,7 +141,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void MultipleEventsToConsole()
+        public void WhenMultipleEvents()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -164,7 +164,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void OneSourceTwoListenersConcurrentlyToConsole()
+        public void WhenOneSourceTwoListenersConcurrently()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -192,7 +192,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void PaylodIsParsedWithDifferentTypesToConsole()
+        public void WhenPayloadHasDifferentTypes()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -212,7 +212,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void PaylodIsParsedWithDifferentTypesAndNullToConsole()
+        public void WhenPayloadHasDifferentTypesAndNull()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -233,7 +233,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void RawMessageAndFormattedMessageToConsole()
+        public void WhenEventHasRawMessageAndFormattedMessage()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -253,7 +253,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void HighEventIdsToConsole()
+        public void WhenHighEventIds()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -271,7 +271,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void LowEventIdsToConsole()
+        public void WhenLowEventIds()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -292,7 +292,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void ErrorEventRaisedWhenErrorInLoggingToConsole()
+        public void WhenLoggingErrorOCcurs()
         {
             InMemoryEventListener collectErrorsListener;
             var mockConsole = new MockConsoleOutputInterceptor();
@@ -311,7 +311,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void SingleLineTextFormatterToConsole()
+        public void WhenSingleLineTextFormatter()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -333,7 +333,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EnablingAllKeywordsToConsole()
+        public void WhenEnablingAllKeywords()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter("----", "====", EventLevel.LogAlways);
@@ -352,7 +352,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void SpecificKeywordToConsole()
+        public void WhenSourceEnabledAndNotSpecifyingKeyword()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -369,7 +369,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void CriticalVerbosityForFormatterToConsole()
+        public void WhenCriticalVerbosityForFormatter()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -390,7 +390,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void DefaultFormatterToConsole()
+        public void WhenDefaultFormatter()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -410,7 +410,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EventWithTaskNameToConsole()
+        public void WhenEventWithTaskName()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -429,7 +429,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EventWithTaskNoneToConsole()
+        public void WhenEventWithTaskNone()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -448,7 +448,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EventWithMessageInAttributeToConsole()
+        public void WhenEventWithMessageInAttribute()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -470,7 +470,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EventWithMessageInAttributeUsingJsonToConsole()
+        public void WhenEventWithMessageInAttributeUsingJson()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -492,7 +492,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void EventWithMessageInAttributeUsingXmlToConsole()
+        public void WhenEventWithMessageInAttributeUsingXml()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);

@@ -22,7 +22,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
     public class FlatFileSinkFixture
     {
         [TestMethod]
-        public void AbsentFileIsCreatedWhenEventIsLogged()
+        public void WhenFileDoesNotExist()
         {
             var fileName = "newflatfile.log";
             File.Delete(fileName);
@@ -49,7 +49,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void FileIsCreatedWhenNotPresentBetweenLoggingSessions()
+        public void WhenFileIsDeletedBetweenSessions()
         {
             var fileName = "newflatfile.log";
             File.Delete(fileName);
@@ -226,7 +226,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void ExceptionThrownDuringInitializationWhenDriveDoesNotExist()
+        public void WhenDriveDoesNotExist()
         {
             string filepath = string.Empty;
             string[] strDrives = Directory.GetLogicalDrives();
@@ -579,7 +579,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void ExceptionInFormatterGoesToBuiltInSource()
+        public void WhenExceptionInFormatter()
         {
             var fileName = "OtherExceptionInFormatterIsHandled.log";
             File.Delete(fileName);
@@ -606,7 +606,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void CanContinueLoggingAfterError()
+        public void WhenErrorAndValidMessageAfterError()
         {
             var fileName = "AfterExceptionInFormatterResultIsOk.log";
             File.Delete(fileName);
