@@ -25,14 +25,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <value>
         /// The event id.
         /// </value>
-        public string Id { get; set; }
-
-        /// <summary>
-        /// Gets or sets the event identifier.
-        /// </summary>
-        /// <value>
-        /// The event id.
-        /// </value>
         public int EventId { get; set; }
 
         /// <summary>
