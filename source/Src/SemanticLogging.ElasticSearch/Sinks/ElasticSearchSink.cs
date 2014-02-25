@@ -163,8 +163,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             try
             {
-                // NOTE:  One things that needs to be considered is that some of the items in the bulk service operation can succeed
                 var response = await client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
+
+                // Anything but a 200 response will leave the entries in the buffer and we will try again
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
                     return 0;
@@ -172,16 +173,47 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
                 var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                 var responseObject = JObject.Parse(responseString);
+
                 var items = responseObject["items"] as JArray;
 
-                //TODO: This needs to be updated to support < 1.0 releases of elasticsearch
-                return items != null
-                    ? items.Count(t => t["create"]["status"].Value<int>().Equals(201))
-                    : 0;
+                // If the reponse return items collection
+                if (items != null)
+                {
+                    // NOTE: This only works with ElasticSearch 1.0
+                    // Alternatively we could query ES as part of initialization check resutls or fall back to trying <1.0 parsing
+                    // We should also consider logging errors for individual entries
+                    return items.Count(t => t["create"]["status"].Value<int>().Equals(201));
+
+                    // Pre-1.0 ElasticSearch
+                    // return items.Count(t => t["create"]["ok"].Value<bool>().Equals(true));
+                }
+
+                // Check ElasticSearch response for status and error - this should be rare
+                JToken status = responseObject["status"];
+                if (status != null && status.Value<int>() == 400)
+                {
+                    // Possible multiple enumeration, but this should be rare occurance
+                    var messagesDiscarded = collection.Count();
+
+                    // We are unable to write the batch of event entries
+                    // I don't like discarding events but we cannot let a single marlformed event prevent others from being written
+                    // We might want to consider falling back to writing entries individually here
+                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, responseObject["error"].Value<string>());
+
+                    return messagesDiscarded;
+                }
+
+                return 0;
             }
             catch (OperationCanceledException)
             {
                 return 0;
+            }
+            catch (Exception ex)
+            {
+                // Although this is generally considered an anti-pattern this is not logged upstream and we have context
+                SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailed(ex.ToString());
+                throw;
             }
         }
 
