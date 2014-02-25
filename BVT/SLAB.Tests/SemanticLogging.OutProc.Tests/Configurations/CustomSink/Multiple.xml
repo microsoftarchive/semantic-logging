@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <cqs:CustomSqlSink name="myCustomSqlSink" xmlns:cqs="urn:sqlTest" instanceName="testingInstance" connectionString="Data Source=(localdb)\v11.0; Initial Catalog=Logging;Integrated Security=True" bufferingCount="1" bufferingIntervalInSeconds="1" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+    </cqs:CustomSqlSink>
+    <customSink name="MockFlatFileSink" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects.MockFlatFileSink, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <parameters>
+        <parameter name="fileName" type="System.String" value="multipleMockFlatFile.log"></parameter>
+        <parameter name="header" type="System.String" value="==-=="></parameter>
+      </parameters>
+    </customSink>
+    <sqlDatabaseSink name="sqlListener" connectionString="Data Source=(localdb)\v11.0; Initial Catalog=Logging;Integrated Security=True" instanceName="testingInstance" bufferingCount="1" bufferingIntervalInSeconds="1" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+    </sqlDatabaseSink>
+    <flatFileSink  fileName="multipleFlatFile.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <eventTextFormatter dateTimeFormat="d" verbosityThreshold="LogAlways" footer="-------------------------" header="--==--" />
+    </flatFileSink>
+</sinks>
+</configuration>

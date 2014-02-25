@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <sqlDatabaseSink name="sqlListener" connectionString="Data Source=.\sqlexpress; Initial Catalog=LoggingDB;Integrated Security=True" instanceName="" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+    </sqlDatabaseSink>
+  </sinks>
+
+</configuration>

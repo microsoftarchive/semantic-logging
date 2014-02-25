@@ -1,0 +1,14 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <customSink name="MockFlatFileSink" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects.MockFlatFileSink, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <parameters>
+        <parameter name="fileName" type="System.String" value="ProvidedCustomSink.log"></parameter>
+        <parameter name="header" type="System.String" value="==-=="></parameter>
+      </parameters>
+    </customSink>
+  </sinks>
+</configuration>

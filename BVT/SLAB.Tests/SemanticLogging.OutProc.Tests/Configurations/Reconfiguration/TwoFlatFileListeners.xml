@@ -1,0 +1,19 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService sessionNamePrefix="ServiceReconfig"/>
+
+    <sinks>
+      <flatFileSink  fileName="twoflatFileListeners.log" name="flatFileListener">
+        <sources>
+          <eventSource name="MyCompany1" />
+        </sources>
+        <eventTextFormatter dateTimeFormat="d" header="======="/>
+      </flatFileSink>
+      <flatFileSink  fileName="twoflatFileListeners2.log" name="flatFileListener2">
+        <sources>
+          <eventSource name="MyCompany1" />
+        </sources>
+        <eventTextFormatter dateTimeFormat="d" header="======="/>
+      </flatFileSink>
+    </sinks>
+  </configuration>

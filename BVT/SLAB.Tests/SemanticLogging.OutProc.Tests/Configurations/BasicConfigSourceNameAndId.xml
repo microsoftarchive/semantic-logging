@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <consoleSink name="consoleSink" >
+      <sources>
+        <eventSource  name="MockEventSourceOutProc" id="bae7ce7c-69bf-5ff9-af64-84f174de2d45" />
+      </sources>
+    </consoleSink>
+  </sinks>
+</configuration>

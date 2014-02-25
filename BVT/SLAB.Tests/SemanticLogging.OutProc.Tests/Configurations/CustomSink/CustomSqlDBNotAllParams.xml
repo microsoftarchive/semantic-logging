@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <cqs:CustomSqlSink name="myCustomSqlSink" xmlns:cqs="urn:sqlTest" connectionString="Data Source=.\sqlexpress; Initial Catalog=Logging;Integrated Security=True" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+    </cqs:CustomSqlSink>
+
+  </sinks>
+</configuration>

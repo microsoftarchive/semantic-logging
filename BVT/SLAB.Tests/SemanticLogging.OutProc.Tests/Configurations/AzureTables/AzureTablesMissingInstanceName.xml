@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <windowsAzureTableSink name="AzureTablesEventListener" tableAddress="testingTableName" bufferingIntervalInSeconds="1" sortKeysAscending="0" connectionString="UseDevelopmentStorage=true" >
+      <sources>
+        <eventSource name="MyEventSource"  />
+      </sources>
+    </windowsAzureTableSink>
+  </sinks>
+
+</configuration>

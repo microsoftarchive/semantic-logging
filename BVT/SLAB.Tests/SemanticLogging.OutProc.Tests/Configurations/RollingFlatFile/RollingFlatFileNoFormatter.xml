@@ -1,0 +1,10 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <rollingFlatFileSink  fileName="FlatFileOutProcConfig.log" name="RollingFlatFileEventListener" rollFileExistsBehavior="Overwrite" rollInterval="Month" rollSizeKB="1024" timeStampPattern="d" maxArchivedFiles="10">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+    </rollingFlatFileSink>
+  </sinks>
+</configuration>

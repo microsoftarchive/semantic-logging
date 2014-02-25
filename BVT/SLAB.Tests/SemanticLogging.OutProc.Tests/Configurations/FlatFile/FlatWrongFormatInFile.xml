@@ -1,0 +1,15 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="c:\flatFile\c:\flatFile\FlatFileOutProcCfgWS.log"  name="FlatFileEventListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <customEventTextFormatter type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects.CustomFormatterWithWait, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests">
+        <parameters>
+          <parameter name="header" type="System.String" value="----------"></parameter>
+        </parameters>
+      </customEventTextFormatter>
+    </flatFileSink>
+  </sinks>
+</configuration>

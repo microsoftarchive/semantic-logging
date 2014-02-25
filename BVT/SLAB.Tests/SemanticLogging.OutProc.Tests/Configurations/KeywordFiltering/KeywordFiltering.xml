@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="keywordFiltering.log" name="listener1">
+      <sources>
+        <eventSource name="MockEventSourceOutProcKeywords" matchAnyKeyword="3"/>
+      </sources>
+      <eventTextFormatter header="======" verbosityThreshold="LogAlways" />
+    </flatFileSink>
+  </sinks>
+</configuration>

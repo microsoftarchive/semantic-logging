@@ -1,0 +1,788 @@
+﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzure;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sinks
+{
+    [TestClass]
+    public class WindowsAzureTableSinkFixture
+    {
+        private string tableName;
+
+        [TestInitialize]
+        public void Initialize()
+        {
+            this.tableName = string.Empty;
+        }
+
+        [TestCleanup]
+        public void Teardown()
+        {
+            if (!string.IsNullOrWhiteSpace(this.tableName))
+            {
+                AzureTableHelper.DeleteTable(System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"], this.tableName);
+            }
+        }
+
+        [TestMethod]
+        public void WhenEventsWithDifferentLevelsToAzure()
+        {
+            this.tableName = "WhenEventsWithDifferentLevelsToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("This is a critical message");
+                    logger.Error("This is an error message");
+                    logger.Informational("This is informational");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 3);
+            Assert.AreEqual(3, events.Count());
+            Assert.AreEqual(TestEventSource.InformationalEventId, events.ElementAt(0).EventId);
+            Assert.AreEqual(TestEventSource.ErrorEventId, events.ElementAt(1).EventId);
+            Assert.AreEqual(TestEventSource.CriticalEventId, events.ElementAt(2).EventId);
+        }
+
+        [TestMethod]
+        public void WhenLoggingMultipleMessagesToAzure()
+        {
+            this.tableName = "WhenLoggingMultipleMessagesToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    for (int n = 0; n < 300; n++)
+                    {
+                        logger.Informational("logging multiple messages " + n.ToString());
+                    }
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 300);
+            Assert.AreEqual(300, events.Count());
+        }
+
+        [TestMethod]
+        public void WhenNoPayloadToAzure()
+        {
+            this.tableName = "WhenNoPayloadToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.EventWithoutPayloadNorMessage();
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            Assert.AreEqual(TestEventSource.EventWithoutPayloadNorMessageId, events.ElementAt(0).EventId);
+        }
+
+        [TestMethod]
+        public void WhenEventHasAllValuesForAttributeToAzure()
+        {
+            this.tableName = "WhenEventHasAllValuesForAttributeToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    logger.AllParametersWithCustomValues();
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            Assert.AreEqual(10001, events.ElementAt(0).EventId);
+        }
+
+        [TestMethod]
+        public void WhenSourceIsEnabledAndDisabledToAzure()
+        {
+            this.tableName = "WhenSourceIsEnabledAndDisabledToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("This is a critical message");
+                    var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+                    Assert.AreEqual(1, events.Count());
+
+                    listener.DisableEvents(logger);
+                    logger.Critical("This is a critical message");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+            Assert.AreEqual(1, eventsCount);
+        }
+
+        [TestMethod]
+        public void WhenEventHasMultiplePayloadsToAzure()
+        {
+            this.tableName = "WhenEventHasMultiplePayloadsToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.EventWithMultiplePayloads("TestPayload 1", "TestPayload 2", "TestPayload 3");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            StringAssert.Contains(events.First().Payload, @"""payload1"": ""TestPayload 1""");
+            StringAssert.Contains(events.First().Payload, @"""payload2"": ""TestPayload 2""");
+            StringAssert.Contains(events.First().Payload, @"""payload3"": ""TestPayload 3""");
+        }
+
+        [TestMethod]
+        public void WhenDefaultTableNameIsUsedToAzure()
+        {
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, WindowsAzureTableLog.DefaultTableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Error("This is an error message");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, WindowsAzureTableLog.DefaultTableName, 1);
+            Assert.AreEqual(1, events.Count());
+        }
+
+        [TestMethod]
+        public void WhenTableNameIsNullToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
+            {
+                this.tableName = null;
+                var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Value cannot be null");
+            StringAssert.Contains(ex.Message, "Parameter name: tableAddress");
+        }
+
+        [TestMethod]
+        public void WhenTableNameIsEmptyToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
+            {
+                this.tableName = string.Empty;
+                var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Argument is empty");
+            StringAssert.Contains(ex.Message, "Parameter name: tableAddress");
+        }
+
+        [TestMethod]
+        public void WhenTableNameIsInvalidToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
+            {
+                this.tableName = "$$$$";
+                var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Table names may contain only alphanumeric characters, cannot begin with a numeric character and must be from 3 to 63 characters long.");
+            StringAssert.Contains(ex.Message, "Parameter name: tableAddress");
+        }
+
+        [TestMethod]
+        public void WhenConnectionStringIsEmptyToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
+            {
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", string.Empty);
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Argument is empty");
+            StringAssert.Contains(ex.Message, "Parameter name: connectionString");
+        }
+
+        [TestMethod]
+        public void WhenConnectionStringIsNullToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
+            {
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", null);
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Value cannot be null");
+            StringAssert.Contains(ex.Message, "Parameter name: connectionString");
+        }
+
+        [TestMethod]
+        public void WhenInstanceIsEmptyToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentException>(() =>
+            {
+                var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable(string.Empty, connectionString);
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Argument is empty");
+            StringAssert.Contains(ex.Message, "Parameter name: instanceName");
+        }
+
+        [TestMethod]
+        public void WhenInstanceIsNullToAzure()
+        {
+            var ex = ExceptionAssertHelper.Throws<ArgumentNullException>(() =>
+            {
+                var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+
+                using (var listener = new ObservableEventListener())
+                {
+                    listener.LogToWindowsAzureTable(null, connectionString);
+                }
+            });
+
+            StringAssert.Contains(ex.Message, "Value cannot be null");
+            StringAssert.Contains(ex.Message, "Parameter name: instanceName");
+        }
+
+        [TestMethod]
+        public void WhenBatchSizeIsExceededToAzure()
+        {
+            this.tableName = "WhenBatchSizeIsExceededToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+            IEnumerable<WindowsAzureTableEventEntry> events = null;
+
+            using (var listener1 = new ObservableEventListener())
+            using (var listener2 = new ObservableEventListener())
+            {
+                try
+                {
+                    listener1.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener2.LogToWindowsAzureTable("mytestinstance2", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // 100 events or more will be flushed by count before the buffering interval elapses
+                    var logTaskList = new List<Task>();
+                    for (int i = 0; i < 120; i++)
+                    {
+                        var messageNumber = i;
+                        logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
+                    }
+
+                    Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
+                    
+                    // Wait less than the buffering interval for the events to be written and assert
+                    // Only the first batch of 100 is written for each listener
+                    events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 200, waitFor: TimeSpan.FromSeconds(10));
+                    Assert.AreEqual(200, events.Count());
+                    Assert.AreEqual(100, events.Where(e => e.InstanceName == "mytestinstance1").Count());
+                    Assert.AreEqual(100, events.Where(e => e.InstanceName == "mytestinstance2").Count());
+                }
+                finally
+                {
+                    listener1.DisableEvents(logger);
+                    listener2.DisableEvents(logger);
+                }
+            }
+
+            // The rest of the events are written during the Dispose flush
+            events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 240, waitFor: TimeSpan.FromSeconds(2));
+            Assert.AreEqual(240, events.Count());
+            Assert.AreEqual(120, events.Where(e => e.InstanceName == "mytestinstance1").Count());
+            Assert.AreEqual(120, events.Where(e => e.InstanceName == "mytestinstance2").Count());
+        }
+
+        [TestMethod]
+        public void WhenBufferingWithMinimumNonDefaultIntervalToAzure()
+        {
+            this.tableName = "WhenBufferingWithMinimalNonDefaultIntervalToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    // Minimum buffering interval is 500 ms
+                    var minimumBufferingInterval = TimeSpan.FromMilliseconds(500);
+                    listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: minimumBufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    var logTaskList = new List<Task>();
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.Critical("Critical message");
+                    }
+
+                    // Wait for the events to be written and assert
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+                    var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+                    Assert.AreEqual(10, eventsCount);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            // No more events should be written during the Dispose flush
+            var eventsCountFinal = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+            Assert.AreEqual(10, eventsCountFinal);
+        }
+
+        [TestMethod]
+        public void WhenUsingNonDefaultBufferIntervalToAzure()
+        {
+            this.tableName = "WhenUsingNonDefaultBufferIntervalToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    var bufferingInterval = TimeSpan.FromSeconds(5);
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // Pre-condition: Wait for the events to be written and assert
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+                    Assert.AreEqual(0, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.Critical("Critical Message");
+                    }
+
+                    // Event must not be written before the interval has elapsed
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+                    Assert.AreEqual(0, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+
+                    // Wait for the buffer to flush at end of interval
+                    Task.Delay(bufferingInterval).Wait();
+
+                    // 1st interval: Wait for the events to be written and assert
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
+                    Assert.AreEqual(10, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void WhenInternalBufferCountIsExceededAndIntervalExceededToAzure()
+        {
+            this.tableName = "WhenInternalBufferCountIsExceededAndIntervalExceededToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    var bufferingInterval = TimeSpan.FromSeconds(5);
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.Informational);
+
+                    // When reachiing 100 events buffer will be flushed
+                    for (int i = 0; i < 110; i++)
+                    {
+                        logger.Informational("Message1");
+                    }
+
+                    // Wait for buffer interval to elapse
+                    Task.Delay(bufferingInterval).Wait();
+                    var events = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+                    Assert.AreEqual(100, events);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            // Last events should be written during the Dispose flush
+            var eventsCountFinal = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+            Assert.AreEqual(110, eventsCountFinal);
+        }
+
+        [TestMethod]
+        public void WhenBufferIntervalExceedsAndLessEntriesThanBufferCountToAzure()
+        {
+            this.tableName = "WhenBufferIntervalExceedsAndLessEntriesThanBufferCountToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    var bufferingInterval = TimeSpan.FromSeconds(2);
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.Informational);
+
+                    // 100 events or more will be flushed by count before the buffering interval elapses
+                    for (int i = 0; i < 90; i++)
+                    {
+                        logger.Informational("Message1");
+                    }
+
+                    // Wait for buffer interval to elapse and allow time for events to be written
+                    Task.Delay(bufferingInterval.Add(TimeSpan.FromSeconds(2))).Wait();
+                    var events = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+                    Assert.AreEqual(90, events);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void WhenEventsInThreeConsecutiveIntervalsToAzure()
+        {
+            this.tableName = "WhenEventsInThreeConsecutiveIntervalsToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            var bufferingInterval = TimeSpan.FromSeconds(5);
+            var insertionInterval = TimeSpan.FromSeconds(1);
+            using (var listener = new ObservableEventListener())
+            using (var errorsListener = new InMemoryEventListener())
+            {
+                try
+                {
+                    errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Verbose);
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.Informational);
+
+                    // 1st interval: Log 10 events
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.Informational("Message1");
+                    }
+
+                    // 1st interval: Wait for the buffer to flush at end of interval
+                    Task.Delay(bufferingInterval).Wait();
+                    // 2nd interval: start
+
+                    // 1st interval: Wait for the events to be written and assert
+                    Task.Delay(insertionInterval).Wait();
+                    Assert.AreEqual(10, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+
+                    // 2nd interval: Log 10 events
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.Informational("Message1");
+                    }
+
+                    // 2nd interval: Wait for the buffer to flush at end of interval
+                    Task.Delay(bufferingInterval).Wait();
+                    // 3rd interval: start
+
+                    // 2nd interval: Wait for the events to be written and assert
+                    Task.Delay(insertionInterval).Wait();
+                    Assert.AreEqual(20, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+
+                    // 3rd interval: Log 10 events
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.Informational("Message1");
+                    }
+
+                    // 3rd interval: Wait for the buffer to flush at end of interval
+                    Task.Delay(bufferingInterval).Wait();
+                    // 4th interval: start
+
+                    // 3rd interval: Wait for the events to be written and assert
+                    Task.Delay(insertionInterval).Wait();
+                    Assert.AreEqual(30, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+
+                    // No errors should have been reported
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
+                }
+            }
+
+            // No more events should have been written during the last flush in the Dispose
+            Assert.AreEqual(30, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
+        }
+
+        [TestMethod]
+        public void WhenSourceEnabledWitKeywordsAllToAzure()
+        {
+            this.tableName = "WhenSourceEnabledWitKeywordsAllToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    logger.ErrorWithKeywordDiagnostic("Error with keyword Diagnostic");
+                    logger.CriticalWithKeywordPage("Critical with keyword Page");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 2);
+            Assert.AreEqual(2, events.Count());
+            Assert.AreEqual("1", events.First().Keywords.ToString());
+            Assert.AreEqual("4", events.ElementAt(1).Keywords.ToString());
+        }
+
+        [TestMethod]
+        public void WhenNotEnabledWithKeywordsAndEventWithSpecificKeywordIsRaisedToAzure()
+        {
+            this.tableName = "WhenNotEnabledWithKeywordsAndEventWithSpecificKeywordIsRaised";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.ErrorWithKeywordDiagnostic("Error with keyword EventlogClassic");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
+            Assert.AreEqual(0, eventsCount);
+        }
+
+        [TestMethod]
+        public void WhenListenerIsDisposedToAzure()
+        {
+            this.tableName = "WhenListenerIsDisposedToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            var listener1 = new ObservableEventListener();
+            var listener2 = new ObservableEventListener();
+            try
+            {
+                listener1.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                listener2.LogToWindowsAzureTable("mytestinstance2", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                listener1.EnableEvents(logger, EventLevel.LogAlways);
+                listener2.EnableEvents(logger, EventLevel.LogAlways);
+                var logTaskList = new List<Task>();
+                for (int i = 0; i < 105; i++)
+                {
+                    var messageNumber = i;
+                    logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
+                }
+
+                Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
+                listener1.Dispose();
+                listener2.Dispose();
+
+                var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 600);
+                Assert.AreEqual(210, events.Count());
+            }
+            finally
+            {
+                try
+                { listener1.DisableEvents(logger); }
+                catch
+                { }
+
+                try
+                { listener2.DisableEvents(logger); }
+                catch
+                { }
+            }
+        }
+
+        [TestMethod]
+        public void WhenEventWithTaskNameInAttributeIsRaisedToAzure()
+        {
+            this.tableName = "WhenEventWithTaskNameInAttributeIsRaisedToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = TestEventSource.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    logger.CriticalWithTaskName("Critical with task name");
+                    logger.CriticalWithKeywordPage("Critical with no task name");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 2);
+            Assert.AreEqual(2, events.Count());
+            Assert.AreEqual("64513", events.First().Task.ToString());
+            Assert.AreEqual("1", events.ElementAt(1).Task.ToString());
+        }
+
+        [TestMethod]
+        public void WhenEventWithEnumsInPayloadIsRaisedToAzure()
+        {
+            this.tableName = "WhenEventWithEnumsInPayloadIsRaisedToAzure";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = MockEventSourceInProcEnum.Logger;
+
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.Zero);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                }
+            }
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            Assert.AreEqual((int)EventTask.None, events.ElementAt(0).Task);
+            Assert.AreEqual((int)EventOpcode.Resume, events.ElementAt(0).Opcode);
+            Assert.AreEqual("{\n  \"a\": 2,\n  \"b\": 2\n}", events.ElementAt(0).Payload.ToString());
+        }
+    }
+}

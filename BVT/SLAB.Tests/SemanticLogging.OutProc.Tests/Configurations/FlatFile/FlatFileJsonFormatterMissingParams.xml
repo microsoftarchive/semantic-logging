@@ -1,0 +1,12 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="FlatFileOutProcConfigJson.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <jsonEventTextFormatter  />
+    </flatFileSink>
+  </sinks>
+</configuration>
+

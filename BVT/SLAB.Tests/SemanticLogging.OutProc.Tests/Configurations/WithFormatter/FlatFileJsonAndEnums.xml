@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService />
+  <sinks>
+    <flatFileSink fileName=".\Logs\FlatFileJsonAndEnums.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProcEnum" />
+      </sources>
+      <jsonEventTextFormatter formatting="Indented" dateTimeFormat="dMyyyy" />
+    </flatFileSink>
+  </sinks>
+
+</configuration>

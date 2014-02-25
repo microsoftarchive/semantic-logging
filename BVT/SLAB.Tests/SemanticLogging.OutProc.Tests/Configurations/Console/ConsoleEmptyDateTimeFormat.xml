@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <consoleSink name="ConsoleEventListener" colorMapperType="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters.DefaultConsoleColorMapper, Microsoft.Practices.EnterpriseLibrary.SemanticLogging">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+      <eventTextFormatter footer="********" dateTimeFormat="" header="================================================================================" verbosityThreshold="LogAlways"/>
+    </consoleSink>
+  </sinks>
+</configuration>

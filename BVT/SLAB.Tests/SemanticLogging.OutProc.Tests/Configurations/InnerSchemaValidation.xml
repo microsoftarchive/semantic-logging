@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService/>
+  <sinks>
+    <mySink name="my" xmlns="urn:test" attr="Indented" foo="someValue">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <jsonEventTextFormatter name="json" dateTimeFormat="d" />
+    </mySink>
+  </sinks>
+</configuration>

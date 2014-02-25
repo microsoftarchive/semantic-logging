@@ -1,0 +1,24 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService sessionNamePrefix="ServiceReconfig"/>
+
+  <sinks>
+    <flatFileSink  name="flatFileLst" fileName="sessionLength.log">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <eventTextFormatter dateTimeFormat="d" verbosityThreshold="LogAlways" header="==--==--=="/>
+    </flatFileSink>
+    <consoleSink  name="123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+    </consoleSink>
+    <flatFileSink  name="flatFileLst2" fileName="sessionLength2.log" >
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+    <eventTextFormatter dateTimeFormat="d" verbosityThreshold="LogAlways" header="==--==--=="/>
+    </flatFileSink>
+  </sinks>
+</configuration>

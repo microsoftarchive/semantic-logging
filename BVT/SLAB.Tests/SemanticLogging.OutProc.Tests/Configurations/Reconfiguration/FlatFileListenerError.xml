@@ -1,0 +1,30 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService sessionNamePrefix="ServiceReconfig"/>
+
+  <sinks>
+    <consoleSink  name="dummyListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+    </consoleSink>
+    <flatFileSink fileName="c:\c:\flatfile.log" name="flatFileListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <eventTextFormatter dateTimeFormat="d" header="======="/>
+    </flatFileSink>
+    <flatFileSink fileName="c:\c:\flatfile2.log" name="4flatFileListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <eventTextFormatter dateTimeFormat="d" header="======="/>
+    </flatFileSink>
+    <flatFileSink  fileName="flatfileListenerOk.log" name="2flatFileListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <eventTextFormatter dateTimeFormat="d" header="======="/>
+    </flatFileSink>
+  </sinks>
+</configuration>

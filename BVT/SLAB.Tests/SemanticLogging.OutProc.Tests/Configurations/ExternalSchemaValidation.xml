@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="urn:test2 ExternalSchemas/MyCustomSinkElement.xxsd">
+
+  <traceEventService/>
+
+  <sinks>
+    <mySink name="my" xmlns="urn:test2" attr="foo">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+      <jsonEventTextFormatter name="json" dateTimeFormat="d" />
+    </mySink>
+  </sinks>
+</configuration>

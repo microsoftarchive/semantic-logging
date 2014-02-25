@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <traceEventService />
+  <sinks>
+   <flatFileSink fileName="FlatFileFormatterOutProc.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="MockEventSourceOutProc" />
+      </sources>
+     <eventTextFormatter dateTimeFormat="d" verbosityThreshold="LogAlways" footer="==" header="=======" />
+    </flatFileSink>
+  </sinks>
+
+</configuration>

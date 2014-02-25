@@ -1,0 +1,11 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <customSink name="customListener" type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Mocks.InMemoryEventListener, Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests">
+      <sources>
+        <eventSource  name="MyEventSource" id="659518be-d338-564b-2759-c63c10ef82e2" />
+      </sources>
+    </customSink>
+  </sinks>
+</configuration>

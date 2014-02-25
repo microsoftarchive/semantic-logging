@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink name="customListener" fileName="customFormatterError.log">
+      <sources>
+        <eventSource name="MyEventSource"  />
+      </sources>
+      <customEventTextFormatter type="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters, Microsoft.Practices.EnterpriseLibrary.SemanticLogging">
+        <parameters>
+          <parameter name="header" type="System.String" value="----------"></parameter>
+        </parameters>
+      </customEventTextFormatter>
+    </flatFileSink>
+  </sinks>
+</configuration>
+

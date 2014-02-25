@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="levelFiltering.log" name="listener1">
+      <sources>
+        <eventSource name="MockEventSourceOutProcFiltering" level="Critical"/>
+      </sources>
+      <eventTextFormatter header="======"/>
+    </flatFileSink>
+    <flatFileSink  fileName="levelFiltering2.log" name="listener2">
+      <sources>
+        <eventSource name="MockEventSourceOutProcFiltering" level="Error"/>
+      </sources>
+      <eventTextFormatter header="======"/>
+    </flatFileSink>
+    <flatFileSink  fileName="levelFiltering3.log" name="listener3">
+      <sources>
+        <eventSource name="MockEventSourceOutProcFiltering" level="Warning"/>
+      </sources>
+      <eventTextFormatter header="======"/>
+    </flatFileSink>
+  </sinks>
+</configuration>
