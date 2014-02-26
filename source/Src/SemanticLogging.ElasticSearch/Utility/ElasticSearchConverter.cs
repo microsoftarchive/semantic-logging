@@ -7,15 +7,12 @@ using System.Globalization;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
-    using System.Text.RegularExpressions;
-
     /// <summary>
     /// Converts ElasticSearchLogEntry to JSON formatted ElasticSearch _bulk service index operation
     /// </summary>
     public class ElasticSearchConverter : JsonConverter
     {
         private const string PayloadFlattenFormatString = "Payload_{0}";
-
 
         /// <summary>
         /// Writes the JSON representation of the object.
@@ -38,7 +35,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             // Write the batch "index" operation header
             writer.WriteStartObject();
             // ES index names must be lower case and cannot contain whitespace or any of the following characters \/*?"<>|,
-            WriteValue(writer, "_index", logEntry.Index.ToLower());
+            WriteValue(writer, "_index", logEntry.Index.ToLower(CultureInfo.InvariantCulture));
             WriteValue(writer, "_type", logEntry.Type);
             writer.WriteEndObject();
             writer.WriteEndObject();

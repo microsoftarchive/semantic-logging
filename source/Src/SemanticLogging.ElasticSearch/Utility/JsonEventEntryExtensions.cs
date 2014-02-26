@@ -54,10 +54,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 RelatedActivityId = entry.RelatedActivityId
             };
 
-            if (!InitializePayload(entity, entry.Payload, entry.Schema))
-            {
-                return null;
-            }
+            InitializePayload(entity, entry.Payload, entry.Schema);
 
             return entity;
         }

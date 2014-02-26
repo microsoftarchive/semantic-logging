@@ -35,7 +35,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly Uri elasticSearchUrl;
         private readonly TimeSpan onCompletedTimeout;
 
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ElasticSearchSink"/> class with the specified connection string and table address.
         /// </summary>
@@ -121,7 +120,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             Dispose(false);
         }
 
-
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -176,11 +174,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
                 var items = responseObject["items"] as JArray;
 
-                // If the reponse return items collection
+                // If the response return items collection
                 if (items != null)
                 {
                     // NOTE: This only works with ElasticSearch 1.0
-                    // Alternatively we could query ES as part of initialization check resutls or fall back to trying <1.0 parsing
+                    // Alternatively we could query ES as part of initialization check results or fall back to trying <1.0 parsing
                     // We should also consider logging errors for individual entries
                     return items.Count(t => t["create"]["status"].Value<int>().Equals(201));
 
@@ -192,11 +190,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 JToken status = responseObject["status"];
                 if (status != null && status.Value<int>() == 400)
                 {
-                    // Possible multiple enumeration, but this should be rare occurance
+                    // Possible multiple enumeration, but this should be rare ocurance
                     var messagesDiscarded = collection.Count();
 
                     // We are unable to write the batch of event entries
-                    // I don't like discarding events but we cannot let a single marlformed event prevent others from being written
+                    // I don't like discarding events but we cannot let a single malformed event prevent others from being written
                     // We might want to consider falling back to writing entries individually here
                     SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, responseObject["error"].Value<string>());
 
