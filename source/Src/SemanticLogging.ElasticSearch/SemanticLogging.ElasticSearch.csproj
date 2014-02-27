@@ -55,9 +55,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
-    <Compile Include="Sinks\ElasticSearchLogEntry.cs" />
     <Compile Include="Utility\JsonEventEntryExtensions.cs" />
-    <Compile Include="Utility\ElasticSearchConverter.cs" />
+    <Compile Include="Utility\ElasticSearchEventEntrySerializer.cs" />
     <Compile Include="Sinks\ElasticSearchSink.cs" />
     <Compile Include="Sinks\JsonEventEntry.cs" />
     <Compile Include="ElasticSearchLog.cs" />

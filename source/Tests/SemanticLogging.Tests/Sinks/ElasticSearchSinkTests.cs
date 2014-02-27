@@ -1,18 +1,18 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json.Linq;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Threading;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
     [TestClass]
     public class given_elasticsearch_configuration
     {
@@ -21,19 +21,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_creating_sink_for_null_connection_string_then_throws()
         {
-            AssertEx.Throws<ArgumentNullException>(() => new ElasticSearchSink("instanceName", null, "logstash", "etw", TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentNullException>(() => new ElasticSearchSink("instanceName", null, "logstash", "etw", true, TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_sink_with_invalid_connection_string_then_throws()
         {
-            AssertEx.Throws<UriFormatException>(() => new ElasticSearchSink("instanceName", "InvalidConnection", "logstash", "etw", TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<UriFormatException>(() => new ElasticSearchSink("instanceName", "InvalidConnection", "logstash", "etw", true, TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_sink_with_small_buffer_size_then_throws()
         {
-            AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, "logstash", "etw", TimeSpan.FromSeconds(1), 10, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, "logstash", "etw", true, TimeSpan.FromSeconds(1), 10, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
@@ -44,17 +44,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("{0}testindex", invalidChar), "etw", TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("{0}testindex", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
             }
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("test{0}index", invalidChar), "etw", TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("test{0}index", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
             }
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("testindex{0}", invalidChar), "etw", TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("testindex{0}", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 10000, Timeout.InfiniteTimeSpan));
             }
         }
     }
@@ -72,27 +72,90 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 Payload = payload,
                 InstanceName = "instance"
             };
-            var logEntry = new ElasticSearchLogEntry { Index = "log", Type = "slab", LogEntry = logObject };
 
-            var actual = JsonConvert.SerializeObject(logEntry);
+            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
         }
 
         [TestMethod]
-        public void when_serializing_concatenating_serialized_entries_then_they_are_valid_bulk_message()
+        public void when_serializing_a_log_entry_with_activtyid_then_activityid_serialized()
+        {
+            var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
+            var logObject = new JsonEventEntry
+            {
+                EventDate = DateTime.UtcNow,
+                Payload = payload,
+                InstanceName = "instance",
+                ActivityId = Guid.NewGuid(),
+                RelatedActivityId = Guid.NewGuid()
+            };
+
+            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+
+            var serializedEntry = actual.Split('\n')[1];
+            var jsonObject = JObject.Parse(serializedEntry);
+
+            Assert.IsTrue(jsonObject["ActivityId"] != null);
+            Assert.IsTrue(jsonObject["RelatedActivityId"] != null);
+            Assert.IsNotNull(actual);
+            Assert.IsTrue(this.IsValidBulkMessage(actual));
+        }
+
+        [TestMethod]
+        public void when_serializing_a_log_entry_without_activtyid_then_activityid_not_serialized()
+        {
+            var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
+            var logObject = new JsonEventEntry
+            {
+                EventDate = DateTime.UtcNow,
+                Payload = payload,
+                InstanceName = "instance"
+            };
+
+            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+
+            var serializedEntry = actual.Split('\n')[1];
+            var jsonObject = JObject.Parse(serializedEntry);
+
+            Assert.IsTrue(jsonObject["ActivityId"] == null);
+            Assert.IsTrue(jsonObject["RelatedActivityId"] == null);
+            Assert.IsNotNull(actual);
+            Assert.IsTrue(this.IsValidBulkMessage(actual));
+        }
+
+        [TestMethod]
+        public void when_serializing_a_log_entry_without_flattened_payload_then_payload_nested()
+        {
+            var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
+            var logObject = new JsonEventEntry
+            {
+                EventDate = DateTime.UtcNow,
+                Payload = payload,
+                InstanceName = "instance"
+            };
+
+            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", false).Serialize(new[] { logObject });
+
+            var serializedEntry = actual.Split('\n')[1];
+            var jsonObject = JObject.Parse(serializedEntry);
+
+            Assert.IsTrue(jsonObject["Payload"]["msg"] != null);
+            Assert.IsTrue(jsonObject["Payload"]["date"] != null);
+            Assert.IsNotNull(actual);
+            Assert.IsTrue(this.IsValidBulkMessage(actual));
+        }
+
+        [TestMethod]
+        public void when_serializing_logentries_can_serialize_valid_bulk_request_format()
         {
             // Note: converting an array does not create valid message for use in elasticsearch bulk operation
 
-            var bulkMessage = new StringBuilder();
-            bulkMessage.Append(JsonConvert.SerializeObject(new ElasticSearchLogEntry { Index = "log", Type = "slab", LogEntry = CreateJsonEventEntry() }));
-            bulkMessage.Append(JsonConvert.SerializeObject(new ElasticSearchLogEntry { Index = "log", Type = "slab", LogEntry = CreateJsonEventEntry() }));
+            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { CreateJsonEventEntry(), CreateJsonEventEntry() });
 
-            var messages = bulkMessage.ToString();
-
-            Assert.IsNotNull(messages);
-            Assert.IsTrue(this.IsValidBulkMessage(messages));
+            Assert.IsNotNull(actual);
+            Assert.IsTrue(this.IsValidBulkMessage(actual));
         }
 
         private static JsonEventEntry CreateJsonEventEntry()

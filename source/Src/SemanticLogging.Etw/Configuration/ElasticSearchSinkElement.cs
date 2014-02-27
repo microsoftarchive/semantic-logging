@@ -33,6 +33,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
                 (string)element.Attribute("connectionString"),
                 (string)element.Attribute("index") ?? "logstash",
                 (string)element.Attribute("type") ?? "etw",
+                (bool?)element.Attribute("flattenPayload") ?? true,
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ??
                 Constants.DefaultBufferingFlushAllTimeout,

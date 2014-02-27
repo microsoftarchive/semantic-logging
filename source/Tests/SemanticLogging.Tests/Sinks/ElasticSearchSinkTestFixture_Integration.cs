@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading;
+
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Threading;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
     [TestClass]
     public class given_empty_index
     {
@@ -91,7 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var msgPropValues = new[] { "1", "2", "3" };
             var eventEntries = msgPropValues.Select(this.CreateEventEntry);
 
-            var sink = new ElasticSearchSink("instance", DevelopmentElasticSearchUrl, TestIndex, "etw", TimeSpan.FromSeconds(1), 600,
+            var sink = new ElasticSearchSink("instance", DevelopmentElasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 600,
                 TimeSpan.FromMinutes(1));
 
             var count = sink.PublishEventsAsync(eventEntries).Result;
