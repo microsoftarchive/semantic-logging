@@ -35,7 +35,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             // Write the batch "index" operation header
             writer.WriteStartObject();
             // ES index names must be lower case and cannot contain whitespace or any of the following characters \/*?"<>|,
-            WriteValue(writer, "_index", logEntry.Index.ToLower(CultureInfo.InvariantCulture));
+            WriteValue(writer, "_index", logEntry.Index);
             WriteValue(writer, "_type", logEntry.Type);
             writer.WriteEndObject();
             writer.WriteEndObject();

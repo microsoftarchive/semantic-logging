@@ -59,7 +59,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             return entity;
         }
 
-        private static bool InitializePayload(JsonEventEntry entity, IList<object> payload, EventSchema schema)
+        private static void InitializePayload(JsonEventEntry entity, IList<object> payload, EventSchema schema)
         {
             try
             {
@@ -69,13 +69,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 {
                     entity.Payload.Add(schema.Payload[i], payload[i]);
                 }
-
-                return true;
             }
             catch (Exception e)
             {
-                SemanticLoggingEventSource.Log.ElasticSearchSinkEntityCreationFailed(e.ToString());
-                return false;
+                SemanticLoggingEventSource.Log.ElasticSearchSinkEntityPayloadCreationFailed(e.ToString());
             }
         }
     }

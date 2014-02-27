@@ -160,8 +160,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(600, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to create an entity. Message: {0}")]
-        internal void ElasticSearchSinkEntityCreationFailed(string message)
+        [Event(600, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to create payload for an entity. Message: {0}")]
+        internal void ElasticSearchSinkEntityPayloadCreationFailed(string message)
         {
             if (this.IsEnabled())
             {

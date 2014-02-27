@@ -12,23 +12,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     [TestClass]
     public class given_empty_index
     {
-        //These tests will delete EVERYTHING in the supplied elasticsearch endpoint
+        // These tests will delete data in the provided elasticsearch endpoint
         protected readonly string DevelopmentElasticSearchUrl = "http://localhost:9200";
+
+        protected readonly string TestIndex = "slabtest";
 
         [TestInitialize]
         public void Setup()
         {
-            //Delete all indexes
+            // Delete data in the text index(s)
             DeleteIndex();
         }
 
         protected void DeleteIndex(string indexName = null)
         {
-            indexName = indexName ?? "*";
+            indexName = indexName ?? TestIndex + "*";
 
             var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
 
@@ -39,18 +42,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
 
-            var operation = string.Format("{0}/_count", indexName ?? "_all");
+            var operation = string.Format("{0}/_count", indexName ?? TestIndex + "*");
 
-            var result = JsonConvert.DeserializeObject<CountResult>(client.GetStringAsync(operation).Result);
+            var response = client.GetStringAsync(operation).Result;
 
-            return result.Count;
+            return JObject.Parse(response)["count"].Value<int>();
         }
 
         protected QueryResult QueryAllEntriesByIndex(string indexName = null)
         {
             var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
 
-            var operation = string.Format("{0}/_search?q=*", indexName ?? "_all");
+            var operation = string.Format("{0}/_search?q=*", indexName ?? TestIndex + "*");
 
             var resultString = client.GetStringAsync(operation).Result;
 
@@ -70,6 +73,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             };
             return logObject;
         }
+
+        [TestCleanup]
+        protected void Cleanup()
+        {
+            DeleteIndex();
+        }
     }
 
     [TestClass]
@@ -82,7 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var msgPropValues = new[] { "1", "2", "3" };
             var eventEntries = msgPropValues.Select(this.CreateEventEntry);
 
-            var sink = new ElasticSearchSink("instance", DevelopmentElasticSearchUrl, "logstash", "etw", TimeSpan.FromSeconds(1), 600,
+            var sink = new ElasticSearchSink("instance", DevelopmentElasticSearchUrl, TestIndex, "etw", TimeSpan.FromSeconds(1), 600,
                 TimeSpan.FromMinutes(1));
 
             var count = sink.PublishEventsAsync(eventEntries).Result;
@@ -100,10 +109,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 }
             }
 
-            //Query across the _all index
+            // Query across the _all index
             var results = this.QueryAllEntriesByIndex();
 
-            //Compare the message property values to make sure they match
+            // Compare the message property values to make sure they match
             var queryMsgPropValues = results.Hits.Hits.Select(hit => hit.Source["Payload_msg"].ToString()).ToArray();
             var areMsgPropertiesEqual = (queryMsgPropValues.Length == msgPropValues.Length && queryMsgPropValues.Intersect(msgPropValues).Count() == queryMsgPropValues.Length);
 
@@ -112,14 +121,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         }
     }
 
-    #region MessageResponsTypes
-    public class CountResult
-    {
-        public int Count { get; set; }
-
-        [JsonProperty(PropertyName = "_shards")]
-        public Dictionary<string, object> Shards { get; set; }
-    }
+    #region MessageResponseTypes
 
     public class QueryResult
     {

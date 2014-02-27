@@ -16,6 +16,10 @@ using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
+    using System.Text.RegularExpressions;
+
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Properties;
+
     /// <summary>
     /// Sink that asynchronously writes entries to a ElasticSearch server.
     /// </summary>
@@ -56,6 +60,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             Guard.ArgumentNotNullOrEmpty(index, "index");
             Guard.ArgumentNotNullOrEmpty(type, "type");
             Guard.ArgumentIsValidTimeout(onCompletedTimeout, "onCompletedTimeout");
+
+            if (Regex.IsMatch(index, "[\\\\/*?\",<>|\\sA-Z]"))
+            {
+                throw new ArgumentException(Resource.InvalidElasticSearchIndexNameError, "index");
+            }
 
             this.onCompletedTimeout = onCompletedTimeout;
 
@@ -146,22 +155,29 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
         internal async Task<int> PublishEventsAsync(IEnumerable<JsonEventEntry> collection)
         {
+            // Create bulk operation message
             var bulkMessage = new StringBuilder();
 
-            var es = new ElasticSearchLogEntry { Type = type };
+            var es = new ElasticSearchLogEntry { Type = this.type };
             foreach (var entry in collection)
             {
-                es.Index = GetIndexName(index, entry.EventDate);
+                es.Index = GetIndexName(this.index, entry.EventDate);
                 es.LogEntry = entry;
                 bulkMessage.Append(JsonConvert.SerializeObject(es));
             }
 
-            var client = new HttpClient();
-            var content = new StringContent(bulkMessage.ToString());
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            HttpClient client = null;
+
             try
             {
-                var response = await client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
+                client = new HttpClient();
+                var content = new StringContent(bulkMessage.ToString());
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                var response =
+                    await
+                    client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token)
+                        .ConfigureAwait(false);
 
                 // Anything but a 200 response will leave the entries in the buffer and we will try again
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -186,17 +202,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     // return items.Count(t => t["create"]["ok"].Value<bool>().Equals(true));
                 }
 
-                // Check ElasticSearch response for status and error - this should be rare
+                // Check ElasticSearch response for status and error
                 JToken status = responseObject["status"];
                 if (status != null && status.Value<int>() == 400)
                 {
-                    // Possible multiple enumeration, but this should be rare ocurance
+                    // Possible multiple enumeration, but this should be rare occurrence
                     var messagesDiscarded = collection.Count();
 
                     // We are unable to write the batch of event entries
                     // I don't like discarding events but we cannot let a single malformed event prevent others from being written
                     // We might want to consider falling back to writing entries individually here
-                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, responseObject["error"].Value<string>());
+                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(
+                        messagesDiscarded,
+                        responseObject["error"].Value<string>());
 
                     return messagesDiscarded;
                 }
@@ -212,6 +230,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 // Although this is generally considered an anti-pattern this is not logged upstream and we have context
                 SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailed(ex.ToString());
                 throw;
+            }
+            finally
+            {
+                if (client != null)
+                {
+                    client.Dispose();
+                }
             }
         }
 
