@@ -176,6 +176,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token)
                         .ConfigureAwait(false);
 
+                // Check the response for 400 bad request
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    // Possible multiple enumeration, but this should be rare occurrence
+                    var messagesDiscarded = collection.Count();
+
+                    var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                    var errorObject = JObject.Parse(errorContent);
+
+                    // We are unable to write the batch of event entries
+                    // I don't like discarding events but we cannot let a single malformed event prevent others from being written
+                    // We might want to consider falling back to writing entries individually here
+                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(
+                        messagesDiscarded,
+                        errorObject["error"].Value<string>());
+
+                    return messagesDiscarded;
+                }
+
                 // Anything but a 200 response will leave the entries in the buffer and we will try again
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
@@ -197,23 +217,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
                     // Pre-1.0 ElasticSearch
                     // return items.Count(t => t["create"]["ok"].Value<bool>().Equals(true));
-                }
-
-                // Check ElasticSearch response for status and error
-                JToken status = responseObject["status"];
-                if (status != null && status.Value<int>() == 400)
-                {
-                    // Possible multiple enumeration, but this should be rare occurrence
-                    var messagesDiscarded = collection.Count();
-
-                    // We are unable to write the batch of event entries
-                    // I don't like discarding events but we cannot let a single malformed event prevent others from being written
-                    // We might want to consider falling back to writing entries individually here
-                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(
-                        messagesDiscarded,
-                        responseObject["error"].Value<string>());
-
-                    return messagesDiscarded;
                 }
 
                 return 0;
