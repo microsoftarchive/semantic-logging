@@ -171,34 +171,42 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 var content = new StringContent(logMessages);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                var response =
-                    await
-                    client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token)
-                        .ConfigureAwait(false);
+                var response = await client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
 
-                // Check the response for 400 bad request
-                if (response.StatusCode == HttpStatusCode.BadRequest)
-                {
-                    // Possible multiple enumeration, but this should be rare occurrence
-                    var messagesDiscarded = collection.Count();
-
-                    var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-                    var errorObject = JObject.Parse(errorContent);
-
-                    // We are unable to write the batch of event entries
-                    // I don't like discarding events but we cannot let a single malformed event prevent others from being written
-                    // We might want to consider falling back to writing entries individually here
-                    SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(
-                        messagesDiscarded,
-                        errorObject["error"].Value<string>());
-
-                    return messagesDiscarded;
-                }
-
-                // Anything but a 200 response will leave the entries in the buffer and we will try again
+                // If there is an exception
                 if (response.StatusCode != HttpStatusCode.OK)
                 {
+                    // Check the response for 400 bad request
+                    if (response.StatusCode == HttpStatusCode.BadRequest)
+                    {
+                        // Possible multiple enumeration, but this should be an extremely rare occurance
+                        var messagesDiscarded = collection.Count();
+
+                        var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+                        string serverErrorMessage;
+
+                        // Try to parse the exception message
+                        try
+                        {
+                            var errorObject = JObject.Parse(errorContent);
+                            serverErrorMessage = errorObject["error"].Value<string>();
+                        }
+                        catch (Exception)
+                        {
+                            // If for some reason we cannot extract the server error message log the entire response
+                            serverErrorMessage = errorContent;
+                        }
+
+                        // We are unable to write the batch of event entries - Possible poison message
+                        // I don't like discarding events but we cannot let a single malformed event prevent others from being written
+                        // We might want to consider falling back to writing entries individually here
+                        SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, serverErrorMessage);
+
+                        return messagesDiscarded;
+                    }
+
+                    // This will leave the messages in the buffer
                     return 0;
                 }
 
