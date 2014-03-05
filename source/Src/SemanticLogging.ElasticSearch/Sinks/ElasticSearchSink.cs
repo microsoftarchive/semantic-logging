@@ -7,18 +7,17 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Properties;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
-    using System.Text.RegularExpressions;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Properties;
-
     /// <summary>
     /// Sink that asynchronously writes entries to a ElasticSearch server.
     /// </summary>
@@ -179,7 +178,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     // Check the response for 400 bad request
                     if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
-                        // Possible multiple enumeration, but this should be an extremely rare occurance
+                        // Possible multiple enumeration, but this should be an extremely rare occurrance
                         var messagesDiscarded = collection.Count();
 
                         var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
