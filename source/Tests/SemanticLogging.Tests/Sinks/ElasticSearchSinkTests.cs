@@ -2,9 +2,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -210,6 +213,40 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             // Finally, the last item seen should not be header
             return isHeader;
+        }
+    }
+
+    [TestClass]
+    public class given_elasticsearch_response
+    {
+        [TestMethod]
+        public void when_400_error_is_returned_then_batch_fails_and_logs_exception_without_timeout()
+        {
+            var mockHttpListener = new MockHttpListener();
+
+            using (var collectErrorsListener = new MockEventListener())
+            {
+                collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
+
+                var endpoint = mockHttpListener.Start(new MockHttpListenerResponse()
+                                    {
+                                        ResponseCode = 400,
+                                        ContentType = "application/json",
+                                        Content = "{ \"error\": \"InvalidIndexNameException[[log,stash] Invalid index name [log,stash], must not contain the following characters [\\\\, /, *, ?, \\\", <, >, |,  , ,]]\",\"status\": 400}"
+                                    });
+
+                var sink = new ElasticSearchSink("instance", endpoint, "slabtest", "etw", true, TimeSpan.FromSeconds(1), 600, TimeSpan.FromMinutes(1));
+
+                sink.OnNext(new JsonEventEntry());
+
+                var flushCompleteInTime = sink.FlushAsync().Wait(TimeSpan.FromSeconds(45));
+                
+                mockHttpListener.Stop();
+
+                // Make sure the exception is logged
+                Assert.IsTrue(collectErrorsListener.WrittenEntries.First().Payload.Single(m => m.ToString().Contains("InvalidIndexNameException")) != null);
+                Assert.IsTrue(flushCompleteInTime);
+            }
         }
     }
 }

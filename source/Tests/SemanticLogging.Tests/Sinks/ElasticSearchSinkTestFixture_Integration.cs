@@ -95,7 +95,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 TimeSpan.FromMinutes(1));
 
             var count = sink.PublishEventsAsync(eventEntries).Result;
-            sink.FlushAsync().Wait(TimeSpan.FromSeconds(45));
 
             Assert.AreEqual(count, 3);
 

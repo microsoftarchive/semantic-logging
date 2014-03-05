@@ -101,6 +101,8 @@
     <Compile Include="TestObjects\CustomSink.cs" />
     <Compile Include="TestObjects\LargeManifestEventSource.cs" />
     <Compile Include="TestObjects\MockEventListener.cs" />
+    <Compile Include="TestObjects\MockHttpListener.cs" />
+    <Compile Include="TestObjects\MockHttpListenerResponse.cs" />
     <Compile Include="TestObjects\MultipleTypesEventSource.cs" />
     <Compile Include="TestObjects\SimpleEventSource.cs" />
     <Compile Include="Observable\EventEntrySubjectFixture.cs" />
