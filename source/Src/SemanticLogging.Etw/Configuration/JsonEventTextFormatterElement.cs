@@ -38,7 +38,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
 
             EventTextFormatting formatting = (EventTextFormatting)Enum.Parse(typeof(EventTextFormatting), (string)formatter.Attribute("formatting") ?? JsonEventTextFormatter.DefaultEventTextFormatting.ToString());
 
-            return new JsonEventTextFormatter(formatting, (string)formatter.Attribute("dateTimeFormat"));
+            var includeSeparator = formatter.Attribute("includeEntrySeparator");
+
+            var jsonFormatter = new JsonEventTextFormatter(formatting, (string)formatter.Attribute("dateTimeFormat"));
+            if (includeSeparator != null)
+            {
+                bool parsedValue = false;
+                if (bool.TryParse(includeSeparator.Value, out parsedValue))
+                {
+                    jsonFormatter.IncludeEntrySeparator = parsedValue;
+                }
+            }
+
+            return jsonFormatter;
         }
 
         private XElement GetFormatterElement(XElement element)
