@@ -469,5 +469,37 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 StringAssert.Contains(this.RawOutput, "\"arg8\": 1");
             }
         }
+
+        [TestClass]
+        public class when_formatter_configured_to_leave_off_separator : given_json_event_text_formatter
+        {
+            protected StringCollectionEventListener collectionListener;
+
+            protected override void Given()
+            {
+                formatter = new JsonEventTextFormatter(){IncludeEntrySeparator = false};
+                collectionListener = new StringCollectionEventListener(formatter);
+                collectionListener.EnableEvents(logger, EventLevel.LogAlways);
+            }
+
+            protected override void OnCleanup()
+            {
+                collectionListener.DisableEvents(logger);
+                collectionListener.Dispose();
+            }
+
+            protected override void When()
+            {
+                logger.Informational("Foo");
+            }
+
+            [TestMethod]
+            public void then_event_written_should_leave_off_trailing_separator()
+            {
+                Assert.IsFalse(collectionListener.EventsWritten.Single().EndsWith(","));
+            }
+        }
     }
+
+    
 }
