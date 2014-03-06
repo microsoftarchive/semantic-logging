@@ -15,6 +15,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     [TestClass]
     public class given_traceEventServiceConfigurationInstance
     {

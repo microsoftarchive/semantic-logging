@@ -11,20 +11,11 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     internal static class XmlUtil
     {
         private static readonly XName ParametersName = XName.Get("parameters", Constants.Namespace);
-
-        internal static TimeSpan? ToTimeSpan(this XAttribute attribute)
-        {
-            int? bufferingIntervalInSeconds = (int?)attribute;
-            if (!bufferingIntervalInSeconds.HasValue)
-            {
-                return (TimeSpan?)null;
-            }
-
-            return bufferingIntervalInSeconds.Value == -1 ? Timeout.InfiniteTimeSpan : TimeSpan.FromSeconds(bufferingIntervalInSeconds.Value);
-        }
 
         //// Recreates the element structure in a ordered way (attributes and child elements) to get accurate element comparisons 
         internal static XElement DeepNormalization(this XElement element)

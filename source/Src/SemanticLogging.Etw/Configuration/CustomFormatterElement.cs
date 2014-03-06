@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using System.Xml.Linq;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
-
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using System.Xml.Linq;
+
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
+
     internal class CustomFormatterElement : IFormatterElement
     {
         private readonly XName formatterName = XName.Get("customEventTextFormatter", Constants.Namespace);

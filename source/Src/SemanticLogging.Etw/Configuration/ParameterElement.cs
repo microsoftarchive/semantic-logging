@@ -7,6 +7,8 @@ using System.Xml.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+
     internal class ParameterElement
     {
         private static readonly XName ParametersName = XName.Get("parameters", Constants.Namespace);

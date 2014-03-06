@@ -53,6 +53,9 @@
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\Constants.cs" />
+    <Compile Include="Configuration\IFormatterElement.cs" />
+    <Compile Include="Configuration\ISinkElement.cs" />
     <Compile Include="ConsoleLog.cs" />
     <Compile Include="EventListenerExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -106,6 +109,7 @@
     <Compile Include="Utility\Guard.cs" />
     <Compile Include="Utility\EventEntryUtil.cs" />
     <Compile Include="Utility\TypeExtensions.cs" />
+    <Compile Include="Utility\XmlExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SemanticLogging.licenseheader">

@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
     public abstract class given_extensionsloader : ContextBase
     {
         internal ExtensionsLoader Sut;
@@ -89,7 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
         {
             private string generatedAssemblyPath;  
             private const string Source =
-@"using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+@"using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using System;
@@ -151,7 +153,7 @@ namespace Test
         {
             private string generatedAssemblyPath;
             private const string Source =
-@"using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+@"using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using System;
