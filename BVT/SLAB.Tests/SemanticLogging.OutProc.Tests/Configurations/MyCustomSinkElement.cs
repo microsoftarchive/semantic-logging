@@ -1,7 +1,8 @@
-﻿using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
-using System;
+﻿using System;
 using System.Xml.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Mocks
 {

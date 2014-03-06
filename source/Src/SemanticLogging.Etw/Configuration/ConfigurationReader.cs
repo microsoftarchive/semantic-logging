@@ -10,13 +10,12 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-
     internal class ConfigurationReader
     {
         private const string SchemaFileName = "SemanticLogging-svc.xsd";

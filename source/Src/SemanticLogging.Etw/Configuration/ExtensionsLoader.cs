@@ -1,23 +1,22 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-
     /// <summary>
     /// Loads all the configuration extension elements.
     /// </summary>
     internal sealed class ExtensionsLoader
     {
-        private static readonly Dictionary<string, ExtensionsLoader> Instances = new Dictionary<string, ExtensionsLoader>();       
+        private static readonly Dictionary<string, ExtensionsLoader> Instances = new Dictionary<string, ExtensionsLoader>();
         private IEnumerable<string> schemaFileNames;
         private IEnumerable<Lazy<ISinkElement>> sinkElements;
         private IEnumerable<Lazy<IFormatterElement>> formatterElements;

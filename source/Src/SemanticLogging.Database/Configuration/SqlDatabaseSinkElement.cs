@@ -1,13 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Xml.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
 {
-    using System;
-    using System.Xml.Linq;
-
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-
     internal class SqlDatabaseSinkElement : ISinkElement
     {
         private readonly XName sinkName = XName.Get("sqlDatabaseSink", Constants.Namespace);

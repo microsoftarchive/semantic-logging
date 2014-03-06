@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Threading;
 using System.Xml.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-
     [TestClass]
     public class given_xmlUtil
     {

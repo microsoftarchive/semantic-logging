@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-
     [TestClass]
     public class given_traceEventServiceSettings_configuration
     {

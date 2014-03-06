@@ -6,6 +6,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Xml.Schema;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw.Configuration;
@@ -15,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-
     [TestClass]
     public class given_traceEventServiceConfigurationInstance
     {

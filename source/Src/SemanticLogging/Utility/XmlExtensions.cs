@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Threading;
+using System.Xml.Linq;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
-    using System;
-    using System.Threading;
-    using System.Xml.Linq;
-
     /// <summary>
     /// Xml extensions for configuration extensibility support
     /// </summary>

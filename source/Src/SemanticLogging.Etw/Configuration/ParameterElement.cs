@@ -1,14 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Xml.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-
     internal class ParameterElement
     {
         private static readonly XName ParametersName = XName.Get("parameters", Constants.Namespace);
@@ -16,9 +13,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         public string Name { get; set; }
 
         public string Type { get; set; }
-        
+
         public string Value { get; set; }
-        
+
         public IEnumerable<ParameterElement> Parameters { get; set; }
 
         internal static ParameterElement Read(XElement element)

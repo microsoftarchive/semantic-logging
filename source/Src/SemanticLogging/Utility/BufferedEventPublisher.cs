@@ -16,7 +16,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
     /// Buffering and batching utility for sinks that can benefit from batched writes
     /// </summary>
     /// <typeparam name="TEntry">The type of the entry to buffer.</typeparam>
-    public class BufferedEventPublisher<TEntry> : IDisposable
+    public sealed class BufferedEventPublisher<TEntry> : IDisposable
     {
         private static readonly TimeSpan MinimumInterval = TimeSpan.FromMilliseconds(500);
         private readonly string sinkId;

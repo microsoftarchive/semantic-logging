@@ -8,14 +8,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Security;
 using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Schema;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
-    using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-
     /// <summary>
     /// Represents one or more errors that occur during loading the <see cref="TraceEventService"/> configuration file.
     /// </summary>
