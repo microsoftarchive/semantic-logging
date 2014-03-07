@@ -53,7 +53,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
 
-            var operation = string.Format("{0}/_search?q=*", indexName ?? TestIndex + "*");
+            var operation = string.Format("{0}/_search", indexName ?? TestIndex + "*");
 
             var resultString = client.GetStringAsync(operation).Result;
 
@@ -98,18 +98,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             Assert.AreEqual(count, 3);
 
-            // Check the index count until it's what we expect or we have checked too many times
-            for (int i = 0; i < 6; i++)
+            // Check until it's what we expect or we have checked too many times
+            QueryResult results = null;
+
+            for (int i = 0; i < 12; i++)
             {
+                results = this.QueryAllEntriesByIndex();
+
                 Thread.Sleep(500);
-                if (this.GetIndexCount() > 2)
+                
+                if (results != null && results.Hits.Hits.Length >= eventEntries.Count())
                 {
                     break;
                 }
             }
-
-            // Query across the _all index
-            var results = this.QueryAllEntriesByIndex();
 
             // Compare the message property values to make sure they match
             var queryMsgPropValues = results.Hits.Hits.Select(hit => hit.Source["Payload_msg"].ToString()).ToArray();
