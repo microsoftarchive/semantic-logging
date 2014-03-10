@@ -160,6 +160,33 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
+        [Event(600, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to create payload for an entity. Message: {0}")]
+        internal void ElasticSearchSinkEntityPayloadCreationFailed(string message)
+        {
+            if (this.IsEnabled())
+            {
+                this.WriteEvent(600, message);
+            }
+        }
+
+        [Event(601, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to write a batch of events. Message: {0}")]
+        internal void ElasticSearchSinkWriteEventsFailed(string message)
+        {
+            if (this.IsEnabled())
+            {
+                this.WriteEvent(601, message);
+            }
+        }
+
+        [Event(602, Level = EventLevel.Error, Keywords = Keywords.Sink, Message = "An ElasticSearch sink discarded {0} events due to failures while attempting to write a batch.")]
+        internal void ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(int numberOfEntries, string message)
+        {
+            if (this.IsEnabled())
+            {
+                this.WriteEvent(602, numberOfEntries, message);
+            }
+        }
+
         [Event(700, Level = EventLevel.Warning, Keywords = Keywords.Formatting, Message = "The payload for an event could not be serialized. Message: {0}")]
         internal void EventEntrySerializePayloadFailed(string message)
         {

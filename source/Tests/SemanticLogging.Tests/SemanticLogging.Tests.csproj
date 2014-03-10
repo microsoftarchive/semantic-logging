@@ -63,6 +63,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Spatial.5.6.0\lib\net40\System.Spatial.dll</HintPath>
     </Reference>
@@ -84,6 +85,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Etw\ElasticSearchSinkElementFixture.cs" />
     <Compile Include="Etw\ConfigurationReaderFixture.cs" />
     <Compile Include="Etw\ConsoleSinkElementFixture.cs" />
     <Compile Include="Etw\TraceEventServiceWorkerFixture.cs" />
@@ -93,10 +95,14 @@
     <Compile Include="Etw\SqlDatabaseSinkElementFixture.cs" />
     <Compile Include="Etw\XmlUtilFixture.cs" />
     <Compile Include="Observable\ObservableProjectionFixture.cs" />
+    <Compile Include="Sinks\ElasticSearchSinkTestFixture_Integration.cs" />
+    <Compile Include="Sinks\ElasticSearchSinkTests.cs" />
     <Compile Include="TestObjects\DifferentEnumsEventSource.cs" />
     <Compile Include="TestObjects\CustomSink.cs" />
     <Compile Include="TestObjects\LargeManifestEventSource.cs" />
     <Compile Include="TestObjects\MockEventListener.cs" />
+    <Compile Include="TestObjects\MockHttpListener.cs" />
+    <Compile Include="TestObjects\MockHttpListenerResponse.cs" />
     <Compile Include="TestObjects\MultipleTypesEventSource.cs" />
     <Compile Include="TestObjects\SimpleEventSource.cs" />
     <Compile Include="Observable\EventEntrySubjectFixture.cs" />
@@ -159,6 +165,10 @@
     <Compile Include="TestSupport\PollingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Src\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
+      <Name>SemanticLogging.ElasticSearch</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Src\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
       <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>
       <Name>SemanticLogging.WindowsAzure</Name>

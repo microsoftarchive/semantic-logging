@@ -78,6 +78,8 @@
     <Compile Include="Configuration\SinkConfigurationElement.cs" />
     <Compile Include="Configuration\SinkSettingsEqualityComparer.cs" />
     <Compile Include="Configuration\TraceEventServiceElement.cs" />
+    <Compile Include="Configuration\ElasticSearchSinkElement.cs" />
+    <Compile Include="Configuration\WindowsAzureTableSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="TraceEventSchemaCache.cs" />
     <Compile Include="TraceEventManifestsCache.cs" />
@@ -116,6 +118,18 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
+      <Name>SemanticLogging.ElasticSearch</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
+      <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>
+      <Name>SemanticLogging.WindowsAzure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SemanticLogging.Database\SemanticLogging.Database.csproj">
+      <Project>{ac34c8e7-2a5b-412c-aff7-cf7f52ee4569}</Project>
+      <Name>SemanticLogging.Database</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SemanticLogging\SemanticLogging.csproj">
       <Project>{2cd4105b-0dd6-4c18-9b37-05d8e8f57303}</Project>
       <Name>SemanticLogging</Name>

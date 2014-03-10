@@ -1,8 +1,8 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+﻿﻿<?xml version="1.0" encoding="utf-8" ?>
 <configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xsi:schemaLocation="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw SemanticLogging-svc.xsd">
-  
+
   <!-- Optional settings for fine tuning performance and Trace Event Session identification-->
   <traceEventService/>
 
@@ -19,9 +19,9 @@
       <!--[Add any built-in or custom formatter here if the sink supports text formatters]-->
       <eventTextFormatter header="----------"/>
     </flatFileSink>
-    
+
     <!--[Add any built-in or custom sink definition here]-->
-  
+
   </sinks>
 
 </configuration>
