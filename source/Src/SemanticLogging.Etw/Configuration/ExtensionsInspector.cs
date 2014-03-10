@@ -55,7 +55,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
                 Assembly asm = LoadAssembly(file);
                 if (asm != null && !asm.IsDynamic && !asm.IsFrameworkAssembly())
                 {
-                    foreach (Type type in asm.GetExportedTypes())
+                    foreach (Type type in asm.GetTypes())
                     {
                         if (typeof(ISinkElement).IsAssignableFrom(type) ||
                             typeof(IFormatterElement).IsAssignableFrom(type))

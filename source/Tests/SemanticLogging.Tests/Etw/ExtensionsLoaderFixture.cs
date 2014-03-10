@@ -147,6 +147,69 @@ namespace Test
             }
         }
 
+
+        [TestClass]
+        public class when_loading_internal_custom_sinks_from_external_assemblies : given_extensionsloader
+        {
+            private string generatedAssemblyPath;
+            private const string Source =
+@"using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
+using System;
+using System.Xml.Linq;
+
+namespace Test
+{
+    internal class TestSinkElement : ISinkElement
+    {
+        public bool CanCreateSink(XElement element)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IObserver<EventEntry> CreateSink(XElement element)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
+";
+            protected override void Given()
+            {
+            }
+
+            protected override void When()
+            {
+                var results = AssemblyBuilder.CompileFromSource(Source, generateInMemory: false);
+                Assert.AreEqual(0, results.Errors.Count, AssemblyBuilder.DumpOnErrors(results));
+                this.generatedAssemblyPath = results.PathToAssembly;
+            }
+
+            [TestMethod]
+            public void then_all_custom_implementations_should_be_loaded()
+            {
+                using (var domain = new DisposableDomain())
+                {
+                    domain.DoCallBack(() =>
+                    {
+                        var sut = new ExtensionsLoader();
+                        Assert.IsTrue(sut.SinkElements.Any(s => s.Value.GetType().FullName == "Test.TestSinkElement"));
+                    });
+                }
+            }
+
+            protected override void OnCleanup()
+            {
+                if (File.Exists(this.generatedAssemblyPath))
+                {
+                    File.Delete(this.generatedAssemblyPath);
+                }
+
+                base.OnCleanup();
+            }
+        }
+
         [TestClass]
         public class when_loading_custom_formatter_from_external_assemblies : given_extensionsloader
         {
