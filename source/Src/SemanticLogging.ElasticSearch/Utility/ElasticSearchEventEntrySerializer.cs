@@ -3,10 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using System.IO;
 using System.Text;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Newtonsoft.Json;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
@@ -58,7 +57,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             this.writer.WriteStartObject();
 
             this.writer.WritePropertyName("index");
-            
+
             // Write the batch "index" operation header
             this.writer.WriteStartObject();
             // ES index names must be lower case and cannot contain whitespace or any of the following characters \/*?"<>|,

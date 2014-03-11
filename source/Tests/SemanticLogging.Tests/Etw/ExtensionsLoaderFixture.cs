@@ -147,7 +147,6 @@ namespace Test
             }
         }
 
-
         [TestClass]
         public class when_loading_internal_custom_sinks_from_external_assemblies : given_extensionsloader
         {

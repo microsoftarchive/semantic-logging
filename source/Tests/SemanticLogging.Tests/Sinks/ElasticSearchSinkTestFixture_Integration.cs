@@ -5,27 +5,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
-
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {
     [TestClass]
-    public class given_empty_index
+    public class given_empty_index : ArrangeActAssert
     {
         // These tests will delete data in the provided elasticsearch endpoint
-        protected readonly string DevelopmentElasticSearchUrl = "http://localhost:9200";
+        protected string elasticSearchUrl;
 
         protected readonly string TestIndex = "slabtest";
 
-        [TestInitialize]
-        public void Setup()
+        protected override void Arrange()
         {
+            this.elasticSearchUrl = ConfigurationHelper.GetSetting("ElasticSearchUrl");
+
+            if (string.IsNullOrEmpty(this.elasticSearchUrl))
+            {
+                Assert.Inconclusive("Cannot run tests because the Elastic Search URL is not configured in the app.config file. Uncomment the app setting for ElasticSearchUrl and update it if needed.");
+            }
+
             // Delete data in the text index(s)
+            DeleteIndex();
+        }
+
+        protected override void Teardown()
+        {
             DeleteIndex();
         }
 
@@ -33,14 +43,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             indexName = indexName ?? TestIndex + "*";
 
-            var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
 
             client.DeleteAsync(indexName).Wait();
         }
 
         protected int GetIndexCount(string indexName = null)
         {
-            var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
 
             var operation = string.Format("{0}/_count", indexName ?? TestIndex + "*");
 
@@ -51,7 +61,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
         protected QueryResult QueryAllEntriesByIndex(string indexName = null)
         {
-            var client = new HttpClient { BaseAddress = new Uri(DevelopmentElasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
 
             var operation = string.Format("{0}/_search", indexName ?? TestIndex + "*");
 
@@ -73,30 +83,42 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             };
             return logObject;
         }
-
-        [TestCleanup]
-        protected void Cleanup()
-        {
-            DeleteIndex();
-        }
     }
 
     [TestClass]
     public class when_writing_multiple_entries : given_empty_index
     {
-        [TestMethod]
-        public void then_correct_count_is_returned_and_all_entries_and_properties_are_written()
+        private ElasticSearchSink sink;
+        private string[] msgPropValues;
+
+        protected override void Arrange()
         {
-            //These are writing to the property "msg"
-            var msgPropValues = new[] { "1", "2", "3" };
-            var eventEntries = msgPropValues.Select(this.CreateEventEntry);
+            base.Arrange();
 
-            var sink = new ElasticSearchSink("instance", DevelopmentElasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 600,
+            this.sink = new ElasticSearchSink("instance", this.elasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 600,
                 TimeSpan.FromMinutes(1));
+            this.msgPropValues = new[] { "1", "2", "3" };
+        }
 
-            var count = sink.PublishEventsAsync(eventEntries).Result;
+        protected override void Teardown()
+        {
+            base.Teardown();
 
-            Assert.AreEqual(count, 3);
+            this.sink.OnCompleted();
+        }
+
+        protected override void Act()
+        {
+            foreach (var entry in this.msgPropValues.Select(this.CreateEventEntry))
+            {
+                this.sink.OnNext(entry);
+            }
+        }
+
+        [TestMethod]
+        public void then_all_entries_and_properties_are_written()
+        {
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
 
             // Check until it's what we expect or we have checked too many times
             QueryResult results = null;
@@ -106,8 +128,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 results = this.QueryAllEntriesByIndex();
 
                 Thread.Sleep(500);
-                
-                if (results != null && results.Hits.Hits.Length >= eventEntries.Count())
+
+                if (results != null && results.Hits.Hits.Length >= this.msgPropValues.Length)
                 {
                     break;
                 }

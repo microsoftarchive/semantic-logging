@@ -2,7 +2,7 @@
 
 using System;
 using System.Xml.Linq;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 

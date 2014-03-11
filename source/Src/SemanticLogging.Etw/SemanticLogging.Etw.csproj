@@ -78,8 +78,6 @@
     <Compile Include="Configuration\SinkConfigurationElement.cs" />
     <Compile Include="Configuration\SinkSettingsEqualityComparer.cs" />
     <Compile Include="Configuration\TraceEventServiceElement.cs" />
-    <Compile Include="Configuration\ElasticSearchSinkElement.cs" />
-    <Compile Include="Configuration\WindowsAzureTableSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="TraceEventSchemaCache.cs" />
     <Compile Include="TraceEventManifestsCache.cs" />
