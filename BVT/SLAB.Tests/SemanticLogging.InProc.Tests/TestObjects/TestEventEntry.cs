@@ -29,5 +29,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         public Dictionary<string, object> Payload { get; set; }
 
         public DateTimeOffset Timestamp { get; set; }
+
+        public Guid ActivityId { get; set; }
+
+        public Guid RelatedActivityId { get; set; }
     }
 }

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <elasticSearchSink instanceName="sink1" name="sink1" bufferingFlushAllTimeoutInSeconds="1" connectionString="http://localhost:9200" index="testindex" type="">
+      <sources>
+        <eventSource name="TestEventSource"/>
+      </sources>
+    </elasticSearchSink>
+
+  </sinks>
+
+</configuration>

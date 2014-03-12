@@ -410,6 +410,73 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
+        public void WhenActivityId()
+        {
+            var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
+            var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToConsole();
+                    eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+            Assert.IsNotNull(entry);
+            StringAssert.Contains(entry, "200");
+            StringAssert.Contains(entry, "Keywords : None");
+            Assert.AreEqual(DefaultConsoleColorMapper.Critical, consoleOutputInterceptor.OutputForegroundColor);
+            StringAssert.Contains(entry, "ActivityId : " + activityId.ToString());
+            StringAssert.DoesNotMatch(entry, new Regex("RelatedActivityId"));
+        }
+
+        [TestMethod]
+        public void WhenActivityIdAndRelatedActivityId()
+        {
+            var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
+            var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToConsole();
+                    eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    MockConsoleListenerEventSource.Logger.CriticalWithRelatedActivityId("This is to log critical in Console", relatedActivityId);
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+            Assert.IsNotNull(entry);
+            StringAssert.Contains(entry, "800");
+            StringAssert.Contains(entry, "Keywords : None");
+            Assert.AreEqual(DefaultConsoleColorMapper.Critical, consoleOutputInterceptor.OutputForegroundColor);
+            StringAssert.Contains(entry, "ActivityId : " + activityId.ToString());
+            StringAssert.Contains(entry, "RelatedActivityId : " + relatedActivityId.ToString());
+        }
+
+        [TestMethod]
         public void WhenEventWithTaskName()
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();

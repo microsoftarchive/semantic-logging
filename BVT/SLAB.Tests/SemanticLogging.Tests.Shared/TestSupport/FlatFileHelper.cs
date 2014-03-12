@@ -88,7 +88,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
                 {
                     if (Directory.Exists(path))
                     {
-
                         if (GetFileNames(fileNamePattern).Count() == filesCount)
                         {
                             break;

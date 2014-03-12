@@ -44,9 +44,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             }
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
-        }
-
-        
+        }        
 
         [TestMethod]
         public void WhenEmptyConnectionString()

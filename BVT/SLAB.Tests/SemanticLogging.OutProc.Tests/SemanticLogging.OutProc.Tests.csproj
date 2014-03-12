@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests</RootNamespace>
     <AssemblyName>Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -22,6 +22,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -94,6 +95,7 @@
     <Compile Include="Formatters\JsonEventTextFormatterFixture.cs" />
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceConfiguration\ElasticSearchSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\ReconfigFixture.cs" />
     <Compile Include="ServiceConfiguration\RFFLSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\FlatFileSinkConfigFixture.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="ServiceConfiguration\AzureSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\ConfigIntegrationFixture.cs" />
     <Compile Include="ServiceConfiguration\TraceEventServiceConfigFixture.cs" />
+    <Compile Include="Sinks\ElasticSearchSinkFixture.cs" />
     <Compile Include="Sinks\WindowsAzureTableSinkFixture.cs" />
     <Compile Include="Sinks\DatabaseSinkFixture.cs" />
     <Compile Include="Sinks\FlatFileSinkFixture.cs" />
@@ -132,10 +135,37 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkAllProperties.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkEmptyConnectionString.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkEmptyIndex.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkEmptyInstanceName.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkEmptyTypeName.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkMandatoryProperties.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkMissingConnectionString.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\ElasticSearchSink\ElasticSinkMissingInstanceName.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Configurations\RollingFlatFile\RollingFlatFile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations\WinService\AzureTablesWinService.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\WinService\ElasticSearchWinService.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations\WinService\FlatFileWinService.xml">
@@ -477,6 +507,10 @@
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Database\SemanticLogging.Database.csproj">
       <Project>{ac34c8e7-2a5b-412c-aff7-cf7f52ee4569}</Project>
       <Name>SemanticLogging.Database</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\source\Src\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
+      <Name>SemanticLogging.ElasticSearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Etw.WindowsService\SemanticLogging.Etw.WindowsService.csproj">
       <Project>{0ebf89e7-d2b2-4968-bc17-0da066029c46}</Project>

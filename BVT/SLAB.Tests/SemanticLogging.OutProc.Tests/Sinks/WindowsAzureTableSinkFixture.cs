@@ -20,6 +20,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
     {
         private string tableName;
 
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
+
         [TestInitialize]
         public void Initialize()
         {

@@ -436,6 +436,87 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
+        public void WhenActivityId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            var message = string.Empty;
+            using (ObservableEventListener eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+            Assert.IsNotNull(dt, "No data logged");
+            Assert.IsTrue(dt.Rows.Count > 0);
+            var dr = dt.Rows[0];
+            Assert.AreEqual((int)EventLevel.Informational, int.Parse(dr["Level"].ToString()));
+            Assert.AreEqual(1, (int)dr["EventID"]);
+            Assert.AreEqual("mytestinstance1", dr["InstanceName"].ToString());
+            StringAssert.Contains((string)dr["Payload"], message);
+            Assert.AreEqual(activityId, (Guid)dr["ActivityId"]);
+            Assert.AreEqual(Guid.Empty, (Guid)dr["RelatedActivityId"]);
+        }
+
+        [TestMethod]
+        public void WhenActivityIdAndRelatedActivityId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            var message = string.Empty;
+            using (ObservableEventListener eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.InformationalWithRelatedActivityId(message, relatedActivityId);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+            Assert.IsNotNull(dt, "No data logged");
+            Assert.IsTrue(dt.Rows.Count > 0);
+            var dr = dt.Rows[0];
+            Assert.AreEqual((int)EventLevel.Informational, int.Parse(dr["Level"].ToString()));
+            Assert.AreEqual(14, (int)dr["EventID"]);
+            Assert.AreEqual("mytestinstance1", dr["InstanceName"].ToString());
+            StringAssert.Contains((string)dr["Payload"], message);
+            Assert.AreEqual(activityId, (Guid)dr["ActivityId"]);
+            Assert.AreEqual(relatedActivityId, (Guid)dr["RelatedActivityId"]);
+        }
+
+        [TestMethod]
         public void WhenMaxLengthPayload()
         {
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
@@ -1071,7 +1152,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
 
                     // Wait for the buffer to flush at end of interval
-                    Task.Delay(new TimeSpan(0,0,0,1,800)).Wait();
+                    Task.Delay(new TimeSpan(0, 0, 0, 1, 800)).Wait();
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(150, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval1'").Count());

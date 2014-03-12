@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
@@ -9,6 +10,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         public const int UsingKeywordsEventID = 1;
         public const int LogUsingMessageEventID = 2;
         public const int LogUsingMessageFormatEventID = 3;
+        public const int LogMessageEventID = 4;
+        public const int LogUsingMessageWithRelatedActivityIdEventID = 5;
         public const string LogMessage = @"Test Message /";
 
         public static readonly MockEventSrcForXml Logger = new MockEventSrcForXml();
@@ -37,6 +40,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
             {
                 this.WriteEvent(LogUsingMessageFormatEventID, message); 
+            }
+        }
+
+        [Event(LogUsingMessageWithRelatedActivityIdEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Message = LogMessage)]
+        internal void LogUsingMessageWithRelatedActivityId(string message, Guid relatedActivityId)
+        {
+            if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
+            {
+                this.WriteEventWithRelatedActivityId(LogUsingMessageWithRelatedActivityIdEventID, relatedActivityId, message);
             }
         }
 

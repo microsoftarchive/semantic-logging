@@ -131,6 +131,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         {
             this.WriteEvent(15, (int)color, (int)flags);
         }
+
+        public void IntArgEventWithRelatedActivityId(int arg, Guid relatedActivityId)
+        {
+            if (this.IsEnabled())
+            {
+                this.WriteEventWithRelatedActivityId(16, relatedActivityId, arg);
+            }
+        }
     }
 
     public enum MyColor

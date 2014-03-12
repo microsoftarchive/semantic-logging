@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
@@ -75,6 +76,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             {
                 this.WriteEvent(700, message); 
             }
+        }
+
+        [Event(800, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 0)]
+        public void CriticalWithRelatedActivityId(string message, Guid relatedActivityId)
+        {
+            this.WriteEventWithRelatedActivityId(800, relatedActivityId, message); 
         }
     }
 

@@ -19,6 +19,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         public static XElement TimeCreated { get; set; }
         public static XElement Payload { get; set; }
         public static XElement Message { get; set; }
+        public static XElement Correlation { get; set; }
         public static void Fill(XElement entry)
         {
             Provider = entry.Descendants(EventNS + "Provider").Single();
@@ -31,6 +32,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
             TimeCreated = entry.Descendants(EventNS + "TimeCreated").Single();
             Payload = entry.Descendants(EventNS + "EventData").Single();
             Message = entry.Descendants(EventNS + "RenderingInfo").Single();
+            Correlation = entry.Descendants(EventNS + "Correlation").SingleOrDefault();
         }
     }
 }

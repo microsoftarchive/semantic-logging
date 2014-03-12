@@ -398,5 +398,76 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual("b", XmlFormattedEntry.Payload.Elements().Last().Attribute("Name").Value);
             Assert.AreEqual("1", XmlFormattedEntry.Payload.Elements().Last().Value);
         }
+
+        [TestMethod]
+        public void EventWithActivityIdInXml()
+        {
+            var formatter = new XmlEventTextFormatter();
+            var logger = MockEventSrcForXml.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            string rawOutput = string.Empty;
+            using (var listener = new InMemoryEventListener(formatter))
+            {
+                listener.EnableEvents(logger, EventLevel.LogAlways, MockEventSrcForXml.Keywords.Errors);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.LogUsingMessage(MockEventSrcForXml.LogMessage);
+                    rawOutput = Encoding.Default.GetString(listener.Stream.ToArray());
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entries = XDocument.Parse("<Events>" + rawOutput + "</Events>").Root.Elements();
+            XmlFormattedEntry.Fill(entries.First());
+            Assert.AreEqual<Guid>(EventSource.GetGuid(typeof(MockEventSrcForXml)), Guid.Parse(XmlFormattedEntry.Provider.Attribute("Guid").Value));
+            Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
+            Assert.AreEqual("message", XmlFormattedEntry.Payload.Elements().First().Attribute("Name").Value);
+            Assert.AreEqual(MockEventSrcForXml.LogMessage, XmlFormattedEntry.Payload.Elements().First().Value);
+            Assert.AreEqual<Guid>(activityId, Guid.Parse(XmlFormattedEntry.Correlation.Attribute("ActivityID").Value));
+            Assert.IsNull(XmlFormattedEntry.Correlation.Attribute("RelatedActivityID"));
+        }
+
+        [TestMethod]
+        public void EventWithActivityIdAndRelatedActivityIdInXml()
+        {
+            var formatter = new XmlEventTextFormatter();
+            var logger = MockEventSrcForXml.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            string rawOutput = string.Empty;
+            using (var listener = new InMemoryEventListener(formatter))
+            {
+                listener.EnableEvents(logger, EventLevel.LogAlways, MockEventSrcForXml.Keywords.Errors);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.LogUsingMessageWithRelatedActivityId(MockEventSrcForXml.LogMessage, relatedActivityId);
+                    rawOutput = Encoding.Default.GetString(listener.Stream.ToArray());
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entries = XDocument.Parse("<Events>" + rawOutput + "</Events>").Root.Elements();
+            XmlFormattedEntry.Fill(entries.First());
+            Assert.AreEqual<Guid>(EventSource.GetGuid(typeof(MockEventSrcForXml)), Guid.Parse(XmlFormattedEntry.Provider.Attribute("Guid").Value));
+            Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
+            Assert.AreEqual("message", XmlFormattedEntry.Payload.Elements().First().Attribute("Name").Value);
+            Assert.AreEqual(MockEventSrcForXml.LogMessage, XmlFormattedEntry.Payload.Elements().First().Value);
+            Assert.AreEqual<Guid>(activityId, Guid.Parse(XmlFormattedEntry.Correlation.Attribute("ActivityID").Value));
+            Assert.AreEqual<Guid>(relatedActivityId, Guid.Parse(XmlFormattedEntry.Correlation.Attribute("RelatedActivityID").Value));
+        }
     }
 }

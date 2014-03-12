@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <elasticSearchSink name="ElasticSeachEventListener" instanceName="testInstalce" connectionString="http://localhost:9200" bufferingFlushAllTimeoutInSeconds="1" bufferingIntervalInSeconds="1" index="elasticsearch2eusingwindowsservice"  type="testtype">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+    </elasticSearchSink>   
+  
+  </sinks>
+
+</configuration>

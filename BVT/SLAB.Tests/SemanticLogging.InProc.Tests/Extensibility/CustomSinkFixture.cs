@@ -127,8 +127,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.AreEqual(4, dt.Rows.Count);
-
-            
         }
 
         [TestMethod]

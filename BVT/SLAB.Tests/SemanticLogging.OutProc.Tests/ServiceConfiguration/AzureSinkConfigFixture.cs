@@ -3,12 +3,19 @@
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.ServiceConfiguration
 {
     [TestClass]
     public class AzureSinkConfigFixture
     {
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
+
         [TestMethod]
         public void WhenMissingConnectionString()
         {

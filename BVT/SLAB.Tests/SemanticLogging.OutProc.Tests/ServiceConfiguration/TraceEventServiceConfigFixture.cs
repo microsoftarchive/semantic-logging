@@ -80,9 +80,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
 
             StringAssert.Contains(exc.ToString(), "One or more errors occurred when loading the TraceEventService configuration file.");
             StringAssert.Contains(exc.ToString(), "Could not load type 'Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters' from assembly 'Microsoft.Practices.EnterpriseLibrary.SemanticLogging'.");
-        }
-
-    
+        }    
 
         [TestMethod]
         public void WhenWrongTypeForFormatter()

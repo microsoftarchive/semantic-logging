@@ -879,7 +879,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenFileNameISFolder()
+        public void WhenFileNameIsFolder()
         {
             try
             {
@@ -1159,7 +1159,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.AreEqual(count, entries.Count());
         }
 
-        //// Test if dispose logs all messages
         [TestMethod]
         public void WhenDisposeFlushOccurs()
         {
@@ -1818,6 +1817,75 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual("arg1- 1,arg2- 3,arg3- 5", fileContents[0]["Message"]);
+        }
+
+        [TestMethod]
+        public void WhenActivityId()
+        {
+            string fileName = @".\IntArgEventIsLogged.log";
+            File.Delete(fileName);
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
+            var logger = TestEventSourceNoAttributes.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var eventListener = new ObservableEventListener())
+            {
+                eventListener.LogToFlatFile(fileName, formatter);
+                eventListener.EnableEvents(logger, EventLevel.Informational);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.IntArgEvent2(10);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var fileContents = LogFileReader.GetEntries(fileName);
+            Assert.AreEqual<string>("2", fileContents[0]["EventId"]);
+            var payLoad = PayloadParser.GetPayload(fileContents[0]["Payload"]);
+            Assert.AreEqual<string>("10", payLoad["arg"]);
+            Assert.AreEqual(activityId, Guid.Parse(fileContents[0]["ActivityId"]));
+            Assert.IsNull(fileContents[0].Keys.SingleOrDefault(k => k == "RelatedActivityId"));
+        }
+
+        [TestMethod]
+        public void WhenActivityIdAndRelatedActivityId()
+        {
+            string fileName = @".\IntArgEventIsLogged.log";
+            File.Delete(fileName);
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
+            var logger = TestEventSourceNoAttributes.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var eventListener = new ObservableEventListener())
+            {
+                eventListener.LogToFlatFile(fileName, formatter);
+                eventListener.EnableEvents(logger, EventLevel.Informational);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.IntArgEventWithRelatedActivityId(10, relatedActivityId);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var fileContents = LogFileReader.GetEntries(fileName);
+            Assert.AreEqual<string>("16", fileContents[0]["EventId"]);
+            var payLoad = PayloadParser.GetPayload(fileContents[0]["Payload"]);
+            Assert.AreEqual<string>("10", payLoad["arg"]);
+            Assert.AreEqual(activityId, Guid.Parse(fileContents[0]["ActivityId"]));
+            Assert.AreEqual(relatedActivityId, Guid.Parse(fileContents[0]["RelatedActivityId"]));
         }
 
         private string ReadFileWithoutLock(string fileName)

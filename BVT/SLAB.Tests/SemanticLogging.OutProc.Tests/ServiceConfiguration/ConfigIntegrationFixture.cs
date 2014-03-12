@@ -21,7 +21,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
     public class ConfigIntegrationFixture
     {
         [TestMethod]
-        public void  WhenUsingTwoCollectorsForSameEventSource()
+        public void WhenUsingTwoCollectorsForSameEventSource()
         {
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
             DatabaseHelper.CleanLoggingDB(validConnectionString);

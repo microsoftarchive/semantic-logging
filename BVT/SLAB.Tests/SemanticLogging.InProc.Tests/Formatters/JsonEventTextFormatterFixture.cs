@@ -215,5 +215,74 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual(1, entry.Payload.Count);
             StringAssert.Contains(entry.Payload.First().ToString(), "test");
         }
+
+        [TestMethod]
+        public void EventWithActivityIdInJson()
+        {
+            var logger = MockEventSrcForJson.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            string rawOutput = string.Empty;
+            using (var listener = new InMemoryEventListener() { Formatter = new JsonEventTextFormatter() })
+            {
+                listener.EnableEvents(logger, EventLevel.LogAlways, MockEventSrcForJson.Keywords.Errors);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.LogUsingMessage(MockEventSrcForJson.LogMessage);
+                    rawOutput = Encoding.Default.GetString(listener.Stream.ToArray());
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entries = JsonConvert.DeserializeObject<TestEventEntry[]>("[" + rawOutput + "]");
+            var entry = entries.First();
+            Assert.IsFalse(rawOutput.StartsWith("{\r\n"));
+            Assert.AreEqual(MockEventSrcForJson.LogMessage, entry.Message);
+            Assert.AreEqual(1, entry.Payload.Count);
+            StringAssert.Contains(entry.Payload.First().ToString(), MockEventSrcForJson.LogMessage);
+            Assert.AreEqual<Guid>(activityId, entry.ActivityId);
+            Assert.AreEqual<Guid>(Guid.Empty, entry.RelatedActivityId);
+        }
+
+        [TestMethod]
+        public void EventWithActivityIdAndRelatedActivityIdInJson()
+        {
+            var logger = MockEventSrcForJson.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            string rawOutput = string.Empty;
+            using (var listener = new InMemoryEventListener() { Formatter = new JsonEventTextFormatter() })
+            {
+                listener.EnableEvents(logger, EventLevel.LogAlways, MockEventSrcForJson.Keywords.Errors);
+                try
+                {
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.LogUsingMessageWithRelatedActivityId(MockEventSrcForJson.LogMessage, relatedActivityId);
+                    rawOutput = Encoding.Default.GetString(listener.Stream.ToArray());
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var entries = JsonConvert.DeserializeObject<TestEventEntry[]>("[" + rawOutput + "]");
+            var entry = entries.First();
+            Assert.IsFalse(rawOutput.StartsWith("{\r\n"));
+            Assert.AreEqual(MockEventSrcForJson.LogMessage, entry.Message);
+            Assert.AreEqual(1, entry.Payload.Count);
+            StringAssert.Contains(entry.Payload.First().ToString(), MockEventSrcForJson.LogMessage);
+            Assert.AreEqual<Guid>(activityId, entry.ActivityId);
+            Assert.AreEqual<Guid>(relatedActivityId, entry.RelatedActivityId);
+        }
     }
 }

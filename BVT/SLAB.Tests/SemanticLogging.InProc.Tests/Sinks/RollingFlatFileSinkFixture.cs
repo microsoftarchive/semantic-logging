@@ -978,7 +978,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenFileNameIsNull()  // deferred bug?
+        public void WhenFileNameIsNull()
         {
             using (var listener = new ObservableEventListener())
             {
@@ -989,7 +989,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenFileNameIsEmpty() // deffered bug?
+        public void WhenFileNameIsEmpty()
         {
             using (var listener = new ObservableEventListener())
             {
@@ -1000,7 +1000,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenTimestampPAtternIsEmpty()
+        public void WhenTimestampPatternIsEmpty()
         {
             var excpectionThrown = ExceptionAssertHelper.Throws<ArgumentException>(() =>
                 {
@@ -1145,7 +1145,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenAllKEywordsAreEnabled()
+        public void WhenAllKeywordsAreEnabled()
         {
             var fileNameWithoutExtension = "RollingFlatFileEL_For_Keywords_All";
             var fileName = fileNameWithoutExtension + ".log";
@@ -1174,7 +1174,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenKEywordsAreNotSpecifiedWithEnabled()
+        public void WhenKeywordsAreNotSpecifiedWithEnabled()
         {
             var fileNameWithoutExtension = "RollingFlatFileEL_Without_Keywords_All_KeywordAsNotNone";
             var fileName = fileNameWithoutExtension + ".log";
@@ -1199,6 +1199,73 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
             Assert.IsFalse(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : VerboseWithKeywordPage]"));
+        }
+
+        [TestMethod]
+        public void WhenActivityId()
+        {
+            var fileNameWithoutExtension = "RollingFlatFileEL_WhenActivityId";
+            var fileName = fileNameWithoutExtension + ".log";
+            FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.Critical("Critical");
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("ActivityId : " + activityId.ToString()));
+            Assert.IsFalse(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("RelatedActivityId : "));
+        }
+
+        [TestMethod]
+        public void WhenActivityIdAndRelatedActivityId()
+        {
+            var fileNameWithoutExtension = "RollingFlatFileEL_WhenActivityId";
+            var fileName = fileNameWithoutExtension + ".log";
+            FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            using (var listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    logger.CriticalWithRelatedActivityId("Critical", relatedActivityId);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("ActivityId : " + activityId.ToString()));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("RelatedActivityId : " + relatedActivityId.ToString()));
         }
 
         [TestMethod]
@@ -1265,7 +1332,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenPositionalPArametersInPayload()
+        public void WhenPositionalParametersInPayload()
         {
             var fileNameWithoutExtension = "Task1557_ForRollingFlatFile_EventLogFormatter";
             var fileName = fileNameWithoutExtension + ".log";

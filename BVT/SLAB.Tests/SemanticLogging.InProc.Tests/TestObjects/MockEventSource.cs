@@ -1,5 +1,6 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
 using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
@@ -35,9 +36,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(4, Level = EventLevel.Verbose, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 1)]
-        public void Verbose(string message) { this.WriteEvent(4, message); }
-
         [Event(2, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 0)]
         public void Critical(string message) { this.WriteEvent(2, message); }
 
@@ -49,6 +47,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
                 this.WriteEvent(3, message); 
             }
         }
+
+        [Event(4, Level = EventLevel.Verbose, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 1)]
+        public void Verbose(string message) { this.WriteEvent(4, message); }
 
         [Event(5, Level = EventLevel.LogAlways, Keywords = EventKeywords.None, Message = "Test LogAlways", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 5)]
         public void LogAlways(string message) { this.WriteEvent(5, message); }
@@ -111,6 +112,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             {
                 this.WriteEvent(CriticalWithTaskNameEventId, message); 
             }
+        }
+
+        [Event(14, Level = EventLevel.Informational)]
+        public void InformationalWithRelatedActivityId(string message, Guid relatedActivityId)
+        {
+            if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
+            {
+                this.WriteEventWithRelatedActivityId(14, relatedActivityId, message);
+            }
+        }
+
+        [Event(15, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 0)]
+        public void CriticalWithRelatedActivityId(string message, Guid relatedActivityId)
+        {
+            this.WriteEventWithRelatedActivityId(15, relatedActivityId, message);
         }
     }
 

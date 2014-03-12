@@ -1,0 +1,13 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+
+  <sinks>
+    <elasticSearchSink instanceName="sink1" name="sink1" bufferingFlushAllTimeoutInSeconds="1" connectionString="http://localhost:9200" bufferingIntervalInSeconds="1" index="testindex"  type="testtype" maxBufferSize="1000">
+      <sources>
+        <eventSource name="MockEventSourceOutProc"/>
+      </sources>
+    </elasticSearchSink>   
+  
+  </sinks>
+
+</configuration>

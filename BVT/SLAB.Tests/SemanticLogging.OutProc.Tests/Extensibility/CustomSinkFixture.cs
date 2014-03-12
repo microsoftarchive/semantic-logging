@@ -18,6 +18,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
     [TestClass]
     public class CustomSinkFixture
     {
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
+
         [TestMethod]
         public void WhenUsingCustomSinkWithSchema()
         {

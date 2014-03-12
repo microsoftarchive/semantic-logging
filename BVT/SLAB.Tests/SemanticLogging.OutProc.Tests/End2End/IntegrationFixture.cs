@@ -5,7 +5,9 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSup
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -94,12 +96,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         {
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
             DatabaseHelper.CleanLoggingDB(validConnectionString);
-            string configFile = "Configurations\\WinService\\sqlDB.xml";
-            var proc = Process.GetProcessesByName("SemanticLogging-svc").FirstOrDefault();
-            if (proc != null)
+            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "sqlDB.xml");
+
+            try
             {
-                proc.Kill();
+                var proc = Process.GetProcessesByName("SemanticLogging-svc").FirstOrDefault();
+                if (proc != null)
+                {
+                    proc.Kill();
+                }
             }
+            catch 
+            { }
 
             // Run the service as a console app.
             // Login to the localdb from the Windows Service (as SYSTEM user) is denied.
@@ -137,7 +145,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             this.tableName = "azuretablese2eusingwindowsservice";
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
-            string configFile = "Configurations\\WinService\\AzureTablesWinService.xml";
+            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "AzureTablesWinService.xml");
 
             IEnumerable<WindowsAzureTableEventEntry> events = null;
             try
@@ -159,6 +167,44 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             Assert.IsNotNull(event1);
             var event2 = events.SingleOrDefault(e => e.Payload.Contains(@"""message"": ""logging using windows service to azure tables 2"""));
             Assert.IsNotNull(event2);
+        }
+
+        [TestMethod]
+        public void WhenUsingElasticSearch()
+        {
+            var elasticSearchUri = ConfigurationManager.AppSettings["ElasticSearchUri"];
+            try
+            {
+                ElasticSearchHelper.DeleteIndex(elasticSearchUri);
+            }
+            catch (Exception exp)
+            {
+                Assert.Inconclusive(String.Format("Error occured connecting to ES: Message{0}, StackTrace: {1}", exp.Message, exp.StackTrace));
+            }
+
+            var indexPrefix = "elasticsearch2eusingwindowsservice";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", indexPrefix, DateTime.UtcNow);
+            var type = "testtype";
+            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "ElasticSearchWinService.xml");
+
+            QueryResult result = null;
+            try
+            {
+                StartServiceWithConfig(configFile);
+                var logger = MockEventSourceOutProc.Logger;
+                logger.LogSomeMessage("logging using windows service to elastic search");
+                logger.LogSomeMessage("logging using windows service to elastic search 2");
+
+                result = ElasticSearchHelper.PollUntilEvents(elasticSearchUri, index, type, 2);
+            }
+            finally
+            {
+                StopService();
+            }
+
+            Assert.AreEqual(2, result.Hits.Total);
+            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging using windows service to elastic search"));
+            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging using windows service to elastic search 2"));
         }
 
         private void StartServiceWithConfig(string configFileName)
@@ -264,6 +310,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             }
 
             return semanticLoggingServiceProcess;
+        }
+
+        private static string CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath(string configFileDirectory, string configFileName)
+        {
+            var sourceConfigFile = Path.Combine(configFileDirectory, configFileName);
+            var configFile = Path.Combine(Environment.CurrentDirectory, configFileName);
+            File.Copy(sourceConfigFile, configFile, true);
+
+            return configFile;
         }
     }
 }
