@@ -55,7 +55,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     listener.DisableEvents(logger);
                 }
             }
-            
+
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
             Assert.AreEqual<int>(3, result.Hits.Total);
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (long)h.Source["EventId"] == TestEventSource.InformationalEventId));
@@ -527,7 +527,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
         }
-        
+
         [TestMethod]
         public void WhenEventsInThreeConsecutiveIntervals()
         {
@@ -758,6 +758,195 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.AreEqual(1, result.Hits.Total);
             Assert.AreEqual(1, (long)result.Hits.Hits.ElementAt(0).Source["Payload_a"]);
             Assert.AreEqual(2, (long)result.Hits.Hits.ElementAt(0).Source["Payload_b"]);
+        }
+
+        [TestMethod]
+        public void WhenOneSourceTwoListeners()
+        {
+            this.indexPrefix = "whenonesourcetwolisteners";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            string errorMessage = string.Concat("Error ", Guid.NewGuid());
+            string infoMessage = string.Concat("Message", Guid.NewGuid());
+            using (ObservableEventListener listener = new ObservableEventListener())
+            using (ObservableEventListener listener2 = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener2.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.Error);
+                    listener2.EnableEvents(logger, EventLevel.Informational);
+                    logger.Informational(infoMessage);
+                    logger.Error(errorMessage);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    listener2.DisableEvents(logger);
+                }
+            }
+
+            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
+            Assert.AreEqual(3, result.Hits.Total);
+            Assert.AreEqual(2, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Error).Count());
+            Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Informational).Count());
+        }
+
+        [TestMethod]
+        public void WhenOneListenerTwoSources()
+        {
+            this.indexPrefix = "whenonelistenertwosources";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+            var logger2 = MockEventSource2.Logger;
+
+            using (ObservableEventListener listener = new ObservableEventListener())
+            {
+                try
+                {
+                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    string message = string.Concat("Message ", Guid.NewGuid());
+                    string errorMessage = string.Concat("Error ", Guid.NewGuid());
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.EnableEvents(logger2, EventLevel.LogAlways);
+                    logger.Informational(message);
+                    logger2.Error(errorMessage);
+                }
+                finally
+                {
+                    listener.DisableEvents(logger);
+                    listener.DisableEvents(logger2);
+                }
+            }
+
+            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
+            Assert.AreEqual(2, result.Hits.Total);
+            Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Error).Count());
+            Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Informational).Count());
+            Assert.AreNotEqual(Guid.Parse(result.Hits.Hits.ElementAt(0).Source["ProviderId"].ToString()), Guid.Parse(result.Hits.Hits.ElementAt(1).Source["ProviderId"].ToString()));
+        }
+
+        [TestMethod]
+        public void WhenActivityId()
+        {
+            this.indexPrefix = "whenactivityid";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            var message = string.Empty;
+            using (ObservableEventListener eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            Assert.AreEqual(1, result.Hits.Total);
+            var loggedEvent = result.Hits.Hits.ElementAt(0);
+            Assert.AreEqual((int)EventLevel.Informational, (long)loggedEvent.Source["Level"]);
+            Assert.AreEqual(1, (long)loggedEvent.Source["EventId"]);
+            Assert.AreEqual("testInstance", loggedEvent.Source["InstanceName"].ToString());
+            Assert.AreEqual(message, (string)loggedEvent.Source["Payload_message"]);
+            Assert.AreEqual(activityId, Guid.Parse(loggedEvent.Source["ActivityId"].ToString()));
+            Assert.IsFalse(loggedEvent.Source.ContainsKey("RelatedActivityId"));
+        }
+
+        [TestMethod]
+        public void WhenActivityIdAndRelatedActivityId()
+        {
+            this.indexPrefix = "whenactivityidandrelatedactivityid";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            var activityId = Guid.NewGuid();
+            var relatedActivityId = Guid.NewGuid();
+            var previousActivityId = Guid.Empty;
+            var message = string.Empty;
+            using (ObservableEventListener eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.InformationalWithRelatedActivityId(message, relatedActivityId);
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                    EventSource.SetCurrentThreadActivityId(previousActivityId);
+                }
+            }
+
+            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            Assert.AreEqual(1, result.Hits.Total);
+            var loggedEvent = result.Hits.Hits.ElementAt(0);
+            Assert.AreEqual((int)EventLevel.Informational, (long)loggedEvent.Source["Level"]);
+            Assert.AreEqual(14, (long)loggedEvent.Source["EventId"]);
+            Assert.AreEqual("testInstance", loggedEvent.Source["InstanceName"].ToString());
+            Assert.AreEqual(message, (string)loggedEvent.Source["Payload_message"]);
+            Assert.AreEqual(activityId, Guid.Parse(loggedEvent.Source["ActivityId"].ToString()));
+            Assert.AreEqual(relatedActivityId, Guid.Parse(loggedEvent.Source["RelatedActivityId"].ToString()));
+        }
+
+        [TestMethod]
+        public void WhenExceptionsAreRoutedToErrorEventSource()
+        {
+            this.indexPrefix = "whenexceptionsareroutedtoerroreventsource";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            var invalidElasticSearchUri = "http://invalid-elastic-search-uri";
+            using (ObservableEventListener eventListener = new ObservableEventListener())
+            {
+                try
+                {
+                    eventListener.LogToElasticSearch("testInstance", invalidElasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    using (var collectErrorsListener = new InMemoryEventListener(true))
+                    {
+                        try
+                        {
+                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Warning, Keywords.All);
+                            logger.Informational("Message 1");
+
+                            collectErrorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(5));
+
+                            StringAssert.Contains(collectErrorsListener.ToString(), @"An ElasticSearch sink failed to write a batch of events");
+                            StringAssert.Contains(collectErrorsListener.ToString(), @"The remote name could not be resolved: 'invalid-elastic-search-uri'");
+                        }
+                        finally
+                        {
+                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
+                        }
+                    }
+                }
+                finally
+                {
+                    eventListener.DisableEvents(logger);
+                }
+            }
+
+            var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            Assert.AreEqual(0, result.Hits.Total);
         }
     }
 }
