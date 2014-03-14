@@ -4,6 +4,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -44,15 +45,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             File.Delete("sessionLength.log");
             File.Delete("sessionLength2.log");
 
-            var cfg = TraceEventServiceConfiguration.Load("Configurations\\SessionNameLongInOneSink.xml");
-            using (TraceEventService svc = new TraceEventService(cfg))
-            {
-                svc.Start();
-
-                Assert.IsTrue(TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfigService", 3));
-                Assert.IsTrue(File.Exists("sessionLength.log"));
-                Assert.IsTrue(File.Exists("sessionLength2.log"));
-            }
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\SessionNameLongInOneSink.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    Assert.IsTrue(TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfigService", 3));
+                    Assert.IsTrue(File.Exists("sessionLength.log"));
+                    Assert.IsTrue(File.Exists("sessionLength2.log"));
+                });
         }
 
         [TestMethod]

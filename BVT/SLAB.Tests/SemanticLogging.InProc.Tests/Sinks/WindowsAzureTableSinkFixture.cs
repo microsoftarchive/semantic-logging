@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzure;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -41,21 +40,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Critical("This is a critical message");
                     logger.Error("This is an error message");
                     logger.Informational("This is informational");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 3);
             Assert.AreEqual(3, events.Count());
@@ -72,9 +66,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -82,12 +76,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("logging multiple messages " + n.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 300);
             Assert.AreEqual(300, events.Count());
@@ -101,19 +90,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithoutPayloadNorMessage();
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
             Assert.AreEqual(1, events.Count());
@@ -128,19 +112,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.AllParametersWithCustomValues();
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
             Assert.AreEqual(1, events.Count());
@@ -155,9 +134,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -167,12 +146,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     listener.DisableEvents(logger);
                     logger.Critical("This is a critical message");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
             Assert.AreEqual(1, eventsCount);
@@ -186,19 +160,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithMultiplePayloads("TestPayload 1", "TestPayload 2", "TestPayload 3");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
             Assert.AreEqual(1, events.Count());
@@ -214,19 +183,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, WindowsAzureTableLog.DefaultTableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Error("This is an error message");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var events = AzureTableHelper.PollForEvents(connectionString, WindowsAzureTableLog.DefaultTableName, 1);
             Assert.AreEqual(1, events.Count());
@@ -359,10 +323,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = TestEventSource.Logger;
             IEnumerable<WindowsAzureTableEventEntry> events = null;
 
-            using (var listener1 = new ObservableEventListener())
-            using (var listener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
                     listener1.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
                     listener2.LogToWindowsAzureTable("mytestinstance2", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
@@ -378,20 +341,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                    
+
                     // Wait less than the buffering interval for the events to be written and assert
                     // Only the first batch of 100 is written for each listener
                     events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 200, waitFor: TimeSpan.FromSeconds(10));
                     Assert.AreEqual(200, events.Count());
                     Assert.AreEqual(100, events.Where(e => e.InstanceName == "mytestinstance1").Count());
                     Assert.AreEqual(100, events.Where(e => e.InstanceName == "mytestinstance2").Count());
-                }
-                finally
-                {
-                    listener1.DisableEvents(logger);
-                    listener2.DisableEvents(logger);
-                }
-            }
+                });
 
             // The rest of the events are written during the Dispose flush
             events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 240, waitFor: TimeSpan.FromSeconds(2));
@@ -408,9 +365,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     // Minimum buffering interval is 500 ms
                     var minimumBufferingInterval = TimeSpan.FromMilliseconds(500);
@@ -426,12 +383,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
                     var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
                     Assert.AreEqual(10, eventsCount);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             // No more events should be written during the Dispose flush
             var eventsCountFinal = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
@@ -446,9 +398,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
@@ -473,12 +425,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     // 1st interval: Wait for the events to be written and assert
                     Task.Delay(TimeSpan.FromSeconds(2)).Wait();
                     Assert.AreEqual(10, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
         }
 
         [TestMethod]
@@ -489,9 +436,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
@@ -507,12 +454,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(bufferingInterval).Wait();
                     var events = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
                     Assert.AreEqual(100, events);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             // Last events should be written during the Dispose flush
             var eventsCountFinal = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
@@ -527,9 +469,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(2);
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
@@ -545,12 +487,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(bufferingInterval.Add(TimeSpan.FromSeconds(5))).Wait();
                     var events = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
                     Assert.AreEqual(90, events);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
         }
 
         [TestMethod]
@@ -563,12 +500,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var bufferingInterval = TimeSpan.FromSeconds(6);
             var insertionInterval = TimeSpan.FromSeconds(2);
-            using (var listener = new ObservableEventListener())
-            using (var errorsListener = new InMemoryEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Verbose);
                     listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.Informational);
 
@@ -616,13 +551,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // No errors should have been reported
                     Assert.AreEqual(string.Empty, errorsListener.ToString());
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                });
 
             // No more events should have been written during the last flush in the Dispose
             Assert.AreEqual(30, AzureTableHelper.GetEventsCount(connectionString, this.tableName));
@@ -636,20 +565,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
-                {
-                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
-                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
-                    logger.ErrorWithKeywordDiagnostic("Error with keyword Diagnostic");
-                    logger.CriticalWithKeywordPage("Critical with keyword Page");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                   listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                   logger.ErrorWithKeywordDiagnostic("Error with keyword Diagnostic");
+                   logger.CriticalWithKeywordPage("Critical with keyword Page");
+               });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 2);
             Assert.AreEqual(2, events.Count());
@@ -665,19 +589,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
-                {
-                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
-                    listener.EnableEvents(logger, EventLevel.LogAlways);
-                    logger.ErrorWithKeywordDiagnostic("Error with keyword EventlogClassic");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                   listener.EnableEvents(logger, EventLevel.LogAlways);
+                   logger.ErrorWithKeywordDiagnostic("Error with keyword EventlogClassic");
+               });
 
             var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
             Assert.AreEqual(0, eventsCount);
@@ -691,40 +610,28 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            var listener1 = new ObservableEventListener();
-            var listener2 = new ObservableEventListener();
-            try
-            {
-                listener1.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
-                listener2.LogToWindowsAzureTable("mytestinstance2", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
-                listener1.EnableEvents(logger, EventLevel.LogAlways);
-                listener2.EnableEvents(logger, EventLevel.LogAlways);
-                var logTaskList = new List<Task>();
-                for (int i = 0; i < 105; i++)
-                {
-                    var messageNumber = i;
-                    logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
-                }
+            TestScenario.With2Listeners(
+               logger,
+               (listener1, listener2) =>
+               {
+                   listener1.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                   listener2.LogToWindowsAzureTable("mytestinstance2", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(20));
+                   listener1.EnableEvents(logger, EventLevel.LogAlways);
+                   listener2.EnableEvents(logger, EventLevel.LogAlways);
+                   var logTaskList = new List<Task>();
+                   for (int i = 0; i < 105; i++)
+                   {
+                       var messageNumber = i;
+                       logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
+                   }
 
-                Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                listener1.Dispose();
-                listener2.Dispose();
+                   Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
+                   listener1.Dispose();
+                   listener2.Dispose();
 
-                var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 600);
-                Assert.AreEqual(210, events.Count());
-            }
-            finally
-            {
-                try
-                { listener1.DisableEvents(logger); }
-                catch
-                { }
-
-                try
-                { listener2.DisableEvents(logger); }
-                catch
-                { }
-            }
+                   var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 600);
+                   Assert.AreEqual(210, events.Count());
+               });
         }
 
         [TestMethod]
@@ -735,20 +642,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
-                {
-                    listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
-                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
-                    logger.CriticalWithTaskName("Critical with task name");
-                    logger.CriticalWithKeywordPage("Critical with no task name");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance", connectionString, this.tableName, bufferingInterval: TimeSpan.FromSeconds(10));
+                   listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                   logger.CriticalWithTaskName("Critical with task name");
+                   logger.CriticalWithKeywordPage("Critical with no task name");
+               });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 2);
             Assert.AreEqual(2, events.Count());
@@ -764,19 +666,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             AzureTableHelper.DeleteTable(connectionString, this.tableName);
             var logger = MockEventSourceInProcEnum.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
-                {
-                    listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.Zero);
-                    listener.EnableEvents(logger, EventLevel.LogAlways);
-                    logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.Zero);
+                   listener.EnableEvents(logger, EventLevel.LogAlways);
+                   logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
+               });
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
             Assert.AreEqual(1, events.Count());

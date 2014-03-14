@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -16,6 +16,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
     [TestClass]
     public class DatabaseSinkFixture
     {
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
+
         [TestMethod]
         public void WhenUsingSinkProgramatically()
         {
@@ -31,10 +37,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             SinkSettings sinkSettings = new SinkSettings("sqlDBsink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 10; n++)
                     {
@@ -42,12 +47,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
             StringAssert.Contains(eventsDataTable.Rows[0]["payload"].ToString(), "some message");
@@ -68,20 +68,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             SinkSettings sinkSettings = new SinkSettings("sqlDBsink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.SendEnumsEvent16(MockEventSourceOutProcEnum.MyColor.Blue, MockEventSourceOutProcEnum.MyFlags.Flag3);
 
                     eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 1);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, eventsDataTable.Rows.Count);
             StringAssert.Contains(eventsDataTable.Rows[0]["payload"].ToString(), @"""a"": 1");
@@ -97,10 +91,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
 
             System.Data.DataTable eventsDataTable = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\SqlDatabase\\SqlDB.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 10; n++)
                     {
@@ -108,12 +101,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
             StringAssert.Contains(eventsDataTable.Rows[0]["payload"].ToString(), "some message");

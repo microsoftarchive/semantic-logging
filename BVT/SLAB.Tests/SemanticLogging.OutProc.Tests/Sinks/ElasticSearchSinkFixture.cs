@@ -1,9 +1,8 @@
-﻿using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+﻿using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -12,9 +11,6 @@ using System.Configuration;
 using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Sinks
 {
@@ -24,6 +20,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         private readonly string elasticSearchUri = ConfigurationManager.AppSettings["ElasticSearchUri"];
         private string indexPrefix = "testindex";
         private string type = "testtype";
+
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
 
         [TestInitialize]
         public void Initialize()
@@ -53,10 +55,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             SinkSettings sinkSettings = new SinkSettings("essink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 10; n++)
                     {
@@ -64,12 +65,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     result = ElasticSearchHelper.PollUntilEvents(elasticSearchUri, index, this.type, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(10, result.Hits.Total);
             for (int n = 0; n < 10; n++)
@@ -79,40 +75,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void WhenUsingSinkWithDefaultConfig()
+        public void WhenUsingSinkThroughConfig()
         {
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", "logstash", DateTime.UtcNow);
-
             var logger = MockEventSourceOutProc.Logger;
 
             QueryResult result = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkMandatoryProperties.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 10; n++)
                     {
                         logger.LogSomeMessage("some message" + n.ToString());
                     }
 
-                    Thread.Sleep(TimeSpan.FromSeconds(45));
-                    result = ElasticSearchHelper.GetEvents(elasticSearchUri, index, "etw");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                    result = ElasticSearchHelper.PollUntilEvents(elasticSearchUri, index, "etw", 10, maxPollTime: TimeSpan.FromSeconds(35));
+                });
 
             Assert.AreEqual(10, result.Hits.Total);
             StringAssert.Contains(result.Hits.Hits[0].Source["Payload_message"].ToString(), "some message");
-        }
-
-        [TestMethod]
-        public void WhenUsingSinkWithNonDefaultConfig()
-        {
         }
     }
 }

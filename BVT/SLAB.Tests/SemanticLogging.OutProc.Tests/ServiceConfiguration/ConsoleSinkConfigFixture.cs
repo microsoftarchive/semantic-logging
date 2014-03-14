@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,15 +18,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             MockConsoleOutput mockConsole = new MockConsoleOutput();
 
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\Console\\Console.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-
-                for (int n = 0; n < 10; n++)
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    logger.LogSomeMessage("some message to console " + n.ToString() + ".");
-                }
-            }
+                    for (int n = 0; n < 10; n++)
+                    {
+                        logger.LogSomeMessage("some message to console " + n.ToString() + ".");
+                    }
+                });
         }
 
         [TestMethod]

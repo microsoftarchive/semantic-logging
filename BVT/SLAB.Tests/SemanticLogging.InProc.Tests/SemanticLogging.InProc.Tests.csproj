@@ -117,6 +117,7 @@
     <Compile Include="TestObjects\TestEventSource.cs" />
     <Compile Include="TestObjects\TestEventSourceNoAttributes.cs" />
     <Compile Include="TestObjects\TestEventSourceNonTransient.cs" />
+    <Compile Include="TestScenarios\TestScenario.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Database\SemanticLogging.Database.csproj">

@@ -124,6 +124,7 @@
     <Compile Include="TestObjects\TestEventSource.cs" />
     <Compile Include="TestObjects\TestEventSourceNoAttributes.cs" />
     <Compile Include="End2End\IntegrationFixture.cs" />
+    <Compile Include="TestScenarios\TestScenario.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

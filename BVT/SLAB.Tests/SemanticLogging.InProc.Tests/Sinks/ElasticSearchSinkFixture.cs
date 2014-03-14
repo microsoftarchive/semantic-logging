@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -40,21 +41,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
+
                     logger.Informational("This is informational");
                     logger.Error("This is an error message");
                     logger.Critical("This is a critical message");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
             Assert.AreEqual<int>(3, result.Hits.Total);
@@ -70,9 +67,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -80,12 +77,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("logging multiple messages " + n.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 300);
             Assert.AreEqual(300, result.Hits.Total);
@@ -98,19 +90,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithoutPayloadNorMessage();
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, result.Hits.Total);
@@ -124,19 +111,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.AllParametersWithCustomValues();
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, result.Hits.Total);
@@ -150,9 +132,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -162,12 +144,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     listener.DisableEvents(logger);
                     logger.Critical("This is a critical message");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var finalResult = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, finalResult.Hits.Total);
@@ -180,19 +157,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithPayload("message", 2);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
@@ -329,10 +301,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = TestEventSource.Logger;
 
             QueryResult result = null;
-            using (var listener1 = new ObservableEventListener())
-            using (var listener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
                     listener1.LogToElasticSearch("testInstance1", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
                     listener2.LogToElasticSearch("testInstance2", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
@@ -357,13 +328,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Assert.AreEqual(100, result.Hits.Total);
                     result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type, "?q=InstanceName:testInstance2");
                     Assert.AreEqual(100, result.Hits.Total);
-                }
-                finally
-                {
-                    listener1.DisableEvents(logger);
-                    listener2.DisableEvents(logger);
-                }
-            }
+                });
 
             // The rest of the events are written during the Dispose flush
             result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 240);
@@ -381,9 +346,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     // Minimum buffering interval is 500 ms
                     var minimumBufferingInterval = TimeSpan.FromMilliseconds(500);
@@ -399,12 +364,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
                     var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
                     Assert.AreEqual(10, result.Hits.Total);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             // No more events should be written during the Dispose flush
             var finalResult = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
@@ -418,9 +378,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
@@ -448,12 +408,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
                     result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
                     Assert.AreEqual(10, result.Hits.Total);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
         }
 
         [TestMethod]
@@ -463,9 +418,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
@@ -481,12 +436,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(bufferingInterval).Wait();
                     var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
                     Assert.AreEqual(100, result.Hits.Total);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             // Last events should be written during the Dispose flush
             Task.Delay(TimeSpan.FromSeconds(2)).Wait();
@@ -502,9 +452,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(2);
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
@@ -520,12 +470,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.Delay(bufferingInterval.Add(TimeSpan.FromSeconds(3))).Wait();
                     var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
                     Assert.AreEqual(90, result.Hits.Total);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
         }
 
         [TestMethod]
@@ -537,12 +482,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var bufferingInterval = TimeSpan.FromSeconds(5);
             var insertionInterval = TimeSpan.FromSeconds(3);
-            using (var listener = new ObservableEventListener())
-            using (var errorsListener = new InMemoryEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Verbose);
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.Informational);
 
@@ -593,18 +536,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // No errors should have been reported
                     Assert.AreEqual(string.Empty, errorsListener.ToString());
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                });
 
             // No more events should have been written during the last flush in the Dispose
             var finalResult = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
             Assert.AreEqual(30, finalResult.Hits.Total);
-            //Assert.AreEqual(30, AzureTableHelper.GetEventsCount(connectionString, this.indexPrefix));
         }
 
         [TestMethod]
@@ -614,20 +550,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.ErrorWithKeywordDiagnostic("Error with keyword Diagnostic");
                     logger.CriticalWithKeywordPage("Critical with keyword Page");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
@@ -642,19 +573,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ErrorWithKeywordDiagnostic("Error with keyword EventlogClassic");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             // Wait for events to be inserted
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
@@ -669,40 +595,28 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            var listener1 = new ObservableEventListener();
-            var listener2 = new ObservableEventListener();
-            try
-            {
-                listener1.LogToElasticSearch("testInstance1", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                listener2.LogToElasticSearch("testInstance2", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                listener1.EnableEvents(logger, EventLevel.LogAlways);
-                listener2.EnableEvents(logger, EventLevel.LogAlways);
-                var logTaskList = new List<Task>();
-                for (int i = 0; i < 105; i++)
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
-                    var messageNumber = i;
-                    logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
-                }
+                    listener1.LogToElasticSearch("testInstance1", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener2.LogToElasticSearch("testInstance2", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
+                    var logTaskList = new List<Task>();
+                    for (int i = 0; i < 105; i++)
+                    {
+                        var messageNumber = i;
+                        logTaskList.Add(Task.Run(() => logger.Critical(messageNumber + "Critical message")));
+                    }
 
-                Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                listener1.Dispose();
-                listener2.Dispose();
+                    Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
+                    listener1.Dispose();
+                    listener2.Dispose();
 
-                var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 210);
-                Assert.AreEqual(210, result.Hits.Total);
-            }
-            finally
-            {
-                try
-                { listener1.DisableEvents(logger); }
-                catch
-                { }
-
-                try
-                { listener2.DisableEvents(logger); }
-                catch
-                { }
-            }
+                    var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 210);
+                    Assert.AreEqual(210, result.Hits.Total);
+                });
         }
 
         [TestMethod]
@@ -712,20 +626,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = TestEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.CriticalWithTaskName("Critical with task name");
                     logger.CriticalWithKeywordPage("Critical with no task name");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
@@ -740,19 +649,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = MockEventSourceInProcEnum.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Blue, MockEventSourceInProcEnum.MyFlags.Flag2);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
@@ -769,24 +673,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string errorMessage = string.Concat("Error ", Guid.NewGuid());
             string infoMessage = string.Concat("Message", Guid.NewGuid());
-            using (ObservableEventListener listener = new ObservableEventListener())
-            using (ObservableEventListener listener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener1.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener2.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                    listener.EnableEvents(logger, EventLevel.Error);
+                    listener1.EnableEvents(logger, EventLevel.Error);
                     listener2.EnableEvents(logger, EventLevel.Informational);
                     logger.Informational(infoMessage);
                     logger.Error(errorMessage);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    listener2.DisableEvents(logger);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
             Assert.AreEqual(3, result.Hits.Total);
@@ -802,9 +699,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var logger2 = MockEventSource2.Logger;
 
-            using (ObservableEventListener listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                new EventSource[] { logger, logger2 },
+                listener =>
                 {
                     listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     string message = string.Concat("Message ", Guid.NewGuid());
@@ -813,13 +710,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     listener.EnableEvents(logger2, EventLevel.LogAlways);
                     logger.Informational(message);
                     logger2.Error(errorMessage);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    listener.DisableEvents(logger2);
-                }
-            }
+                });
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
@@ -838,23 +729,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var activityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.Informational(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
@@ -878,23 +765,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var relatedActivityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.InformationalWithRelatedActivityId(message, relatedActivityId);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
@@ -915,35 +798,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var invalidElasticSearchUri = "http://invalid-elastic-search-uri";
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToElasticSearch("testInstance", invalidElasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    using (var collectErrorsListener = new InMemoryEventListener(true))
-                    {
-                        try
-                        {
-                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Warning, Keywords.All);
-                            logger.Informational("Message 1");
+                    listener.LogToElasticSearch("testInstance", invalidElasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
-                            collectErrorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(5));
+                    logger.Informational("Message 1");
 
-                            StringAssert.Contains(collectErrorsListener.ToString(), @"An ElasticSearch sink failed to write a batch of events");
-                            StringAssert.Contains(collectErrorsListener.ToString(), @"The remote name could not be resolved: 'invalid-elastic-search-uri'");
-                        }
-                        finally
-                        {
-                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
-                    }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(5));
+                    StringAssert.Contains(errorsListener.ToString(), @"An ElasticSearch sink failed to write a batch of events");
+                    StringAssert.Contains(errorsListener.ToString(), @"The remote name could not be resolved: 'invalid-elastic-search-uri'");
+                });
 
             var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
             Assert.AreEqual(0, result.Hits.Total);

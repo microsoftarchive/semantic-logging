@@ -2,8 +2,8 @@
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -24,9 +24,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -39,12 +39,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 7");
                     logger.Informational("Message 8");
                     logger.Informational("Message 9");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
@@ -58,9 +53,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, -1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -73,12 +68,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 7");
                     logger.Informational("Message 8");
                     logger.Informational("Message 9");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsFalse(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
@@ -92,9 +82,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -102,12 +92,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 2");
 
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Payload : [message : Message 2]");
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Payload : [message : Message 1]");
@@ -122,9 +107,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -138,12 +123,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     logger.Informational("Message 1");
                     logger.Informational("Message 2");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -163,9 +143,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DateTime currentDateTime = new DateTime(2011, 1, 1);
             File.WriteAllText(fileName, existingMessage);
             File.SetCreationTime(fileName, currentDateTime);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -174,12 +154,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
 
                     logger.Informational("New message");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.AreEqual(existingMessage, File.ReadAllText(fileNameWithoutExtension + ".2011.1" + ".log"));
             Assert.IsTrue(File.ReadAllText(fileName).Contains("New message"));
@@ -196,9 +171,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string existingMessage = "Existing Message";
             File.WriteAllText(fileName, existingMessage);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.None, new EventTextFormatter());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -207,12 +182,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Message 25"));
             Assert.IsFalse(File.ReadAllText(fileName).Contains("Existing Message"));
@@ -229,9 +199,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string existingMessage = "Existing Message";
             File.WriteAllText(fileName, existingMessage);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1, string.Empty, RollFileExistsBehavior.Overwrite, RollInterval.None, new EventTextFormatter());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -246,12 +216,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 8");
                     logger.Informational("Message 9");
                     logger.Informational("Message 10");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Message 10"));
             Assert.IsFalse(File.ReadAllText(fileName).Contains("Existing Message"));
@@ -268,9 +233,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string existingMessage = "Existing Message";
             File.WriteAllText(fileName, existingMessage);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, string.Empty, RollFileExistsBehavior.Overwrite, RollInterval.None, new EventTextFormatter());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -285,12 +250,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 8");
                     logger.Informational("Message 9");
                     logger.Informational("Message 10");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Message 10"));
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Existing Message"));
@@ -307,9 +267,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string existingMessage = "Existing Message";
             File.WriteAllText(fileName, existingMessage);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.None, new EventTextFormatter());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -324,12 +284,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 8");
                     logger.Informational("Message 9");
                     logger.Informational("Message 10");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Message 10"));
             Assert.IsTrue(File.ReadAllText(fileName).Contains("Existing Message"));
@@ -344,9 +299,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 10, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -357,12 +312,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dtp;
 
                     logger.Informational("Message 2");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message 2"));
@@ -380,9 +330,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1000, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Minute, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -394,12 +344,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -416,9 +361,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteDirectory(@".\Logs");
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1000, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Hour, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -429,12 +374,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message 4"));
@@ -451,9 +391,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1000, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -466,12 +406,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -489,9 +424,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1000, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Week, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -501,12 +436,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -524,9 +454,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 1000, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Month, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -536,12 +466,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
+
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message 4"));
@@ -556,9 +482,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteDirectory(@".\Logs");
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Year, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -568,12 +494,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -592,9 +513,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var dateTimeProvider = new MockDateTimeProvider();
             DateTime? nextRoll = null;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Midnight, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -608,12 +529,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     logger.Informational("Message 3");
                     logger.Informational("Message 4");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + dateTimeProvider.OverrideCurrentDateTime.Value.Year + ".1" + ".log"));
@@ -630,9 +546,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 4, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -640,12 +556,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var files = FlatFileHelper.GetFileNames(fileNameWithoutExtension + "*.log");
             string result = FlatFileHelper.ReadFromFiles(fileNameWithoutExtension + "*.log");
@@ -675,9 +586,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 10, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Minute, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -693,12 +604,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 5");
                     logger.Informational("Message 6");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message 6"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".2" + ".log"));
@@ -713,9 +619,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "MM-dd-yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -728,12 +634,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message 7");
                     logger.Informational("Message 8");
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message 8"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.ToString("MM-dd-yyyy") + ".1" + ".log"));
@@ -747,9 +648,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteDirectory(@".\Logs");
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 2, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator), 2);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -757,12 +658,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var files = FlatFileHelper.GetFileNames(fileNameWithoutExtension + "*.log");
             Assert.AreEqual<int>(3, files.Count());
@@ -781,9 +677,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var dateTimeProvider = new MockDateTimeProvider();
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator), 2);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -809,12 +705,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 9");
                     logger.Informational("Message 10");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.AreEqual<int>(3, FlatFileHelper.GetFileNames(fileNameWithoutExtension + "*.log").Count());
             Assert.IsFalse(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
@@ -837,9 +728,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Directory.CreateDirectory(@".\Logs");
             File.WriteAllText(fileName, existingMessage);
             File.SetCreationTime(fileName, currentDateTime);
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var subscription = listener.LogToRollingFlatFile(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator), 2);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -867,12 +758,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     dateTimeProvider.OverrideCurrentDateTime = DateTime.Now.AddDays(8);
                     subscription.Sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                     logger.Informational("Message 6");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             var files = FlatFileHelper.GetFileNames(fileNameWithoutExtension + "*.log");
             Assert.IsFalse(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
@@ -887,9 +773,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator), -2);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -897,12 +783,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".2" + ".log"));
@@ -918,9 +799,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator), 0);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -928,12 +809,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1" + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".2" + ".log"));
@@ -949,9 +825,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 2, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -961,12 +837,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Error("Message Err");
                     logger.Warning("Message Warn");
                     logger.LogAlways("Message Log");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message Info"));
@@ -1063,19 +934,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 2, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, null);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message Info");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Message Info"));
@@ -1090,9 +956,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, null, RollFileExistsBehavior.Increment, RollInterval.None);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -1104,12 +970,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.Informational("Message Info6");
                     logger.Informational("Message Info7");
                     logger.Informational("Message Info8");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".1" + ".log"));
@@ -1121,27 +982,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var fileNameWithoutExtension = "ErrorInFormatterIsHandled";
             var fileName = fileNameWithoutExtension + ".log";
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
-            var loggerNonTransient = TestEventSourceNonTransient.Logger;
+            var logger = TestEventSourceNonTransient.Logger;
 
-            using (var listener = new ObservableEventListener())
-            using (var collectErrorsListener = new InMemoryEventListener(true))
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, null, RollFileExistsBehavior.Increment, RollInterval.None, new MockFormatter(true));
-                    listener.EnableEvents(loggerNonTransient, EventLevel.LogAlways);
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, SemanticLoggingEventSource.Keywords.Sink);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
-                    loggerNonTransient.EventWithPayload("payload1", 100);
+                    logger.EventWithPayload("payload1", 100);
 
-                    StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
-                }
-                finally
-                {
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                    listener.DisableEvents(loggerNonTransient);
-                }
-            }
+                    StringAssert.Contains(errorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                });
         }
 
         [TestMethod]
@@ -1152,9 +1005,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var formatter = new EventTextFormatter("====", "=====", EventLevel.LogAlways);
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, formatter);
@@ -1162,12 +1015,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.VerboseWithKeywordPage("VerboseWithKeywordPage");
                     logger.InfoWithKeywordDiagnostic("InfoWithKeywordDiagnostic");
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Keywords : 1");
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Keywords : 4");
@@ -1181,20 +1029,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = MockEventSource.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.VerboseWithKeywordPage("VerboseWithKeywordPage");
                     logger.Critical("Critical");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
@@ -1211,22 +1054,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var activityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
-
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
                     logger.Critical("Critical");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
@@ -1245,22 +1083,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var activityId = Guid.NewGuid();
             var relatedActivityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
-
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
                     logger.CriticalWithRelatedActivityId("Critical", relatedActivityId);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
             Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
@@ -1278,21 +1111,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var eventTextFormatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             eventTextFormatter.VerbosityThreshold = EventLevel.LogAlways;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, eventTextFormatter);
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.CriticalWithTaskName("CriticalWithTaskName");
                     logger.InfoWithKeywordDiagnostic("InfoWithKeywordDiagnostic");
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Task : 1\r\nVersion : 0\r\nPayload : [message : CriticalWithTaskName] \r\nEventName : PageInfo");
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Task : 64512\r\nVersion : 0\r\nPayload : [message : InfoWithKeywordDiagnostic] \r\nEventName : InfoWithKeywordDiagnosticInfo");
@@ -1307,9 +1135,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             EventTextFormatter formatter = new EventTextFormatter("------======------");
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 300000, "d", RollFileExistsBehavior.Increment, RollInterval.Year, formatter);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -1317,12 +1145,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         logger.Informational("some message to flat file " + n.ToString());
                     }
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 300, formatter.Header);
@@ -1339,9 +1162,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator), 0);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -1351,12 +1174,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1.log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             string readFile = File.ReadAllText(fileName);
             Assert.IsTrue(readFile.Contains("Check if it is logged"));
@@ -1373,9 +1191,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var jsonFormatter = new JsonEventTextFormatter();
             jsonFormatter.DateTimeFormat = "dd/MM/yyyy";
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, jsonFormatter, 0);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -1385,12 +1203,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1.log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             string readFile = File.ReadAllText(fileName);
             Assert.IsTrue(readFile.Contains("Check if it is logged"));
@@ -1407,9 +1220,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var xmlFormatter = new XmlEventTextFormatter();
             xmlFormatter.DateTimeFormat = "dd/MM/yyyy";
 
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, xmlFormatter, 0);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -1419,12 +1232,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + "." + DateTime.Now.Year + ".1.log"));
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             string readFile = File.ReadAllText(fileName);
             Assert.IsTrue(readFile.Contains("<Message>Check if it is logged</Message>"));
