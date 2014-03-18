@@ -11,9 +11,9 @@ using System.Security;
 
 ////[assembly: AllowPartiallyTrustedCallers]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.1.1401.0")]
-[assembly: AssemblyInformationalVersion("1.1.1401-prerelease")]
+[assembly: AssemblyVersion("1.1.0.0")]
+[assembly: AssemblyFileVersion("1.1.1403.0")]
+[assembly: AssemblyInformationalVersion("1.1.1403-prerelease")]
 
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]

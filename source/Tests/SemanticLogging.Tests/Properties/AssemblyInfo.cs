@@ -6,4 +6,4 @@ using System.Reflection;
 [assembly: AssemblyDescription("Enterprise Library Semantic Logging Application Block")]
 
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.1.1401.0")]
+[assembly: AssemblyFileVersion("1.1.1403.0")]
