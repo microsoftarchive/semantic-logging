@@ -82,7 +82,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
 
             string sinkId = string.Format(CultureInfo.InvariantCulture, "DatabaseSink ({0})", instanceName);
             this.dbProviderFactory = SqlClientFactory.Instance;
-            this.bufferedPublisher = new BufferedEventPublisher<EventRecord>(sinkId, this.PublishEventsAsync, bufferingInterval ?? Buffering.DefaultBufferingInterval, bufferingCount, 30000, this.cancellationTokenSource.Token);
+            this.bufferedPublisher = BufferedEventPublisher<EventRecord>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval ?? Buffering.DefaultBufferingInterval, bufferingCount, 30000, this.cancellationTokenSource.Token);
             this.instanceName = instanceName;
             this.connectionString = connectionString;
             this.tableName = tableName ?? "Traces";

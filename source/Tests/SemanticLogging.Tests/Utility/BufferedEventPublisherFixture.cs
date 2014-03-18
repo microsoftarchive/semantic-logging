@@ -18,62 +18,62 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         [ExpectedException(typeof(ArgumentNullException))]
         public void when_null_sinkId_throws()
         {
-            new BufferedEventPublisher<int>(null, b => { return Task.FromResult(b.Count); }, TimeSpan.Zero, 1, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart(null, b => { return Task.FromResult(b.Count); }, TimeSpan.Zero, 1, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void when_null_eventPublisherAction_throws()
         {
-            new BufferedEventPublisher<int>("sink", null, TimeSpan.Zero, 1, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", null, TimeSpan.Zero, 1, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void when_negative_bufferingInterval_throws()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromSeconds(-1), 1, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromSeconds(-1), 1, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void when_overrange_bufferingInterval_throws()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromMilliseconds(Convert.ToInt64(int.MaxValue) + 1L), 1, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromMilliseconds(Convert.ToInt64(int.MaxValue) + 1L), 1, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void when_negative_bufferingCount_throw()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromSeconds(5), -1, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.FromSeconds(5), -1, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void when_no_interval_and_no_count_throw()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 0, 1000, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 0, 1000, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void when_maxBufferSize_smaller_than_3times_count_throw()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 1000, 2999, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 1000, 2999, CancellationToken.None);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void when_overrange_maxbuffering_throws()
         {
-            new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 1, 499, CancellationToken.None);
+            BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, Timeout.InfiniteTimeSpan, 1, 499, CancellationToken.None);
         }
 
         [TestMethod]
         public void when_zero_interval_is_set_default_minimum()
         {
-            var sut = new BufferedEventPublisher<int>("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.Zero, 0, 1000, CancellationToken.None);
+            var sut = BufferedEventPublisher<int>.CreateAndStart("sink", b => { return Task.FromResult(b.Count); }, TimeSpan.Zero, 0, 1000, CancellationToken.None);
             Assert.IsNotNull(sut);
         }
     }
@@ -91,7 +91,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
 
         protected override void Given()
         {
-            this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, bufferingInterval, 0, 1000, new CancellationToken());
+            this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, bufferingInterval, 0, 1000, new CancellationToken());
         }
 
         protected override void OnCleanup()
@@ -188,7 +188,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
 
             protected override void Given()
             {
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, interval, 0, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, interval, 0, 1000, new CancellationToken());
                 this.totalEventsToPublish = 3;
             }
 
@@ -221,7 +221,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 2;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -247,7 +247,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 100;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(1), 0, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(1), 0, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -279,7 +279,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 2;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -307,7 +307,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 100;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(1), 0, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(1), 0, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -340,7 +340,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 2;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, Timeout.InfiniteTimeSpan, this.totalEventsToPublish, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -386,7 +386,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 2;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, TimeSpan.FromSeconds(10), this.totalEventsToPublish, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, TimeSpan.FromSeconds(10), this.totalEventsToPublish, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -412,7 +412,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             protected override void Given()
             {
                 this.totalEventsToPublish = 2;
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(500), this.totalEventsToPublish + 1, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, TimeSpan.FromMilliseconds(500), this.totalEventsToPublish + 1, 1000, new CancellationToken());
             }
 
             protected override void When()
@@ -442,7 +442,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
                 this.bufferingCount = 10;
                 this.totalEventsToPublish = 0;
                 var automaticFlushingInterval = TimeSpan.FromMinutes(30);
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, automaticFlushingInterval, bufferingCount, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, automaticFlushingInterval, bufferingCount, 1000, new CancellationToken());
                 Thread.Sleep(200);
             }
 
@@ -474,7 +474,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
                 this.bufferingCount = 10;
                 this.totalEventsToPublish = 0;
                 var automaticFlushingInterval = TimeSpan.FromMilliseconds(1);
-                this.sut = new BufferedEventPublisher<int>("sink", PublishEventsAsync, automaticFlushingInterval, bufferingCount, 1000, new CancellationToken());
+                this.sut = BufferedEventPublisher<int>.CreateAndStart("sink", PublishEventsAsync, automaticFlushingInterval, bufferingCount, 1000, new CancellationToken());
             }
 
             protected override void When()

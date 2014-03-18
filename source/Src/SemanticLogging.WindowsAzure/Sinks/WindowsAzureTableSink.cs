@@ -69,7 +69,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.client.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(5), 7);
             this.table = this.client.GetTableReference(tableAddress);
             string sinkId = string.Format(CultureInfo.InvariantCulture, "WindowsAzureTableSink ({0})", instanceName);
-            this.bufferedPublisher = new BufferedEventPublisher<CloudEventEntry>(sinkId, this.PublishEventsAsync, bufferInterval, BufferCountTrigger, maxBufferSize, this.cancellationTokenSource.Token);
+            this.bufferedPublisher = BufferedEventPublisher<CloudEventEntry>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferInterval, BufferCountTrigger, maxBufferSize, this.cancellationTokenSource.Token);
         }
 
         /// <summary>

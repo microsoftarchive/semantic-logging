@@ -53,7 +53,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.onCompletedTimeout = onCompletedTimeout;
             this.retryPolicy.Retrying += Retrying;
             string sinkId = string.Format(CultureInfo.InvariantCulture, "SqlDatabaseSink ({0})", instanceName);
-            this.bufferedPublisher = new BufferedEventPublisher<EventRecord>(sinkId, this.PublishEventsAsync, bufferingInterval, bufferingCount, maxBufferSize, this.cancellationTokenSource.Token);
+            this.bufferedPublisher = BufferedEventPublisher<EventRecord>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval, bufferingCount, maxBufferSize, this.cancellationTokenSource.Token);
         }
 
         /// <summary>

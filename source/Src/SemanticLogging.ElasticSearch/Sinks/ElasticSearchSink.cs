@@ -75,7 +75,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.index = index;
             this.type = type;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
-            bufferedPublisher = new BufferedEventPublisher<JsonEventEntry>(sinkId, PublishEventsAsync, bufferInterval,
+            bufferedPublisher = BufferedEventPublisher<JsonEventEntry>.CreateAndStart(sinkId, PublishEventsAsync, bufferInterval,
                 BufferCountTrigger, maxBufferSize, cancellationTokenSource.Token);
         }
 

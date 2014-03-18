@@ -24,7 +24,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         private readonly TimeSpan bufferingInterval;
         private readonly int bufferingCount;
         private readonly int maxBufferSize;
-        private readonly Lazy<BlockingCollection<TEntry>> buffer;
+        private readonly BlockingCollection<TEntry> buffer;
         private readonly object lockObject = new object();
         private readonly int maxBatchSize;
         private readonly Lazy<Task> cachedCompletedTask = new Lazy<Task>(() =>
@@ -53,7 +53,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         /// <param name="cancellationToken">Cancels any pending operation.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">BufferingCount out of range.</exception>
         /// <exception cref="System.ArgumentException">Argument valdation error.</exception>
-        public BufferedEventPublisher(string sinkId, Func<IList<TEntry>, Task<int>> eventPublisher, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, CancellationToken cancellationToken)
+        private BufferedEventPublisher(string sinkId, Func<IList<TEntry>, Task<int>> eventPublisher, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, CancellationToken cancellationToken)
         {
             Guard.ArgumentNotNullOrEmpty(sinkId, "sinkId");
             Guard.ArgumentNotNull(eventPublisher, "eventPublisherAction");
@@ -82,12 +82,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             this.maxBatchSize = this.bufferingCount == 0 ? this.maxBufferSize : this.bufferingCount;
             this.cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(new[] { cancellationToken });
 
-            // defer initialization to avoid resource consumption as much as possible
-            this.buffer = new Lazy<BlockingCollection<TEntry>>(() =>
-            {
-                this.StartBackgroundTask();
-                return new BlockingCollection<TEntry>(this.maxBufferSize);
-            });
+            this.buffer = new BlockingCollection<TEntry>(this.maxBufferSize);
+        }
+
+        /// <summary>
+        /// Initializes and starts a new instance of the <see cref="BufferedEventPublisher{TEntry}" /> class.
+        /// </summary>
+        /// <param name="sinkId">An identifier for the sink.</param>
+        /// <param name="eventPublisher">The event publisher.</param>
+        /// <param name="bufferingInterval">The buffering interval.</param>
+        /// <param name="bufferingCount">The buffering count.</param>
+        /// <param name="maxBufferSize">The maximum number of entries that can be buffered before the sink starts dropping entries.</param>
+        /// <param name="cancellationToken">Cancels any pending operation.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">BufferingCount out of range.</exception>
+        /// <exception cref="System.ArgumentException">Argument valdation error.</exception>
+        /// <returns>An instance of BufferedEventPublisher{TEntry}.</returns>
+        public static BufferedEventPublisher<TEntry> CreateAndStart(string sinkId, Func<IList<TEntry>, Task<int>> eventPublisher, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, CancellationToken cancellationToken)
+        {
+            var publisher = new BufferedEventPublisher<TEntry>(sinkId, eventPublisher, bufferingInterval, bufferingCount, maxBufferSize, cancellationToken);
+            publisher.StartBackgroundTask();
+            return publisher;
         }
 
         /// <summary>
@@ -97,7 +111,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         /// <returns>True on successful post, false otherwise.</returns>
         public bool TryPost(TEntry entry)
         {
-            var bufferInstance = this.buffer.Value;
+            var bufferInstance = this.buffer;
             if (bufferInstance.TryAdd(entry))
             {
                 if (!this.autoFlushByCountDisabled && this.bufferingCount > 0 && bufferInstance.Count >= this.bufferingCount)
@@ -126,7 +140,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         public Task FlushAsync()
         {
             // if there are no entries in the buffer, just return a completed operation
-            if (!this.buffer.IsValueCreated || this.buffer.Value.Count == 0)
+            if (this.buffer.Count == 0)
             {
                 return this.cachedCompletedTask.Value;
             }
@@ -191,9 +205,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         //// Main processing loop for publishing entries based on time interval, buffer count and explicit flush triggers.
         private async Task TransferEntries()
         {
+            Thread.MemoryBarrier();
             var token = this.cancellationTokenSource.Token;
 
-            var bufferInstance = this.buffer.Value;
+            var bufferInstance = this.buffer;
             while (true)
             {
                 if (token.IsCancellationRequested)
@@ -344,14 +359,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
         private IList<TEntry> GetBatch()
         {
-            return Enumerable.Take(this.buffer.Value, this.maxBatchSize).ToList();
+            return Enumerable.Take(this.buffer, this.maxBatchSize).ToList();
         }
 
         private void NotifyOnBufferNotEmpty()
         {
-            if (this.buffer.IsValueCreated && this.buffer.Value.Count > 0)
+            if (this.buffer.Count > 0)
             {
-                SemanticLoggingEventSource.Log.BufferedEventPublisherEventsLostWhileDisposing(this.buffer.Value.Count, this.sinkId);
+                SemanticLoggingEventSource.Log.BufferedEventPublisherEventsLostWhileDisposing(this.buffer.Count, this.sinkId);
             }
         }
 
