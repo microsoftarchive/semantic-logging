@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
     /// <summary>
-    /// Converts ElasticSearchLogEntry to JSON formatted ElasticSearch _bulk service index operation
+    /// Converts ElasticSearchLogEntry to JSON formatted Elasticsearch _bulk service index operation
     /// </summary>
     internal class ElasticSearchEventEntrySerializer : IDisposable
     {

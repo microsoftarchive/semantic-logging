@@ -165,9 +165,9 @@
     <Compile Include="TestSupport\PollingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Src\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+    <ProjectReference Include="..\..\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
       <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.ElasticSearch</Name>
+      <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Src\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
       <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>

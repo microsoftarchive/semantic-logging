@@ -160,7 +160,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(600, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to create payload for an entity. Message: {0}")]
+        [Event(600, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An Elasticsearch sink failed to create payload for an entity. Message: {0}")]
         internal void ElasticSearchSinkEntityPayloadCreationFailed(string message)
         {
             if (this.IsEnabled())
@@ -169,7 +169,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(601, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An ElasticSearch sink failed to write a batch of events. Message: {0}")]
+        [Event(601, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An Elasticsearch sink failed to write a batch of events. Message: {0}")]
         internal void ElasticSearchSinkWriteEventsFailed(string message)
         {
             if (this.IsEnabled())
@@ -178,7 +178,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(602, Level = EventLevel.Error, Keywords = Keywords.Sink, Message = "An ElasticSearch sink discarded {0} events due to failures while attempting to write a batch.")]
+        [Event(602, Level = EventLevel.Error, Keywords = Keywords.Sink, Message = "An Elasticsearch sink discarded {0} events due to failures while attempting to write a batch.")]
         internal void ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(int numberOfEntries, string message)
         {
             if (this.IsEnabled())

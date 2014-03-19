@@ -19,7 +19,7 @@ using Newtonsoft.Json.Linq;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
     /// <summary>
-    /// Sink that asynchronously writes entries to a ElasticSearch server.
+    /// Sink that asynchronously writes entries to a Elasticsearch server.
     /// </summary>
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
@@ -43,7 +43,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
         /// <param name="index">Index name prefix formatted as index-{0:yyyy.MM.DD}</param>
-        /// <param name="type">ElasticSearch entry type, the default is etw</param>
+        /// <param name="type">Elasticsearch entry type, the default is etw</param>
         /// <param name="flattenPayload">Flatten the payload collection when serializing event entries</param>
         /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Elasticsearch.</param>
         /// <param name="bufferingCount">The buffering event entry count to wait before sending events to Elasticsearch </param>
@@ -218,12 +218,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 // If the response return items collection
                 if (items != null)
                 {
-                    // NOTE: This only works with ElasticSearch 1.0
+                    // NOTE: This only works with Elasticsearch 1.0
                     // Alternatively we could query ES as part of initialization check results or fall back to trying <1.0 parsing
                     // We should also consider logging errors for individual entries
                     return items.Count(t => t["create"]["status"].Value<int>().Equals(201));
 
-                    // Pre-1.0 ElasticSearch
+                    // Pre-1.0 Elasticsearch
                     // return items.Count(t => t["create"]["ok"].Value<bool>().Equals(true));
                 }
 

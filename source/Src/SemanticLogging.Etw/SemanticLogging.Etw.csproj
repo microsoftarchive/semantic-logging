@@ -116,9 +116,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj">
+    <ProjectReference Include="..\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
       <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.ElasticSearch</Name>
+      <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
       <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>

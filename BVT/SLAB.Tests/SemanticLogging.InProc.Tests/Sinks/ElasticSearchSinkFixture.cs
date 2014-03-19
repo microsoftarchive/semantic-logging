@@ -930,7 +930,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                             collectErrorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(5));
 
-                            StringAssert.Contains(collectErrorsListener.ToString(), @"An ElasticSearch sink failed to write a batch of events");
+                            StringAssert.Contains(collectErrorsListener.ToString(), @"An Elasticsearch sink failed to write a batch of events");
                             StringAssert.Contains(collectErrorsListener.ToString(), @"The remote name could not be resolved: 'invalid-elastic-search-uri'");
                         }
                         finally

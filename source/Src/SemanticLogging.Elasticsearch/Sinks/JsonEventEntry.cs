@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
     /// <summary>
-    /// EventEntry formatted for use with ElasticSearch
+    /// EventEntry formatted for use with Elasticsearch
     /// </summary>
     public sealed class JsonEventEntry
     {

@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.WindowsAzur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Database", "Src\SemanticLogging.Database\SemanticLogging.Database.csproj", "{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.ElasticSearch", "Src\SemanticLogging.ElasticSearch\SemanticLogging.ElasticSearch.csproj", "{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Elasticsearch", "Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj", "{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
