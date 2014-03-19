@@ -40,7 +40,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             }
 
             var sb = new StringBuilder();
-            this.writer = new JsonTextWriter(new StringWriter(sb)) { CloseOutput = true };
+            this.writer = new JsonTextWriter(new StringWriter(sb, CultureInfo.InvariantCulture)) { CloseOutput = true };
 
             foreach (var entry in entries)
             {
