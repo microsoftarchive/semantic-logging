@@ -23,7 +23,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// </summary>
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
-
         private const string BulkServiceOperationPath = "/_bulk";
 
         private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
@@ -164,10 +163,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             {
                 client = new HttpClient();
 
-                var serializer = new ElasticSearchEventEntrySerializer(this.index, this.type, this.flattenPayload);
-
-                string logMessages = serializer.Serialize(collection);
-
+                string logMessages;
+                using (var serializer = new ElasticSearchEventEntrySerializer(this.index, this.type, this.flattenPayload))
+                {
+                    logMessages = serializer.Serialize(collection);
+                }
                 var content = new StringContent(logMessages);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 

@@ -13,7 +13,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
     /// <summary>
     /// Converts ElasticSearchLogEntry to JSON formatted ElasticSearch _bulk service index operation
     /// </summary>
-    internal class ElasticSearchEventEntrySerializer
+    internal class ElasticSearchEventEntrySerializer : IDisposable
     {
         private const string PayloadFlattenFormatString = "Payload_{0}";
 
@@ -40,13 +40,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             }
 
             var sb = new StringBuilder();
-            this.writer = new JsonTextWriter(new StringWriter(sb));
+            this.writer = new JsonTextWriter(new StringWriter(sb)) { CloseOutput = true };
 
             foreach (var entry in entries)
             {
                 this.WriteJsonEntry(entry);
             }
 
+            // Close the writer
+            this.writer.Close();
             this.writer = null;
 
             return sb.ToString();
@@ -125,6 +127,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         private string GetIndexName(DateTime entryDateTime)
         {
             return string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexName, entryDateTime);
+        }
+
+        public void Dispose()
+        {
+            if (writer != null)
+            {
+                this.writer.Close();
+                this.writer = null;
+            }
         }
     }
 }
