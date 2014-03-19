@@ -23,8 +23,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// </summary>
     public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
     {
-        private const int BufferCountTrigger = 100;
-
         private const string BulkServiceOperationPath = "/_bulk";
 
         private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
@@ -47,20 +45,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <param name="index">Index name prefix formatted as index-{0:yyyy.MM.DD}</param>
         /// <param name="type">ElasticSearch entry type, the default is etw</param>
         /// <param name="flattenPayload">Flatten the payload collection when serializing event entries</param>
-        /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Windows Azure Storage.</param>
+        /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Elasticsearch.</param>
+        /// <param name="bufferingCount">The buffering event entry count to wait before sending events to Elasticsearch </param>
         /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="OnCompleted"/> call is received and before disposing the sink.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
         public ElasticSearchSink(string instanceName, string connectionString, string index, string type, bool? flattenPayload, TimeSpan bufferInterval,
-            int maxBufferSize, TimeSpan onCompletedTimeout)
+            int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
             Guard.ArgumentNotNullOrEmpty(connectionString, "connectionString");
             Guard.ArgumentNotNullOrEmpty(index, "index");
             Guard.ArgumentNotNullOrEmpty(type, "type");
             Guard.ArgumentIsValidTimeout(onCompletedTimeout, "onCompletedTimeout");
+            Guard.ArgumentGreaterOrEqualThan(0, bufferingCount, "bufferingCount");
 
             if (Regex.IsMatch(index, "[\\\\/*?\",<>|\\sA-Z]"))
             {
@@ -76,7 +76,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.type = type;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
             bufferedPublisher = BufferedEventPublisher<JsonEventEntry>.CreateAndStart(sinkId, PublishEventsAsync, bufferInterval,
-                BufferCountTrigger, maxBufferSize, cancellationTokenSource.Token);
+                bufferingCount, maxBufferSize, cancellationTokenSource.Token);
         }
 
         /// <summary>
@@ -163,10 +163,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             {
                 client = new HttpClient();
 
-                var serializer = new ElasticSearchEventEntrySerializer(this.index, this.type, this.flattenPayload);
-
-                string logMessages = serializer.Serialize(collection);
-
+                string logMessages;
+                using (var serializer = new ElasticSearchEventEntrySerializer(this.index, this.type, this.flattenPayload))
+                {
+                    logMessages = serializer.Serialize(collection);
+                }
                 var content = new StringContent(logMessages);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 

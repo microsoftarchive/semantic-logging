@@ -95,7 +95,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             base.Arrange();
 
-            this.sink = new ElasticSearchSink("instance", this.elasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 600,
+            this.sink = new ElasticSearchSink("instance", this.elasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 100, 3000,
                 TimeSpan.FromMinutes(1));
             this.msgPropValues = new[] { "1", "2", "3" };
         }
