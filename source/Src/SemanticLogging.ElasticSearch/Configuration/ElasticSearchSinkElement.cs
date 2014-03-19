@@ -37,6 +37,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ??
                 Constants.DefaultBufferingFlushAllTimeout,
+                (int?)element.Attribute("bufferingCount") ?? Buffering.DefaultBufferingCount,
                 (int?)element.Attribute("maxBufferSize") ?? Buffering.DefaultMaxBufferSize);
 
             return subject;

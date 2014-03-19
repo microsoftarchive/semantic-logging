@@ -24,6 +24,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <param name="flattenPayload">Flatten the payload collection when serializing event entries</param>
         /// <param name="bufferingInterval">The buffering interval between each batch publishing. Default value is <see cref="Buffering.DefaultBufferingInterval" />.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="ElasticSearchSink.OnCompleted" /> call is received and before disposing the sink.</param>
+        /// <param name="bufferingCount">Buffering count to send entries sot Elasticsearch. Default value is <see cref="Buffering.DefaultBufferingCount" /></param>
         /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to ElasticSearch before the sink starts dropping entries.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose" /> on
         /// the <see cref="System.Diagnostics.Tracing.EventListener" /> will block until all the entries are flushed or the interval elapses.
@@ -34,10 +35,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         public static SinkSubscription<ElasticSearchSink> LogToElasticSearch(this IObservable<EventEntry> eventStream,
             string instanceName, string connectionString, string index, string type, bool flattenPayload = true, TimeSpan? bufferingInterval = null,
             TimeSpan? onCompletedTimeout = null,
+            int bufferingCount = Buffering.DefaultBufferingCount,
             int maxBufferSize = Buffering.DefaultMaxBufferSize)
         {
             var sink = new ElasticSearchSink(instanceName, connectionString, index, type, flattenPayload,
                 bufferingInterval ?? Buffering.DefaultBufferingInterval,
+                bufferingCount,
                 maxBufferSize,
                 onCompletedTimeout ?? Timeout.InfiniteTimeSpan);
 

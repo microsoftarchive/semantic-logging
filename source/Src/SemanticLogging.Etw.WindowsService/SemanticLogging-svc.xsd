@@ -123,6 +123,7 @@
         <xs:attribute name="type" type="NoEmptyString" use="optional" />
         <xs:attribute name="flattenPayload" type="xs:boolean" use="optional" />
         <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
+        <xs:attribute name="bufferingCount" type="PositiveInteger" use="optional" />
         <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
         <xs:attribute name="bufferingFlushAllTimeoutInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
       </xs:extension>
