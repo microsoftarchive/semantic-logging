@@ -2,11 +2,11 @@
 <configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
 
   <sinks>
-    <elasticSearchSink instanceName="sink1" name="sink1" connectionString="http://localhost:9200" >
+    <elasticsearchSink instanceName="sink1" name="sink1" connectionString="http://localhost:9200" >
       <sources>
         <eventSource name="MockEventSourceOutProc"/>
       </sources>
-    </elasticSearchSink>
+    </elasticsearchSink>
 
   </sinks>
 

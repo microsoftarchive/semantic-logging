@@ -98,7 +98,7 @@
 	<resheader name="writer">
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.3500.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
-  <data name="InvalidElasticSearchIndexNameError" xml:space="preserve">
+  <data name="InvalidElasticsearchIndexNameError" xml:space="preserve">
     <value>The index name must not contain uppercase, whitespace, or any of the following characters \ /*?"&lt;&gt;|</value>
   </data>
 </root>

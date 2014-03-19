@@ -9,22 +9,22 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
-    public abstract class given_elasticSearchSinkElement : ContextBase
+    public abstract class given_elasticsearchSinkElement : ContextBase
     {
         protected ISinkElement sut;
         private XElement element;
 
         protected override void Given()
         {
-            this.element = new XElement(XName.Get("elasticSearchSink", Constants.Namespace),
+            this.element = new XElement(XName.Get("elasticsearchSink", Constants.Namespace),
                                         new XAttribute("instanceName", "instanceName"),
                                         new XAttribute("connectionString", "http://localhost:9200"));
 
-            this.sut = new ElasticSearchSinkElement();
+            this.sut = new ElasticsearchSinkElement();
         }
 
         [TestClass]
-        public class when_query_for_canCreateSink : Etw.given_elasticSearchSinkElement
+        public class when_query_for_canCreateSink : Etw.given_elasticsearchSinkElement
         {
             [TestMethod]
             public void then_instance_can_be_created()
@@ -34,7 +34,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
         }
 
         [TestClass]
-        public class when_createSink_with_required_parameters : Etw.given_elasticSearchSinkElement
+        public class when_createSink_with_required_parameters : Etw.given_elasticsearchSinkElement
         {
             private IObserver<EventEntry> observer;
 

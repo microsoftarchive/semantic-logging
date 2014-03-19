@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport
 {
-    public static class ElasticSearchHelper
+    public static class ElasticsearchHelper
     {
         public static void DeleteIndex(string uri, string indexName = null)
         {

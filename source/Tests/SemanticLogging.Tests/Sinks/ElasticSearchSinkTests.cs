@@ -19,24 +19,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
     [TestClass]
     public class given_elasticsearch_configuration
     {
-        private const string DevelopmentElasticSearchEndpoint = "http://localhost:9200";
+        private const string DevelopmentElasticsearchEndpoint = "http://localhost:9200";
 
         [TestMethod]
         public void when_creating_sink_for_null_connection_string_then_throws()
         {
-            AssertEx.Throws<ArgumentNullException>(() => new ElasticSearchSink("instanceName", null, "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentNullException>(() => new ElasticsearchSink("instanceName", null, "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_sink_with_invalid_connection_string_then_throws()
         {
-            AssertEx.Throws<UriFormatException>(() => new ElasticSearchSink("instanceName", "InvalidConnection", "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<UriFormatException>(() => new ElasticsearchSink("instanceName", "InvalidConnection", "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_sink_with_small_buffer_size_then_throws()
         {
-            AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentException>(() => new ElasticsearchSink("instanceName", DevelopmentElasticsearchEndpoint, "logstash", "etw", true, TimeSpan.FromSeconds(1), 1000, 10, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
@@ -47,17 +47,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("{0}testindex", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticsearchSink("instanceName", DevelopmentElasticsearchEndpoint, string.Format("{0}testindex", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
             }
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("test{0}index", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticsearchSink("instanceName", DevelopmentElasticsearchEndpoint, string.Format("test{0}index", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
             }
 
             foreach (var invalidChar in testInvalidCharacters)
             {
-                AssertEx.Throws<ArgumentException>(() => new ElasticSearchSink("instanceName", DevelopmentElasticSearchEndpoint, string.Format("testindex{0}", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
+                AssertEx.Throws<ArgumentException>(() => new ElasticsearchSink("instanceName", DevelopmentElasticsearchEndpoint, string.Format("testindex{0}", invalidChar), "etw", true, TimeSpan.FromSeconds(1), 1000, 10000, Timeout.InfiniteTimeSpan));
             }
         }
     }
@@ -76,7 +76,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 InstanceName = "instance"
             };
 
-            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
@@ -95,7 +95,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 RelatedActivityId = Guid.NewGuid()
             };
 
-            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -117,7 +117,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 InstanceName = "instance"
             };
 
-            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -139,7 +139,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 InstanceName = "instance"
             };
 
-            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", false).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", false).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -155,7 +155,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             // Note: converting an array does not create valid message for use in elasticsearch bulk operation
 
-            var actual = new ElasticSearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { CreateJsonEventEntry(), CreateJsonEventEntry() });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { CreateJsonEventEntry(), CreateJsonEventEntry() });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
@@ -235,7 +235,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                                         Content = "{ \"error\": \"InvalidIndexNameException[[log,stash] Invalid index name [log,stash], must not contain the following characters [\\\\, /, *, ?, \\\", <, >, |,  , ,]]\",\"status\": 400}"
                                     });
 
-                var sink = new ElasticSearchSink("instance", endpoint, "slabtest", "etw", true, TimeSpan.FromSeconds(1), 100, 800, TimeSpan.FromMinutes(1));
+                var sink = new ElasticsearchSink("instance", endpoint, "slabtest", "etw", true, TimeSpan.FromSeconds(1), 100, 800, TimeSpan.FromMinutes(1));
 
                 sink.OnNext(new JsonEventEntry());
 

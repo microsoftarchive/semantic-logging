@@ -8,9 +8,9 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
-    internal class ElasticSearchSinkElement : ISinkElement
+    internal class ElasticsearchSinkElement : ISinkElement
     {
-        private readonly XName sinkName = XName.Get("elasticSearchSink", Constants.Namespace);
+        private readonly XName sinkName = XName.Get("elasticsearchSink", Constants.Namespace);
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
             "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated with Guard class")]
@@ -28,7 +28,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
             Guard.ArgumentNotNull(element, "element");
 
             var subject = new EventEntrySubject();
-            subject.LogToElasticSearch(
+            subject.LogToElasticsearch(
                 (string)element.Attribute("instanceName"),
                 (string)element.Attribute("connectionString"),
                 (string)element.Attribute("index") ?? "logstash",

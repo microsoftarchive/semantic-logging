@@ -170,12 +170,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         }
 
         [TestMethod]
-        public void WhenUsingElasticSearch()
+        public void WhenUsingElasticsearch()
         {
-            var elasticSearchUri = ConfigurationManager.AppSettings["ElasticSearchUri"];
+            var elasticsearchUri = ConfigurationManager.AppSettings["ElasticsearchUri"];
             try
             {
-                ElasticSearchHelper.DeleteIndex(elasticSearchUri);
+                ElasticsearchHelper.DeleteIndex(elasticsearchUri);
             }
             catch (Exception exp)
             {
@@ -185,7 +185,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             var indexPrefix = "elasticsearch2eusingwindowsservice";
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", indexPrefix, DateTime.UtcNow);
             var type = "testtype";
-            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "ElasticSearchWinService.xml");
+            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "ElasticsearchWinService.xml");
 
             QueryResult result = null;
             try
@@ -195,7 +195,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
                 logger.LogSomeMessage("logging using windows service to elastic search");
                 logger.LogSomeMessage("logging using windows service to elastic search 2");
 
-                result = ElasticSearchHelper.PollUntilEvents(elasticSearchUri, index, type, 2);
+                result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, type, 2);
             }
             finally
             {

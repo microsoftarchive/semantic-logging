@@ -63,9 +63,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Properties {
         /// <summary>
         ///   Looks up a localized string similar to The index name must not contain uppercase, whitespace, or any of the following characters \ /*?&quot;&lt;&gt;|.
         /// </summary>
-        internal static string InvalidElasticSearchIndexNameError {
+        internal static string InvalidElasticsearchIndexNameError {
             get {
-                return ResourceManager.GetString("InvalidElasticSearchIndexNameError", resourceCulture);
+                return ResourceManager.GetString("InvalidElasticsearchIndexNameError", resourceCulture);
             }
         }
     }

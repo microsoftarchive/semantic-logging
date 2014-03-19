@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata schemaVersion="2">
     <id>EnterpriseLibrary.SemanticLogging.Elasticsearch</id>
-    <version>$Microsoft_Practices_EnterpriseLibrary_SemanticLogging_ElasticSearch_Version$</version>
+    <version>$Microsoft_Practices_EnterpriseLibrary_SemanticLogging_Elasticsearch_Version$</version>
     <title>Semantic Logging Application Block - Elasticsearch Sink (PRE-RELEASE)</title>
     <authors>Microsoft</authors>
     <owners>Microsoft; patterns-and-practices</owners>

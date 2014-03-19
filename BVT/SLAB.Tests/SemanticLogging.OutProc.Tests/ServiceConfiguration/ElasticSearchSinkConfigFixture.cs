@@ -8,7 +8,7 @@ using ConfigException = Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Et
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.ServiceConfiguration
 {
     [TestClass]
-    public class ElasticSearchSinkConfigFixture
+    public class ElasticsearchSinkConfigFixture
     {
         [ClassInitialize]
         public static void Setup(TestContext testContext)
@@ -19,7 +19,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenMissingConnectionString()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkMissingConnectionString.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMissingConnectionString.xml"));
 
             StringAssert.Contains(exc.ToString(), "The required attribute 'connectionString' is missing.");
         }
@@ -27,7 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenMissingInstanceName()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkMissingInstanceName.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMissingInstanceName.xml"));
 
             StringAssert.Contains(exc.ToString(), "The required attribute 'instanceName' is missing.");
         }
@@ -35,7 +35,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenEmptyIndex()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkEmptyIndex.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkEmptyIndex.xml"));
 
             StringAssert.Contains(exc.ToString(), "'index' attribute is invalid");
         }
@@ -43,7 +43,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenEmptyConnectionString()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkEmptyConnectionString.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkEmptyConnectionString.xml"));
 
             StringAssert.Contains(exc.ToString(), "'connectionString' attribute is invalid");
         }
@@ -51,7 +51,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenEmptyInstanceName()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkEmptyInstanceName.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkEmptyInstanceName.xml"));
 
             StringAssert.Contains(exc.ToString(), "The 'instanceName' attribute is invalid - The value '' is invalid according to its datatype");
         }
@@ -59,7 +59,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenEmptyTypeName()
         {
-            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkEmptyTypeName.xml"));
+            var exc = ExceptionAssertHelper.Throws<ConfigException>(() => TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkEmptyTypeName.xml"));
 
             StringAssert.Contains(exc.ToString(), "The 'type' attribute is invalid - The value '' is invalid according to its datatype");
         }
@@ -67,7 +67,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenAllProperties()
         {
-            var serviceConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkAllProperties.xml");
+            var serviceConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkAllProperties.xml");
           
             Assert.IsNotNull(serviceConfiguration);
         }
@@ -75,7 +75,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [TestMethod]
         public void WhenOnlyMandatoryProperties()
         {
-            var serviceConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkMandatoryProperties.xml");
+            var serviceConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMandatoryProperties.xml");
           
             Assert.IsNotNull(serviceConfiguration);
         }

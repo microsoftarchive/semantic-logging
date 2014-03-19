@@ -91,7 +91,7 @@
     <Compile Include="TestSupport\AssemblyLoaderHelper.cs" />
     <Compile Include="TestSupport\AzureTableHelper.cs" />
     <Compile Include="TestSupport\DatabaseHelper.cs" />
-    <Compile Include="TestSupport\ElasticSearchHelper.cs" />
+    <Compile Include="TestSupport\ElasticsearchHelper.cs" />
     <Compile Include="TestSupport\EventRecordExtensions.cs" />
     <Compile Include="TestSupport\EventTextFormatterExtensions.cs" />
     <Compile Include="TestSupport\ExceptionAssertHelper.cs" />

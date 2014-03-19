@@ -72,7 +72,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             }
             catch (Exception e)
             {
-                SemanticLoggingEventSource.Log.ElasticSearchSinkEntityPayloadCreationFailed(e.ToString());
+                SemanticLoggingEventSource.Log.ElasticsearchSinkEntityPayloadCreationFailed(e.ToString());
             }
         }
     }

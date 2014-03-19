@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 {
     /// <summary>
-    /// Converts ElasticSearchLogEntry to JSON formatted Elasticsearch _bulk service index operation
+    /// Converts ElasticsearchLogEntry to JSON formatted Elasticsearch _bulk service index operation
     /// </summary>
-    internal class ElasticSearchEventEntrySerializer : IDisposable
+    internal class ElasticsearchEventEntrySerializer : IDisposable
     {
         private const string PayloadFlattenFormatString = "Payload_{0}";
 
@@ -25,7 +25,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
         private JsonWriter writer;
 
-        internal ElasticSearchEventEntrySerializer(string indexName, string entryType, bool flattenPayload)
+        internal ElasticsearchEventEntrySerializer(string indexName, string entryType, bool flattenPayload)
         {
             this.indexName = indexName;
             this.entryType = entryType;

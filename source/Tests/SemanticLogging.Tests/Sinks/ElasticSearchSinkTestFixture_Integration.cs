@@ -17,17 +17,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
     public class given_empty_index : ArrangeActAssert
     {
         // These tests will delete data in the provided elasticsearch endpoint
-        protected string elasticSearchUrl;
+        protected string elasticsearchUrl;
 
         protected readonly string TestIndex = "slabtest";
 
         protected override void Arrange()
         {
-            this.elasticSearchUrl = ConfigurationHelper.GetSetting("ElasticSearchUrl");
+            this.elasticsearchUrl = ConfigurationHelper.GetSetting("ElasticsearchUrl");
 
-            if (string.IsNullOrEmpty(this.elasticSearchUrl))
+            if (string.IsNullOrEmpty(this.elasticsearchUrl))
             {
-                Assert.Inconclusive("Cannot run tests because the Elastic Search URL is not configured in the app.config file. Uncomment the app setting for ElasticSearchUrl and update it if needed.");
+                Assert.Inconclusive("Cannot run tests because the Elastic Search URL is not configured in the app.config file. Uncomment the app setting for ElasticsearchUrl and update it if needed.");
             }
 
             // Delete data in the text index(s)
@@ -43,14 +43,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             indexName = indexName ?? TestIndex + "*";
 
-            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticsearchUrl) };
 
             client.DeleteAsync(indexName).Wait();
         }
 
         protected int GetIndexCount(string indexName = null)
         {
-            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticsearchUrl) };
 
             var operation = string.Format("{0}/_count", indexName ?? TestIndex + "*");
 
@@ -61,7 +61,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
         protected QueryResult QueryAllEntriesByIndex(string indexName = null)
         {
-            var client = new HttpClient { BaseAddress = new Uri(this.elasticSearchUrl) };
+            var client = new HttpClient { BaseAddress = new Uri(this.elasticsearchUrl) };
 
             var operation = string.Format("{0}/_search", indexName ?? TestIndex + "*");
 
@@ -88,14 +88,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
     [TestClass]
     public class when_writing_multiple_entries : given_empty_index
     {
-        private ElasticSearchSink sink;
+        private ElasticsearchSink sink;
         private string[] msgPropValues;
 
         protected override void Arrange()
         {
             base.Arrange();
 
-            this.sink = new ElasticSearchSink("instance", this.elasticSearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 100, 3000,
+            this.sink = new ElasticsearchSink("instance", this.elasticsearchUrl, TestIndex, "etw", true, TimeSpan.FromSeconds(1), 100, 3000,
                 TimeSpan.FromMinutes(1));
             this.msgPropValues = new[] { "1", "2", "3" };
         }

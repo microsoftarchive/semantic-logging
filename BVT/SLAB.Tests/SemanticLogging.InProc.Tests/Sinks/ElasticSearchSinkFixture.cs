@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sinks
 {
     [TestClass]
-    public class ElasticSearchSinkFixture
+    public class ElasticsearchSinkFixture
     {
-        private readonly string elasticSearchUri = ConfigurationManager.AppSettings["ElasticSearchUri"];
+        private readonly string elasticsearchUri = ConfigurationManager.AppSettings["ElasticsearchUri"];
         private string indexPrefix = null;
         private string type = "testtype";
 
@@ -25,7 +25,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             try
             {
-                ElasticSearchHelper.DeleteIndex(elasticSearchUri);
+                ElasticsearchHelper.DeleteIndex(elasticsearchUri);
             }
             catch (Exception exp)
             {
@@ -44,7 +44,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("This is informational");
                     logger.Error("This is an error message");
@@ -56,7 +56,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 3);
             Assert.AreEqual<int>(3, result.Hits.Total);
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (long)h.Source["EventId"] == TestEventSource.InformationalEventId));
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (long)h.Source["EventId"] == TestEventSource.InformationalEventId));
@@ -74,7 +74,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int n = 0; n < 300; n++)
                     {
@@ -87,7 +87,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 300);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 300);
             Assert.AreEqual(300, result.Hits.Total);
         }
 
@@ -102,7 +102,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithoutPayloadNorMessage();
                 }
@@ -112,7 +112,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, result.Hits.Total);
             Assert.AreEqual<long>(TestEventSource.EventWithoutPayloadNorMessageId, (long)result.Hits.Hits.ElementAt(0).Source["EventId"]);
         }
@@ -128,7 +128,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.AllParametersWithCustomValues();
                 }
@@ -138,7 +138,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, result.Hits.Total);
             Assert.AreEqual<long>(10001, (long)result.Hits.Hits.ElementAt(0).Source["EventId"]);
         }
@@ -154,10 +154,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Critical("This is a critical message");
-                    var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+                    var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
                     Assert.AreEqual<int>(1, result.Hits.Total);
 
                     listener.DisableEvents(logger);
@@ -169,7 +169,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var finalResult = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var finalResult = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual<int>(1, finalResult.Hits.Total);
         }
 
@@ -184,7 +184,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithPayload("message", 2);
                 }
@@ -194,7 +194,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
             Assert.AreEqual("testInstance", (string)result.Hits.Hits.ElementAt(0).Source["InstanceName"]);
             Assert.AreEqual("message", (string)result.Hits.Hits.ElementAt(0).Source["Payload_payload1"]);
@@ -208,7 +208,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch(null, elasticSearchUri, "indexPrefix", "type");
+                    listener.LogToElasticsearch(null, elasticsearchUri, "indexPrefix", "type");
                 }
             });
 
@@ -223,7 +223,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch(string.Empty, elasticSearchUri, "indexPrefix", "type");
+                    listener.LogToElasticsearch(string.Empty, elasticsearchUri, "indexPrefix", "type");
                 }
             });
 
@@ -238,7 +238,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", null, "indexPrefix", "type");
+                    listener.LogToElasticsearch("testinstance", null, "indexPrefix", "type");
                 }
             });
 
@@ -253,7 +253,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", string.Empty, "indexPrefix", "type");
+                    listener.LogToElasticsearch("testinstance", string.Empty, "indexPrefix", "type");
                 }
             });
 
@@ -268,7 +268,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", elasticSearchUri, null, "type");
+                    listener.LogToElasticsearch("testinstance", elasticsearchUri, null, "type");
                 }
             });
 
@@ -283,7 +283,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", elasticSearchUri, string.Empty, "type");
+                    listener.LogToElasticsearch("testinstance", elasticsearchUri, string.Empty, "type");
                 }
             });
 
@@ -298,7 +298,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", elasticSearchUri, "indexPrefix", null);
+                    listener.LogToElasticsearch("testinstance", elasticsearchUri, "indexPrefix", null);
                 }
             });
 
@@ -313,7 +313,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 using (var listener = new ObservableEventListener())
                 {
-                    listener.LogToElasticSearch("testinstance", elasticSearchUri, "indexPrefix", string.Empty);
+                    listener.LogToElasticsearch("testinstance", elasticsearchUri, "indexPrefix", string.Empty);
                 }
             });
 
@@ -334,8 +334,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener1.LogToElasticSearch("testInstance1", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
-                    listener2.LogToElasticSearch("testInstance2", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener1.LogToElasticsearch("testInstance1", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener2.LogToElasticsearch("testInstance2", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(20));
                     listener1.EnableEvents(logger, EventLevel.LogAlways);
                     listener2.EnableEvents(logger, EventLevel.LogAlways);
 
@@ -351,11 +351,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // Wait less than the buffering interval for the events to be written and assert
                     // Only the first batch of 100 is written for each listener
-                    result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 200, maxPollTime: TimeSpan.FromSeconds(10));
+                    result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 200, maxPollTime: TimeSpan.FromSeconds(10));
                     Assert.AreEqual(200, result.Hits.Total);
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type, "?q=InstanceName:testInstance1");
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type, "?q=InstanceName:testInstance1");
                     Assert.AreEqual(100, result.Hits.Total);
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type, "?q=InstanceName:testInstance2");
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type, "?q=InstanceName:testInstance2");
                     Assert.AreEqual(100, result.Hits.Total);
                 }
                 finally
@@ -366,11 +366,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             }
 
             // The rest of the events are written during the Dispose flush
-            result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 240);
+            result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 240);
             Assert.AreEqual(240, result.Hits.Total);
-            result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type, "?q=InstanceName:testInstance1");
+            result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type, "?q=InstanceName:testInstance1");
             Assert.AreEqual(120, result.Hits.Total);
-            result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type, "?q=InstanceName:testInstance2");
+            result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type, "?q=InstanceName:testInstance2");
             Assert.AreEqual(120, result.Hits.Total);
         }
 
@@ -387,7 +387,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 {
                     // Minimum buffering interval is 500 ms
                     var minimumBufferingInterval = TimeSpan.FromMilliseconds(500);
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: minimumBufferingInterval);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: minimumBufferingInterval);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     var logTaskList = new List<Task>();
                     for (int i = 0; i < 10; i++)
@@ -397,7 +397,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // Wait for the events to be written and assert
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-                    var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(10, result.Hits.Total);
                 }
                 finally
@@ -407,7 +407,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             }
 
             // No more events should be written during the Dispose flush
-            var finalResult = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            var finalResult = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(10, finalResult.Hits.Total);
         }
 
@@ -423,12 +423,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 try
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
 
                     // Pre-condition: Wait for the events to be written and assert
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-                    var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(0, result.Hits.Total);
 
                     for (int i = 0; i < 10; i++)
@@ -438,7 +438,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // Event must not be written before the interval has elapsed
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(0, result.Hits.Total);
 
                     // Wait for the buffer to flush at end of interval
@@ -446,7 +446,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // 1st interval: Wait for the events to be written and assert
                     Task.Delay(TimeSpan.FromSeconds(3)).Wait();
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(10, result.Hits.Total);
                 }
                 finally
@@ -468,7 +468,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 try
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(5);
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.Informational);
 
                     // When reachiing 100 events buffer will be flushed
@@ -479,7 +479,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // Wait for buffer interval to elapse
                     Task.Delay(bufferingInterval).Wait();
-                    var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(100, result.Hits.Total);
                 }
                 finally
@@ -490,7 +490,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             // Last events should be written during the Dispose flush
             Task.Delay(TimeSpan.FromSeconds(2)).Wait();
-            var finalResult = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            var finalResult = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(110, finalResult.Hits.Total);
         }
 
@@ -507,7 +507,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 try
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(2);
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.Informational);
 
                     // 100 events or more will be flushed by count before the buffering interval elapses
@@ -518,7 +518,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // Wait for buffer interval to elapse and allow time for events to be written
                     Task.Delay(bufferingInterval.Add(TimeSpan.FromSeconds(3))).Wait();
-                    var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(90, result.Hits.Total);
                 }
                 finally
@@ -543,7 +543,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 try
                 {
                     errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Verbose);
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: bufferingInterval);
                     listener.EnableEvents(logger, EventLevel.Informational);
 
                     // 1st interval: Log 10 events
@@ -558,7 +558,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // 1st interval: Wait for the events to be written and assert
                     Task.Delay(insertionInterval).Wait();
-                    var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(10, result.Hits.Total);
 
                     // 2nd interval: Log 10 events
@@ -573,7 +573,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // 2nd interval: Wait for the events to be written and assert
                     Task.Delay(insertionInterval).Wait();
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(20, result.Hits.Total);
 
                     // 3rd interval: Log 10 events
@@ -588,7 +588,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
                     // 3rd interval: Wait for the events to be written and assert
                     Task.Delay(insertionInterval).Wait();
-                    result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+                    result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
                     Assert.AreEqual(30, result.Hits.Total);
 
                     // No errors should have been reported
@@ -602,7 +602,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             }
 
             // No more events should have been written during the last flush in the Dispose
-            var finalResult = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            var finalResult = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(30, finalResult.Hits.Total);
             //Assert.AreEqual(30, AzureTableHelper.GetEventsCount(connectionString, this.indexPrefix));
         }
@@ -618,7 +618,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.ErrorWithKeywordDiagnostic("Error with keyword Diagnostic");
                     logger.CriticalWithKeywordPage("Critical with keyword Page");
@@ -629,7 +629,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Keywords"].ToString() == "1"));
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Keywords"].ToString() == "4"));
@@ -646,7 +646,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ErrorWithKeywordDiagnostic("Error with keyword EventlogClassic");
                 }
@@ -658,7 +658,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             // Wait for events to be inserted
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-            var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(0, result.Hits.Total);
         }
 
@@ -673,8 +673,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var listener2 = new ObservableEventListener();
             try
             {
-                listener1.LogToElasticSearch("testInstance1", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                listener2.LogToElasticSearch("testInstance2", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                listener1.LogToElasticsearch("testInstance1", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                listener2.LogToElasticsearch("testInstance2", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                 listener1.EnableEvents(logger, EventLevel.LogAlways);
                 listener2.EnableEvents(logger, EventLevel.LogAlways);
                 var logTaskList = new List<Task>();
@@ -688,7 +688,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 listener1.Dispose();
                 listener2.Dispose();
 
-                var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 210);
+                var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 210);
                 Assert.AreEqual(210, result.Hits.Total);
             }
             finally
@@ -716,7 +716,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.CriticalWithTaskName("Critical with task name");
                     logger.CriticalWithKeywordPage("Critical with no task name");
@@ -727,7 +727,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Task"].ToString() == "64513"));
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Task"].ToString() == "1"));
@@ -744,7 +744,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Blue, MockEventSourceInProcEnum.MyFlags.Flag2);
                 }
@@ -754,7 +754,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
             Assert.AreEqual(1, (long)result.Hits.Hits.ElementAt(0).Source["Payload_a"]);
             Assert.AreEqual(2, (long)result.Hits.Hits.ElementAt(0).Source["Payload_b"]);
@@ -774,8 +774,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
-                    listener2.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener2.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     listener.EnableEvents(logger, EventLevel.Error);
                     listener2.EnableEvents(logger, EventLevel.Informational);
                     logger.Informational(infoMessage);
@@ -788,7 +788,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 3);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 3);
             Assert.AreEqual(3, result.Hits.Total);
             Assert.AreEqual(2, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Error).Count());
             Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Informational).Count());
@@ -806,7 +806,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    listener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     string message = string.Concat("Message ", Guid.NewGuid());
                     string errorMessage = string.Concat("Error ", Guid.NewGuid());
                     listener.EnableEvents(logger, EventLevel.LogAlways);
@@ -821,7 +821,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 2);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
             Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Error).Count());
             Assert.AreEqual(1, result.Hits.Hits.Where(h => (long)h.Source["Level"] == (long)EventLevel.Informational).Count());
@@ -842,7 +842,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     eventListener.EnableEvents(logger, EventLevel.LogAlways);
 
                     EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
@@ -856,7 +856,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
             var loggedEvent = result.Hits.Hits.ElementAt(0);
             Assert.AreEqual((int)EventLevel.Informational, (long)loggedEvent.Source["Level"]);
@@ -882,7 +882,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             {
                 try
                 {
-                    eventListener.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     eventListener.EnableEvents(logger, EventLevel.LogAlways);
 
                     EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
@@ -896,7 +896,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.PollUntilEvents(this.elasticSearchUri, index, this.type, 1);
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
             Assert.AreEqual(1, result.Hits.Total);
             var loggedEvent = result.Hits.Hits.ElementAt(0);
             Assert.AreEqual((int)EventLevel.Informational, (long)loggedEvent.Source["Level"]);
@@ -914,12 +914,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = MockEventSource.Logger;
 
-            var invalidElasticSearchUri = "http://invalid-elastic-search-uri";
+            var invalidElasticsearchUri = "http://invalid-elastic-search-uri";
             using (ObservableEventListener eventListener = new ObservableEventListener())
             {
                 try
                 {
-                    eventListener.LogToElasticSearch("testInstance", invalidElasticSearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    eventListener.LogToElasticsearch("testInstance", invalidElasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
                     eventListener.EnableEvents(logger, EventLevel.LogAlways);
                     using (var collectErrorsListener = new InMemoryEventListener(true))
                     {
@@ -945,7 +945,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 }
             }
 
-            var result = ElasticSearchHelper.GetEvents(this.elasticSearchUri, index, this.type);
+            var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(0, result.Hits.Total);
         }
     }

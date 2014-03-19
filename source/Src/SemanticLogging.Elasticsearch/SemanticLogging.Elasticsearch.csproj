@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\ElasticSearchSinkElement.cs" />
+    <Compile Include="Configuration\ElasticsearchSinkElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resource.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -57,10 +57,10 @@
       <DependentUpon>Resource.resx</DependentUpon>
     </Compile>
     <Compile Include="Utility\JsonEventEntryExtensions.cs" />
-    <Compile Include="Utility\ElasticSearchEventEntrySerializer.cs" />
-    <Compile Include="Sinks\ElasticSearchSink.cs" />
+    <Compile Include="Utility\ElasticsearchEventEntrySerializer.cs" />
+    <Compile Include="Sinks\ElasticsearchSink.cs" />
     <Compile Include="Sinks\JsonEventEntry.cs" />
-    <Compile Include="ElasticSearchLog.cs" />
+    <Compile Include="ElasticsearchLog.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config">

@@ -20,7 +20,7 @@
             <xs:element name="sqlDatabaseSink" type="SqlDatabaseSinkElement" />
             <xs:element name="consoleSink" type="ConsoleSinkElement" />
             <xs:element name="customSink" type="CustomSinkElement" />
-            <xs:element name="elasticSearchSink" type="ElasticSearchSinkElement" />
+            <xs:element name="elasticsearchSink" type="ElasticsearchSinkElement" />
             <xs:any namespace="##other" processContents="lax"/>
           </xs:choice>
         </xs:complexType>
@@ -114,7 +114,7 @@
     </xs:complexContent>
   </xs:complexType>
 
-  <xs:complexType name="ElasticSearchSinkElement">
+  <xs:complexType name="ElasticsearchSinkElement">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBase">
         <xs:attribute name="instanceName" type="NoEmptyString" use="required" />

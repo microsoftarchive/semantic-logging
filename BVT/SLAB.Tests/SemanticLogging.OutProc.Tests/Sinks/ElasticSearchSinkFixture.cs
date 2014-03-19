@@ -19,9 +19,9 @@ using System.Threading.Tasks;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Sinks
 {
     [TestClass]
-    public class ElasticSearchSinkFixture
+    public class ElasticsearchSinkFixture
     {
-        private readonly string elasticSearchUri = ConfigurationManager.AppSettings["ElasticSearchUri"];
+        private readonly string elasticsearchUri = ConfigurationManager.AppSettings["ElasticsearchUri"];
         private string indexPrefix = "testindex";
         private string type = "testtype";
 
@@ -30,7 +30,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         {
             try
             {
-                ElasticSearchHelper.DeleteIndex(elasticSearchUri);
+                ElasticsearchHelper.DeleteIndex(elasticsearchUri);
             }
             catch (Exception exp)
             {
@@ -47,7 +47,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             EventTextFormatter formatter = new EventTextFormatter();
             EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, EventLevel.LogAlways);
             var subject = new EventEntrySubject();
-            subject.LogToElasticSearch("testInstance", elasticSearchUri, this.indexPrefix, this.type, /* flattenPayload: false, */ bufferingInterval: TimeSpan.FromSeconds(5));
+            subject.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, /* flattenPayload: false, */ bufferingInterval: TimeSpan.FromSeconds(5));
 
             QueryResult result = null;
             SinkSettings sinkSettings = new SinkSettings("essink", subject, new List<EventSourceSettings>() { { settings } });
@@ -63,7 +63,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                         logger.LogSomeMessage("message " + n.ToString());
                     }
 
-                    result = ElasticSearchHelper.PollUntilEvents(elasticSearchUri, index, this.type, 10);
+                    result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, this.type, 10);
                 }
                 finally
                 {
@@ -86,7 +86,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             var logger = MockEventSourceOutProc.Logger;
 
             QueryResult result = null;
-            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticSearchSink\\ElasticSinkMandatoryProperties.xml");
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMandatoryProperties.xml");
             using (TraceEventService collector = new TraceEventService(svcConfiguration))
             {
                 collector.Start();
@@ -98,7 +98,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     Thread.Sleep(TimeSpan.FromSeconds(45));
-                    result = ElasticSearchHelper.GetEvents(elasticSearchUri, index, "etw");
+                    result = ElasticsearchHelper.GetEvents(elasticsearchUri, index, "etw");
                 }
                 finally
                 {

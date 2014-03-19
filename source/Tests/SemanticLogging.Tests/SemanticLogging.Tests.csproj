@@ -85,7 +85,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Etw\ElasticSearchSinkElementFixture.cs" />
+    <Compile Include="Etw\ElasticsearchSinkElementFixture.cs" />
     <Compile Include="Etw\ConfigurationReaderFixture.cs" />
     <Compile Include="Etw\ConsoleSinkElementFixture.cs" />
     <Compile Include="Etw\TraceEventServiceWorkerFixture.cs" />
@@ -95,8 +95,8 @@
     <Compile Include="Etw\SqlDatabaseSinkElementFixture.cs" />
     <Compile Include="Etw\XmlUtilFixture.cs" />
     <Compile Include="Observable\ObservableProjectionFixture.cs" />
-    <Compile Include="Sinks\ElasticSearchSinkTestFixture_Integration.cs" />
-    <Compile Include="Sinks\ElasticSearchSinkTests.cs" />
+    <Compile Include="Sinks\ElasticsearchSinkTestFixture_Integration.cs" />
+    <Compile Include="Sinks\ElasticsearchSinkTests.cs" />
     <Compile Include="TestObjects\DifferentEnumsEventSource.cs" />
     <Compile Include="TestObjects\CustomSink.cs" />
     <Compile Include="TestObjects\LargeManifestEventSource.cs" />

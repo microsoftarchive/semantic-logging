@@ -21,7 +21,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Sink that asynchronously writes entries to a Elasticsearch server.
     /// </summary>
-    public class ElasticSearchSink : IObserver<JsonEventEntry>, IDisposable
+    public class ElasticsearchSink : IObserver<JsonEventEntry>, IDisposable
     {
         private const string BulkServiceOperationPath = "/_bulk";
 
@@ -34,11 +34,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
         private readonly bool flattenPayload;
 
-        private readonly Uri elasticSearchUrl;
+        private readonly Uri elasticsearchUrl;
         private readonly TimeSpan onCompletedTimeout;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElasticSearchSink"/> class with the specified connection string and table address.
+        /// Initializes a new instance of the <see cref="ElasticsearchSink"/> class with the specified connection string and table address.
         /// </summary>
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
@@ -52,7 +52,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public ElasticSearchSink(string instanceName, string connectionString, string index, string type, bool? flattenPayload, TimeSpan bufferInterval,
+        public ElasticsearchSink(string instanceName, string connectionString, string index, string type, bool? flattenPayload, TimeSpan bufferInterval,
             int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
@@ -64,23 +64,23 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
             if (Regex.IsMatch(index, "[\\\\/*?\",<>|\\sA-Z]"))
             {
-                throw new ArgumentException(Resource.InvalidElasticSearchIndexNameError, "index");
+                throw new ArgumentException(Resource.InvalidElasticsearchIndexNameError, "index");
             }
 
             this.onCompletedTimeout = onCompletedTimeout;
 
             this.instanceName = instanceName;
             this.flattenPayload = flattenPayload ?? true;
-            this.elasticSearchUrl = new Uri(new Uri(connectionString), BulkServiceOperationPath);
+            this.elasticsearchUrl = new Uri(new Uri(connectionString), BulkServiceOperationPath);
             this.index = index;
             this.type = type;
-            var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticSearchSink ({0})", instanceName);
+            var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticsearchSink ({0})", instanceName);
             bufferedPublisher = BufferedEventPublisher<JsonEventEntry>.CreateAndStart(sinkId, PublishEventsAsync, bufferInterval,
                 bufferingCount, maxBufferSize, cancellationTokenSource.Token);
         }
 
         /// <summary>
-        /// Releases all resources used by the current instance of the <see cref="ElasticSearchSink"/> class.
+        /// Releases all resources used by the current instance of the <see cref="ElasticsearchSink"/> class.
         /// </summary>
         public void Dispose()
         {
@@ -124,9 +124,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         }
 
         /// <summary>
-        /// Finalizes an instance of the <see cref="ElasticSearchSink"/> class.
+        /// Finalizes an instance of the <see cref="ElasticsearchSink"/> class.
         /// </summary>
-        ~ElasticSearchSink()
+        ~ElasticsearchSink()
         {
             Dispose(false);
         }
@@ -164,14 +164,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 client = new HttpClient();
 
                 string logMessages;
-                using (var serializer = new ElasticSearchEventEntrySerializer(this.index, this.type, this.flattenPayload))
+                using (var serializer = new ElasticsearchEventEntrySerializer(this.index, this.type, this.flattenPayload))
                 {
                     logMessages = serializer.Serialize(collection);
                 }
                 var content = new StringContent(logMessages);
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
-                var response = await client.PostAsync(this.elasticSearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
+                var response = await client.PostAsync(this.elasticsearchUrl, content, cancellationTokenSource.Token).ConfigureAwait(false);
 
                 // If there is an exception
                 if (response.StatusCode != HttpStatusCode.OK)
@@ -201,7 +201,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                         // We are unable to write the batch of event entries - Possible poison message
                         // I don't like discarding events but we cannot let a single malformed event prevent others from being written
                         // We might want to consider falling back to writing entries individually here
-                        SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, serverErrorMessage);
+                        SemanticLoggingEventSource.Log.ElasticsearchSinkWriteEventsFailedAndDiscardsEntries(messagesDiscarded, serverErrorMessage);
 
                         return messagesDiscarded;
                     }
@@ -236,7 +236,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             catch (Exception ex)
             {
                 // Although this is generally considered an anti-pattern this is not logged upstream and we have context
-                SemanticLoggingEventSource.Log.ElasticSearchSinkWriteEventsFailed(ex.ToString());
+                SemanticLoggingEventSource.Log.ElasticsearchSinkWriteEventsFailed(ex.ToString());
                 throw;
             }
             finally
