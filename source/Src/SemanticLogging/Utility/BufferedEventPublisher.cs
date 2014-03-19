@@ -205,7 +205,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         //// Main processing loop for publishing entries based on time interval, buffer count and explicit flush triggers.
         private async Task TransferEntries()
         {
-            Thread.MemoryBarrier();
             var token = this.cancellationTokenSource.Token;
 
             var bufferInstance = this.buffer;
