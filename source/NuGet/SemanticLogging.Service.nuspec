@@ -3,7 +3,7 @@
   <metadata schemaVersion="2">
     <id>EnterpriseLibrary.SemanticLogging.Service</id>
     <version>$SemanticLogging_svc_Version$</version>
-    <title>Semantic Logging Application Block - Out-of-process Service (PRE-RELEASE)</title>
+    <title>Semantic Logging Application Block - Out-of-process Service</title>
     <authors>Microsoft</authors>
     <owners>Microsoft; patterns-and-practices</owners>
     <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
@@ -11,10 +11,11 @@
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>The Semantic Logging Application Block provides a set of destinations (sinks) to persist application events published using a subclass of the EventSource class.</summary>
     <description>
-      The Semantic Logging Application Block (SLAB) provides a set of destinations (sinks) to persist application events published using a subclass of the EventSource class from the System.Diagnostics.Tracing namespace. Sinks include Windows Azure table storage, SQL Server databases, and rolling files with several formats and you can extend the block by creating your own custom formatters and sinks. For the those sinks that can store structured data, the block preserves the full structure of the event payload in order to facilitate analyzing or processing the logged data.
+      The Semantic Logging Application Block (SLAB) provides a set of destinations (sinks) to persist application events published using a subclass of the EventSource class from the System.Diagnostics.Tracing namespace. Sinks include Azure table storage, SQL Server databases, Elasticsearch, and rolling files with several formats and you can extend the block by creating your own custom formatters and sinks. For the those sinks that can store structured data, the block preserves the full structure of the event payload in order to facilitate analysing or processing the logged data.
       This package contains an out-of-proc Windows Service for SLAB.
     </description>
-    <tags>entlib entlib6 slab enterprise library ETW semantic logging EventSource event listener structured strongly-typed block futures OSS</tags>
+    <copyright>© 2014 Microsoft Corporation</copyright>
+    <tags>entlib entlib6 slab enterprise library ETW semantic logging EventSource event listener structured strongly-typed block OSS</tags>
   </metadata>
   <files>
     <file src="NuGet\Readme-service.txt" target="Readme.txt" />
