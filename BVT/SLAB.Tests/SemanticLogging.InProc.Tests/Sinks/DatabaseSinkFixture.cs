@@ -784,7 +784,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                         try
                         {
                             collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Warning, Keywords.All);
-                            for (int n = 0; n <= 200; n++)
+                            for (int n = 0; n < 200; n++)
                             {
                                 logger.Informational("Message: " + n);
                             }

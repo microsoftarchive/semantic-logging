@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.InProc.Tests", "SemanticLogging.InProc.Tests\SemanticLogging.InProc.Tests.csproj", "{FFAF719C-D4E7-4AFF-A896-3CA5605B2C88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.OutProc.Tests", "SemanticLogging.OutProc.Tests\SemanticLogging.OutProc.Tests.csproj", "{0D748FC4-24AA-4D3A-81B9-296DF5921C14}"
