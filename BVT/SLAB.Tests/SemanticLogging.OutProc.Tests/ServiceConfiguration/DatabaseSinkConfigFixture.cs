@@ -1,14 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Configuration;
-using System.Threading;
-using System.Threading.Tasks;
 using EtwConfig = Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.ServiceConfiguration
@@ -25,10 +22,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
 
             System.Data.DataTable eventsDataTable = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\SqlDatabase\\SqlDatabaseHappyPath.xml");
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 10; n++)
                     {
@@ -36,12 +32,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     }
 
                     eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 10);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
         }        

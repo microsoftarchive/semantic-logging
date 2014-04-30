@@ -1,11 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Diagnostics.Tracing;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -34,10 +33,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
             IEnumerable<string> entries = null;
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 200; n++)
                     {
@@ -45,12 +43,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 200, EventTextFormatter.DashSeparator);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(200, entries.Count());
             StringAssert.Contains(entries.First(), "some message0");
@@ -72,10 +65,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
             IEnumerable<string> entries = null;
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 200; n++)
                     {
@@ -83,12 +75,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
                     }
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 200, EventTextFormatter.DashSeparator);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(200, entries.Count());
             StringAssert.Contains(entries.First(), "some message0");
@@ -100,41 +87,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         {
             var serviceConfigFile = "Configurations\\DataCorrectness\\FlatFile.xml";
             string fileName = @".\Logs\OutProcFlatFileData.log";
-
             FlatFileHelper.DeleteDirectory(@".\Logs");
-            string xmlContent = File.ReadAllText(serviceConfigFile);
-            IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("\"replaceEventSource\"", "\"TestEventSourceNoAttributes\"");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
 
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            IEnumerable<string> entries = null;
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.NoArgEvent1();
-                    }
-                    finally
-                    {
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 1");
             StringAssert.Contains(entries.First(), "Payload : ");
         }
-        
+
         [TestMethod]
         public void WhenIntArgPayload()
         {
@@ -142,34 +112,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.IntArgEvent2(10);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 2");
@@ -183,34 +136,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.LongArgEvent3((long)10);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 3");
@@ -224,34 +160,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.ObjectArrayEvent4(10, "stringarg1", 20, "stringarg3", 30);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 4");
@@ -264,34 +183,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             var serviceConfigFile = "Configurations\\DataCorrectness\\FlatFile.xml";
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
-            string xmlContent = File.ReadAllText(serviceConfigFile);
-            IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
 
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            IEnumerable<string> entries = null;
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.TwoIntArgEvent6(10, 30);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 6");
@@ -305,34 +208,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.ThreeStringArgEvent14("message1", "message2", "message3");
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 14");
@@ -346,35 +232,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.StringAndLongArgEvent9("message1", 20);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 9");
@@ -388,34 +256,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
                     {
                         var logger = TestEventSourceNoAttributes.Logger;
                         logger.SendEnumsEvent15(MyColor.Green, MyFlags.Flag1 | MyFlags.Flag3);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 15");
@@ -429,34 +280,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             string fileName = @".\Logs\OutProcFlatFileData.log";
             FlatFileHelper.DeleteDirectory(@".\Logs");
 
-            string xmlContent = File.ReadAllText(serviceConfigFile);
             IEnumerable<string> entries = null;
-            var xmlContentRepl = xmlContent.Replace(@"name=""replaceEventSource""", @"id=""B4F8149D-6DD2-4EE2-A46A-45584A942D1C""");
-            try
-            {
-                File.WriteAllText(serviceConfigFile, xmlContentRepl);
-
-                using (var svcConfiguration = TraceEventServiceConfiguration.Load(serviceConfigFile))
-                using (var eventCollectorService = new TraceEventService(svcConfiguration))
-                {
-                    eventCollectorService.Start();
-                    try
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace(@"name=""replaceEventSource""", @"id=""B4F8149D-6DD2-4EE2-A46A-45584A942D1C"""),
+                    () =>
                     {
                         var logger = TestAttributesEventSource.Logger;
                         logger.NoTaskSpecfied2(1, 3, 5);
 
                         entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
-                    }
-                    finally
-                    {
-                        eventCollectorService.Stop();
-                    }
-                }
-            }
-            finally
-            {
-                File.WriteAllText(serviceConfigFile, xmlContent);
-            }
+                    });
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 105");

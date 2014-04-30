@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -32,11 +32,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\CustomSink\\CustomSqlSink.xml");
 
             System.Data.DataTable eventsDataTable = null;
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     var logger = MockEventSourceOutProc.Logger;
                     for (int n = 0; n < 10; n++)
                     {
@@ -44,12 +43,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
                     }
 
                     eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
             StringAssert.Contains((string)eventsDataTable.Rows[0]["payload"], @"""message"": ""some message0""");
@@ -71,23 +65,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             IEnumerable<string> entries = null;
             IEnumerable<string> entries2 = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\CustomSink\\Multiple.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     logger.LogSomeMessage(message);
                     logger.LogSomeMessage(message2);
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName1, 2, "--==--");
                     entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "==-==");
                     DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 4);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName1));
             Assert.AreEqual<int>(2, entries.Count());
@@ -138,22 +126,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
 
             IEnumerable<string> entries = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\CustomSink\\MockFlatFileSink.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     logger.LogSomeMessage("some message");
                     logger.LogSomeMessage("some message2");
                     logger.LogSomeMessage("some message3");
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 3, "==-==");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual<int>(3, entries.Count());
             Assert.IsNotNull(entries.SingleOrDefault(e => e.Contains("Payload : [message : some message]")));
@@ -176,15 +158,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             SinkSettings sinkSettings = new SinkSettings("MockFlatFileSink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                logger.LogSomeMessage("some message");
-                logger.LogSomeMessage("some message2");
-                logger.LogSomeMessage("some message3");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.LogSomeMessage("some message");
+                    logger.LogSomeMessage("some message2");
+                    logger.LogSomeMessage("some message3");
 
-                entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 3, "==-==");
-            }
+                    entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 3, "==-==");
+                });
 
             Assert.AreEqual<int>(3, entries.Count());
             Assert.IsNotNull(entries.SingleOrDefault(e => e.Contains("Payload : [message : some message]")));
@@ -226,20 +209,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
 
             IEnumerable<string> entries = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\CustomSink\\FlatFileCustomFormatter2.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     logger.LogSomeMessage("some message using formatter");
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "----------");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             StringAssert.Contains(entries.First(), "Mock SourceId");
             StringAssert.Contains(entries.First(), "Mock EventId");
@@ -264,20 +241,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             SinkSettings sinkSettings = new SinkSettings("flatFileSink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     logger.Critical("some message using formatter");
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "---------------");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             StringAssert.Contains(entries.First(), "Mock SourceId");
             StringAssert.Contains(entries.First(), "Mock EventId");
@@ -298,25 +269,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             SinkSettings sinkSettings = new SinkSettings("flatFileSink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            using (var collectErrorsListener = new InMemoryEventListener(true))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
-                    collector.Start();
+                    using (var collectErrorsListener = new InMemoryEventListener())
+                    {
+                        try
+                        {
+                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
 
-                    logger.LogSomeMessage("some message using formatter that throws");
-                    collectErrorsListener.WaitEvents.Wait(5000);
+                            logger.LogSomeMessage("some message using formatter that throws");
+                            collectErrorsListener.WaitEvents.Wait(5000);
 
-                    StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
-                }
-                finally
-                {
-                    collector.Stop();
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                            StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                        }
+                        finally
+                        {
+                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
+                        }
+                    }
+                });
         }
 
         [TestMethod]
@@ -328,24 +301,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             MockFormatter formatter = new MockFormatter(true); //this formatter throws
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\CustomSink\\FlatFileCustomFormatter.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            using (InMemoryEventListener collectErrorsListener = new InMemoryEventListener(true))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.Error, Keywords.All);
-                    collector.Start();
-                    logger.LogSomeMessage("some message using formatter that throws");
-                    collectErrorsListener.WaitEvents.Wait(5000);
+                    using (InMemoryEventListener collectErrorsListener = new InMemoryEventListener())
+                    {
+                        try
+                        {
+                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.Error, Keywords.All);
+                            logger.LogSomeMessage("some message using formatter that throws");
+                            collectErrorsListener.WaitEvents.Wait(5000);
 
-                    StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
-                }
-                finally
-                {
-                    collector.Stop();
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                            StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                        }
+                        finally
+                        {
+                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
+                        }
+                    }
+                });
         }
     }
 }

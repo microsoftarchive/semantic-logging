@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -67,23 +67,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             SinkSettings sinkSettings = new SinkSettings("azureSink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     for (int i = 0; i < 10; i++)
                     {
-                        logger.Critical("Critical message");    
+                        logger.Critical("Critical message");
                     }
 
                     events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual<int>(10, events.Count());
             Assert.AreEqual<int>(2, events.First().EventId);
@@ -99,23 +93,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
 
             IEnumerable<WindowsAzureTableEventEntry> events = null;
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\AzureTables\\AzureTables.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
                     for (int i = 0; i < 10; i++)
                     {
                         logger.Critical("Critical message");
                     }
 
                     events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 10);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual<int>(10, events.Count());
             Assert.AreEqual<int>(2, events.First().EventId);

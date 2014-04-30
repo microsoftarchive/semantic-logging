@@ -2,6 +2,7 @@
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,19 +24,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             var logger = MockEventSource.Logger;
 
             string message = string.Concat("Message ", Guid.NewGuid());
-            using (var eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToCustomSqlDatabase("TestInstanceName", validConnectionString);
-                    eventListener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
-                    logger.LogSomeMessage(message);  
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                    listener.LogToCustomSqlDatabase("TestInstanceName", validConnectionString);
+                    listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
+                    logger.LogSomeMessage(message);
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.AreEqual(1, dt.Rows.Count);
@@ -54,23 +50,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             var logger = MockEventSource.Logger;
 
             IEnumerable<string> entries = null;
-            using (var eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToMockFlatFile(fileName, "==-==");
-                    eventListener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
+                    listener.LogToMockFlatFile(fileName, "==-==");
+                    listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
                     logger.LogSomeMessage("some message");
                     logger.LogSomeMessage("some message2");
                     logger.LogSomeMessage("some message3");
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 3, "==-==");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             Assert.AreEqual<int>(3, entries.Count());
@@ -94,26 +85,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             string message2 = string.Concat("Message2 ", Guid.NewGuid());
             IEnumerable<string> entries = null;
             IEnumerable<string> entries2 = null;
-            using (var eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToMockFlatFile(fileName1, "==-==");
-                    eventListener.LogToFlatFile(fileName2, new EventTextFormatter("--==--"));
-                    eventListener.LogToSqlDatabase("testInstance", validConnectionString, "Traces", TimeSpan.Zero, 1);
-                    eventListener.LogToCustomSqlDatabase("testCustom", validConnectionString);
-                    eventListener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
+                    listener.LogToMockFlatFile(fileName1, "==-==");
+                    listener.LogToFlatFile(fileName2, new EventTextFormatter("--==--"));
+                    listener.LogToSqlDatabase("testInstance", validConnectionString, "Traces", TimeSpan.Zero, 1);
+                    listener.LogToCustomSqlDatabase("testCustom", validConnectionString);
+                    listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
                     logger.LogSomeMessage(message);
                     logger.LogSomeMessage(message2);
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName1, 2, "==-==");
                     entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "--==--");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName1));
             Assert.AreEqual<int>(2, entries.Count());
@@ -137,25 +123,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             var logger = MockEventSource.Logger;
             var formatter = new CustomFormatter(true);
 
-            using (var listener = new ObservableEventListener())
-            using (var collectErrorsListener = new InMemoryEventListener(true))
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
                     listener.LogToFlatFile(filename, formatter);
                     listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
                     logger.LogSomeMessage("testing");
 
-                    collectErrorsListener.WaitEvents.Wait(3000);
-                    StringAssert.Contains(collectErrorsListener.ToString(), "unhandled exception from formatter");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                    errorsListener.WaitEvents.Wait(3000);
+                    StringAssert.Contains(errorsListener.ToString(), "unhandled exception from formatter");
+                });
         }
 
         [TestMethod]
@@ -165,24 +143,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             File.Delete(fileName);
             var logger = TestEventSourceNonTransient.Logger;
 
-            using (var listener = new ObservableEventListener())
-            using (var collectErrorsListener = new InMemoryEventListener(true))
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.Error, Keywords.All);
                     listener.LogToFlatFile(fileName, new MockFormatter(true));
                     listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways);
                     logger.EventWithPayload("payload1", 100);
 
-                    StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                    StringAssert.Contains(errorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                });
         }
 
         [TestMethod]
@@ -196,9 +166,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
             formatter.Detailed = System.Diagnostics.Tracing.EventLevel.LogAlways;
 
             IEnumerable<string> entries = null;
-            using (var listener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     listener.LogToFlatFile(fileName, formatter);
                     listener.EnableEvents(logger, System.Diagnostics.Tracing.EventLevel.LogAlways);
@@ -206,12 +176,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Ext
                     logger.EventWithPayload("payload1", 100);
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, header);
-                }
-                finally
-                {
-                    listener.DisableEvents(logger);
-                }
-            }
+                });
 
             StringAssert.Contains(entries.First(), "Mock SourceId");
             StringAssert.Contains(entries.First(), "Mock EventId");

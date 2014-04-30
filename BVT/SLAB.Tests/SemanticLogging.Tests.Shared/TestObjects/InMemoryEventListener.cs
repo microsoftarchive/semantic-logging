@@ -2,7 +2,6 @@
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics.Tracing;
 using System.IO;
@@ -21,16 +20,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         private bool disposed;
 
         public InMemoryEventListener()
-            : this(false)
-        { }
-
-        public InMemoryEventListener(bool waitOnEvent)
             : this(new EventTextFormatter())
         {
-            if (waitOnEvent)
-            {
-                this.waitEvents = new ManualResetEventSlim(); 
-            }
+            this.waitEvents = new ManualResetEventSlim(); 
         }
 
         public InMemoryEventListener(IEventTextFormatter formatter)
