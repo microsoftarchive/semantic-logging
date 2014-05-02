@@ -180,6 +180,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void then_should_write_properties()
         {
             var entry = CreateValidEntry();
+            entry.ProcessId = 300;
+            entry.ThreadId = 500;
             this.sink.OnNext(entry);
 
             this.sink.FlushAsync().Wait();
@@ -203,6 +205,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                     Assert.AreEqual<string>(entry.Payload, (string)reader["Payload"]);
                     Assert.AreEqual<Guid>(Guid.Empty, (Guid)reader["ActivityId"]);
                     Assert.AreEqual<Guid>(Guid.Empty, (Guid)reader["RelatedActivityId"]);
+                    Assert.AreEqual<int>(entry.ProcessId, (int)reader["ProcessId"]);
+                    Assert.AreEqual<int>(entry.ThreadId, (int)reader["ThreadId"]);
                 }
             }
         }
@@ -322,7 +326,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 Version = 2,
                 InstanceName = "Custom instance name",
                 FormattedMessage = "Formatted message",
-                Payload = "{arg0:Test}"
+                Payload = "{arg0:Test}",
             };
             return entry;
         }

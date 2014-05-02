@@ -91,6 +91,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
             {
                 var entry = this.Entries.SingleOrDefault();
 
+                var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+                var threadId = Utility.NativeMethods.GetCurrentThreadId();
+
                 Assert.IsNotNull(entry);
                 Assert.IsFalse(this.RawOutput.StartsWith("{\r\n")); // No Formatting (Default)
                 Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, entry.EventId);
@@ -105,6 +108,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("Info", entry.Payload["payload1"]);
                 Assert.IsTrue(entry.Payload.ContainsKey("payload2"));
                 Assert.AreEqual((long)100, entry.Payload["payload2"]);
+                Assert.AreEqual(processId, entry.ProcessId);
+                Assert.AreEqual(threadId, entry.ThreadId);
                 Assert.AreEqual(Guid.Empty, entry.ActivityId);
                 Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
             }

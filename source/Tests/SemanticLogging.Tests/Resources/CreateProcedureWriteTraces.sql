@@ -18,7 +18,9 @@ BEGIN
 		[FormattedMessage],
 		[Payload],
 		[ActivityId],
-		[RelatedActivityId]
+		[RelatedActivityId],
+		[ProcessId],
+		[ThreadId]
 	)
   SELECT * FROM @InsertTraces;
 END

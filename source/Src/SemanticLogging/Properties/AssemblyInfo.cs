@@ -9,7 +9,7 @@ using System.Security;
 [assembly: AssemblyTitle("Enterprise Library Semantic Logging Application Block")]
 [assembly: AssemblyDescription("Enterprise Library Semantic Logging Application Block")]
 
-[assembly: SecurityTransparent]
+[assembly: AllowPartiallyTrustedCallers]
 
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.1.1403.0")]

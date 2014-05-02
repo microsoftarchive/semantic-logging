@@ -242,6 +242,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 sqlBulkCopy.ColumnMappings.Add("Payload", "Payload");
                 sqlBulkCopy.ColumnMappings.Add("ActivityId", "ActivityId");
                 sqlBulkCopy.ColumnMappings.Add("RelatedActivityId", "RelatedActivityId");
+                sqlBulkCopy.ColumnMappings.Add("ProcessId", "ProcessId");
+                sqlBulkCopy.ColumnMappings.Add("ThreadId", "ThreadId");
 
                 await this.retryPolicy.ExecuteAsync(() => sqlBulkCopy.WriteToServerAsync(reader, token), token).ConfigureAwait(false);
             }

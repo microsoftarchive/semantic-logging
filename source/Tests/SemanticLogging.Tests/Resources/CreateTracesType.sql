@@ -1,6 +1,6 @@
 CREATE TYPE TracesType AS TABLE
 (
-  [InstanceName] [nvarchar](1000),
+	[InstanceName] [nvarchar](1000),
 	[ProviderId] [uniqueidentifier],
 	[ProviderName] [nvarchar](500),
 	[EventId] [int],
@@ -12,6 +12,8 @@ CREATE TYPE TracesType AS TABLE
 	[Version] [int],
 	[FormattedMessage] [nvarchar](4000),
 	[Payload] [nvarchar](4000),
-    [ActivityId] [uniqueidentifier], 
-    [RelatedActivityId] [uniqueidentifier]
+	[ActivityId] [uniqueidentifier], 
+	[RelatedActivityId] [uniqueidentifier],
+	[ProcessId] [int],
+	[ThreadId] [int]
 );

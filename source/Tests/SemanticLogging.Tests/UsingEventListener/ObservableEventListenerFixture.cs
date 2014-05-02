@@ -32,6 +32,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
         [TestMethod]
         public void when_subscribing_then_receives_events()
         {
+            var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var threadId = Utility.NativeMethods.GetCurrentThreadId();
+
             var sink = new MockSink();
             listener.Subscribe(sink);
             listener.EnableEvents(Logger, EventLevel.LogAlways);
@@ -41,6 +44,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
             Assert.AreEqual(1, sink.OnNextCalls.Count());
             Assert.AreEqual(TestEventSource.InformationalEventId, sink.OnNextCalls.ElementAt(0).EventId);
             Assert.AreEqual(EventLevel.Informational, sink.OnNextCalls.ElementAt(0).Schema.Level);
+            Assert.AreEqual(processId, sink.OnNextCalls.ElementAt(0).ProcessId);
+            Assert.AreEqual(threadId, sink.OnNextCalls.ElementAt(0).ThreadId);
         }
 
         [TestMethod]

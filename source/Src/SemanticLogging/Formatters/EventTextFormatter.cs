@@ -111,6 +111,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 writer.WriteLine(Format, PropertyNames.Payload, FormatPayload(eventEntry));
                 writer.WriteLine(Format, PropertyNames.EventName, eventEntry.Schema.EventName);
                 writer.WriteLine(Format, PropertyNames.Timestamp, eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+                writer.WriteLine(Format, PropertyNames.ProcessId, eventEntry.ProcessId);
+                writer.WriteLine(Format, PropertyNames.ThreadId, eventEntry.ThreadId);
 
                 if (eventEntry.ActivityId != Guid.Empty)
                 {
@@ -126,7 +128,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
             {
                 // Write with summary format
                 writer.Write(
-                    "{0} : {1}, {2} : {3}, {4} : {5}, {6} : {7}, {8} : {9}, {10} : {11}",
+                    "{0} : {1}, {2} : {3}, {4} : {5}, {6} : {7}, {8} : {9}, {10} : {11}, {12} : {13}, {14} : {15}",
                     PropertyNames.EventId,
                     eventEntry.EventId,
                     PropertyNames.Level,
@@ -138,7 +140,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                     PropertyNames.EventName,
                     eventEntry.Schema.EventName,
                     PropertyNames.Timestamp,
-                    eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+                    eventEntry.GetFormattedTimestamp(this.DateTimeFormat),
+                    PropertyNames.ProcessId,
+                    eventEntry.ProcessId,
+                    PropertyNames.ThreadId,
+                    eventEntry.ThreadId);
 
                 if (eventEntry.ActivityId != Guid.Empty)
                 {

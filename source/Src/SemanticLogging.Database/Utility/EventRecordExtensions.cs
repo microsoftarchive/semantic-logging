@@ -34,7 +34,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 new SqlMetaData("FormattedMessage", SqlDbType.NVarChar, 4000),
                 new SqlMetaData("Payload", SqlDbType.NVarChar, 4000),
                 new SqlMetaData("ActivityId", SqlDbType.UniqueIdentifier),
-                new SqlMetaData("RelatedActivityId", SqlDbType.UniqueIdentifier)
+                new SqlMetaData("RelatedActivityId", SqlDbType.UniqueIdentifier),
+                new SqlMetaData("ProcessId", SqlDbType.Int),
+                new SqlMetaData("ThreadId", SqlDbType.Int),
             };
 
             Fields = SqlMetaData.Select(x => x.Name).ToArray();
@@ -76,7 +78,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 FormattedMessage = entry.FormattedMessage,
                 Payload = EventEntryUtil.JsonSerializePayload(entry),
                 ActivityId = entry.ActivityId,
-                RelatedActivityId = entry.RelatedActivityId
+                RelatedActivityId = entry.RelatedActivityId,
+                ProcessId = entry.ProcessId,
+                ThreadId = entry.ThreadId,
             };
 
             return entity;
@@ -100,6 +104,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             sqlDataRecord.SetValue(11, (object)record.Payload ?? DBNull.Value);
             sqlDataRecord.SetValue(12, record.ActivityId);
             sqlDataRecord.SetValue(13, record.RelatedActivityId);
+            sqlDataRecord.SetValue(14, record.ProcessId);
+            sqlDataRecord.SetValue(15, record.ThreadId);
 
             return sqlDataRecord;
         }

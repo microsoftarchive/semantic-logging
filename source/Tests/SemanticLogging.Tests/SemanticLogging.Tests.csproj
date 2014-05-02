@@ -163,6 +163,7 @@
     <Compile Include="TestSupport\LocalDatabaseContext.cs" />
     <Compile Include="Utility\FileUtilFixture.cs" />
     <Compile Include="TestSupport\PollingHelper.cs" />
+    <Compile Include="Utility\NativeMethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
@@ -298,6 +299,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <Compile Include="UsingEventListener\ObservableEventListenerFixture.PartialTrust.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Logging.mdf">

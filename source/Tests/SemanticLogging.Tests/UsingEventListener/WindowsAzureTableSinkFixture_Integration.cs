@@ -131,6 +131,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
             Assert.AreEqual<int>(TestEventSource.ErrorEventId, list.ElementAt(2).EventId);
             Assert.AreEqual<int>(TestEventSource.InformationalEventId, list.ElementAt(3).EventId);
         }
+
+        [TestMethod]
+        public void then_includes_process_and_thread_id()
+        {
+            var processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var threadId = Utility.NativeMethods.GetCurrentThreadId();
+
+            var table = client.GetTableReference(tableName);
+            var query = new TableQuery<TestCloudTableEntry>();
+
+            Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
+
+            var list = table.ExecuteQuery<TestCloudTableEntry>(query).ToArray();
+
+            Assert.AreEqual<int>(4, list.Count());
+            foreach (var entry in list)
+            {
+                Assert.AreEqual(processId, entry.ProcessId);
+                Assert.AreEqual(threadId, entry.ThreadId);
+            }
+        }
     }
 
     [TestClass]

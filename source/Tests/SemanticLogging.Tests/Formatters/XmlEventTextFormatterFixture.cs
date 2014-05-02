@@ -71,8 +71,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
         [TestClass]
         public class when_receiving_event_with_payload_and_message : given_xml_event_text_formatter
         {
+            private int processId;
+            private int threadId;
+
             protected override void When()
             {
+                this.processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+                this.threadId = Utility.NativeMethods.GetCurrentThreadId();
+
                 logger.EventWithPayloadAndMessage("Info", 100);
             }
 
@@ -92,6 +98,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 var payload = element.Descendants(EventNS + "EventData").Single();
                 var message = element.Descendants(EventNS + "Message").Single();
                 var correlation = element.Descendants(EventNS + "Correlation").SingleOrDefault();
+                var execution = element.Descendants(EventNS + "Execution").Single();
 
                 Assert.AreEqual<Guid>(TestEventSource.Log.Guid, Guid.Parse(provider.Attribute("Guid").Value));
                 Assert.AreEqual<int>(TestEventSource.EventWithPayloadAndMessageId, Convert.ToInt32(eventId.Value));
@@ -109,6 +116,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
                 Assert.AreEqual("100", payload.Elements().Last().Value);
                 Assert.AreEqual("Test message Info 100", message.Value);
                 Assert.IsNull(correlation);
+                Assert.AreEqual(processId, int.Parse(execution.Attribute("ProcessID").Value));
+                Assert.AreEqual(threadId, int.Parse(execution.Attribute("ThreadID").Value));
             }
         }
 

@@ -177,6 +177,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
         [TestClass]
         public class when_logging_an_event : given_traceEventService
         {
+            private int processId;
+            private int threadId;
+
             protected override void Given()
             {
                 base.Given();
@@ -185,6 +188,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
             protected override void When()
             {
+                this.processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+                this.threadId = Utility.NativeMethods.GetCurrentThreadId();
+
                 MyCompanyEventSource.Log.PageStart(10, "test");
             }
 
@@ -203,6 +209,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 Assert.AreEqual("loading page test activityID=10", entry.FormattedMessage);
                 Assert.AreEqual(EventOpcode.Start, entry.Schema.Opcode);
                 Assert.AreEqual(3, entry.EventId);
+                Assert.AreEqual(processId, entry.ProcessId);
+                Assert.AreEqual(threadId, entry.ThreadId);
                 Assert.AreEqual(Guid.Empty, entry.ActivityId);
                 Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
             }

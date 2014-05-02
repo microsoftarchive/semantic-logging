@@ -82,6 +82,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database
         public string Payload { get; set; }
 
         /// <summary>
+        /// Gets or sets the process id.
+        /// </summary>
+        /// <value>The process id.</value>
+        public int ProcessId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thread id.
+        /// </summary>
+        /// <value>The thread id.</value>
+        public int ThreadId { get; set; }
+
+        /// <summary>
         /// Gets or sets the activity id.
         /// </summary>
         /// <value>The activity id.</value>

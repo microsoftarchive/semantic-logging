@@ -81,6 +81,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             WriteValue("Opcode", entry.Opcode);
             WriteValue("Task", entry.Task);
             WriteValue("Version", entry.Version);
+            WriteValue("ProcessId", entry.ProcessId);
+            WriteValue("ThreadId", entry.ThreadId);
 
             if (entry.ActivityId != Guid.Empty)
             {

@@ -8,6 +8,8 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
@@ -25,12 +27,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
         internal const string DefaultDateTimeFormat = "O";
 
+        private static readonly int currentProcessId = ProcessPropertyAccess.GetCurrentProcessId();
+
         private readonly Guid providerId;
         private readonly int eventId;
         private readonly string formattedMessage;
         private readonly ReadOnlyCollection<object> payload;
         private readonly DateTimeOffset timestamp;
         private readonly EventSchema schema;
+        private readonly int processId;
+        private readonly int threadId;
         private readonly Guid activityId;
         private readonly Guid relatedActivityId;
 
@@ -60,12 +66,32 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <param name="relatedActivityId">The related activity id.</param>
         /// <param name="schema">The schema.</param>
         public EventEntry(Guid sourceId, int eventId, string formattedMessage, ReadOnlyCollection<object> payload, DateTimeOffset timestamp, Guid activityId, Guid relatedActivityId, EventSchema schema)
+            : this(sourceId, eventId, formattedMessage, payload, timestamp, 0, 0, activityId, relatedActivityId, schema)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EventEntry" /> class.
+        /// </summary>
+        /// <param name="sourceId">The source id.</param>
+        /// <param name="eventId">The event id.</param>
+        /// <param name="formattedMessage">The message.</param>
+        /// <param name="payload">The payload.</param>
+        /// <param name="timestamp">The timestamp.</param>
+        /// <param name="processId">The proces id.</param>
+        /// <param name="threadId">The thread id.</param>
+        /// <param name="activityId">The activity id.</param>
+        /// <param name="relatedActivityId">The related activity id.</param>
+        /// <param name="schema">The schema.</param>
+        public EventEntry(Guid sourceId, int eventId, string formattedMessage, ReadOnlyCollection<object> payload, DateTimeOffset timestamp, int processId, int threadId, Guid activityId, Guid relatedActivityId, EventSchema schema)
         {
             this.providerId = sourceId;
             this.eventId = eventId;
             this.formattedMessage = formattedMessage;
             this.payload = payload;
             this.timestamp = timestamp;
+            this.processId = processId;
+            this.threadId = threadId;
             this.activityId = activityId;
             this.relatedActivityId = relatedActivityId;
             this.schema = schema;
@@ -128,6 +154,28 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         }
 
         /// <summary>
+        /// Gets the process id.
+        /// </summary>
+        /// <value>
+        /// The process id.
+        /// </value>
+        public int ProcessId
+        {
+            get { return this.processId; }
+        }
+
+        /// <summary>
+        /// Gets the thread id.
+        /// </summary>
+        /// <value>
+        /// The thread id.
+        /// </value>
+        public int ThreadId
+        {
+            get { return this.threadId; }
+        }
+
+        /// <summary>
         /// Gets the activity id.
         /// </summary>
         /// <value>
@@ -170,7 +218,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 formattedMessage = string.Format(CultureInfo.InvariantCulture, args.Message, args.Payload.ToArray());
             }
 
-            return new EventEntry(args.EventSource.Guid, args.EventId, formattedMessage, args.Payload, timestamp, ActivityIdPropertyAccess.GetActivityId(args), ActivityIdPropertyAccess.GetRelatedActivityId(args), schema);
+            return new EventEntry(
+                args.EventSource.Guid,
+                args.EventId,
+                formattedMessage,
+                args.Payload,
+                timestamp,
+                currentProcessId,
+                ProcessPropertyAccess.GetCurrentThreadId(),
+                ActivityIdPropertyAccess.GetActivityId(args),
+                ActivityIdPropertyAccess.GetRelatedActivityId(args),
+                schema);
         }
 
         /// <summary>
@@ -212,15 +270,87 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 {
                     var parameter = Expression.Parameter(typeof(EventWrittenEventArgs), "args");
 
-                    return
-                        Expression.Lambda<Func<EventWrittenEventArgs, Guid>>(
-                            Expression.Property(parameter, property),
-                            parameter).Compile();
+                    try
+                    {
+                        return
+                            Expression.Lambda<Func<EventWrittenEventArgs, Guid>>(
+                                Expression.Property(parameter, property),
+                                parameter).Compile();
+                    }
+                    catch (SecurityException)
+                    {
+                        // fall back to no access to the properties
+                    }
+                }
+
+                return args => Guid.Empty;
+            }
+        }
+
+        private static class ProcessPropertyAccess
+        {
+            private static readonly Func<int> ProcessIdAccessor;
+            private static readonly Func<int> CurrentThreadIdAccessor;
+
+            static ProcessPropertyAccess()
+            {
+                if (typeof(ProcessPropertyAccess).Assembly.IsFullyTrusted)
+                {
+                    ProcessIdAccessor = GetCurrentProcessIdSafe;
+                    CurrentThreadIdAccessor = GetCurrentThreadIdSafe;
                 }
                 else
                 {
-                    return args => Guid.Empty;
+                    ProcessIdAccessor = () => 0;
+                    CurrentThreadIdAccessor = () => 0;
                 }
+            }
+
+            public static int GetCurrentProcessId()
+            {
+                return ProcessIdAccessor();
+            }
+
+            public static int GetCurrentThreadId()
+            {
+                return CurrentThreadIdAccessor();
+            }
+
+            [SecuritySafeCritical]
+            private static int GetCurrentProcessIdSafe()
+            {
+                try
+                {
+                    return SafeNativeMethods.GetCurrentProcessId();
+                }
+                catch (SecurityException)
+                {
+                    return 0;
+                }
+            }
+
+            [SecuritySafeCritical]
+            private static int GetCurrentThreadIdSafe()
+            {
+                try
+                {
+                    return SafeNativeMethods.GetCurrentThreadId();
+                }
+                catch (SecurityException)
+                {
+                    return 0;
+                }
+            }
+
+            [SuppressUnmanagedCodeSecurity]
+            [SecurityCritical]
+            private static class SafeNativeMethods
+            {
+                [DllImport("kernel32.dll")]
+                public static extern int GetCurrentProcessId();
+
+                [DllImport("kernel32.dll")]
+                public static extern int GetCurrentThreadId();
             }
         }
     }

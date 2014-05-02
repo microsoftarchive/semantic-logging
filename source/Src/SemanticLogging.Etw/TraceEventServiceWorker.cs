@@ -170,11 +170,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
 
         private EventEntry CreateEventEntry(TraceEvent traceEvent)
         {
-            return new EventEntry(traceEvent.ProviderGuid,
+            return new EventEntry(
+                traceEvent.ProviderGuid,
                 (int)traceEvent.ID,
                 traceEvent.FormattedMessage,
                 this.CreatePayload(traceEvent),
                 DateTimeOffset.FromFileTime(traceEvent.TimeStamp100ns),
+                traceEvent.ProcessID,
+                traceEvent.ThreadID,
                 traceEvent.ActivityID,
                 traceEvent.RelatedActivityID,
                 this.schemaCache.GetSchema(traceEvent));

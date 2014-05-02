@@ -50,6 +50,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 Task = (int)entry.Schema.Task,
                 Version = entry.Schema.Version,
                 EventDate = entry.Timestamp.UtcDateTime,
+                ProcessId = entry.ProcessId,
+                ThreadId = entry.ThreadId,
                 ActivityId = entry.ActivityId,
                 RelatedActivityId = entry.RelatedActivityId
             };

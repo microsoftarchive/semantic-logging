@@ -12,8 +12,10 @@ CREATE TABLE [dbo].[Traces](
 	[Version] [int] NOT NULL,
 	[FormattedMessage] [nvarchar](4000) NULL,
 	[Payload] [nvarchar](4000) NULL,
-    [ActivityId] [uniqueidentifier], 
-    [RelatedActivityId] [uniqueidentifier], 
+	[ActivityId] [uniqueidentifier],
+	[RelatedActivityId] [uniqueidentifier],
+	[ProcessId] [int],
+	[ThreadId] [int],
 	-- only used for testing, not in prod schema
 	[ExtraColumn] [uniqueidentifier] NULL,
 	[ExtraColumn2] [uniqueidentifier] NULL,

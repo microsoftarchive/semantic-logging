@@ -17,5 +17,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
         internal const string Timestamp = "Timestamp";
         internal const string ActivityId = "ActivityId";
         internal const string RelatedActivityId = "RelatedActivityId";
+        internal const string ProcessId = "ProcessId";
+        internal const string ThreadId = "ThreadId";
     }
 }

@@ -34,6 +34,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzu
             dictionary.Add("Task", new EntityProperty(entry.Task));
             dictionary.Add("Version", new EntityProperty(entry.Version));
 
+            dictionary.Add("ProcessId", new EntityProperty(entry.ProcessId));
+            dictionary.Add("ThreadId", new EntityProperty(entry.ThreadId));
+
             if (entry.ActivityId != Guid.Empty)
             {
                 dictionary.Add("ActivityId", new EntityProperty(entry.ActivityId));

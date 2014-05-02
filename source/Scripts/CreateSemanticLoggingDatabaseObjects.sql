@@ -18,7 +18,9 @@ CREATE TYPE TracesType AS TABLE
 	[FormattedMessage] [nvarchar](4000),
 	[Payload] [nvarchar](4000),
 	[ActivityId] [uniqueidentifier], 
-	[RelatedActivityId] [uniqueidentifier] 
+	[RelatedActivityId] [uniqueidentifier],
+	[ProcessId] [int],
+	[ThreadId] [int]
 );
 
 GO
@@ -40,6 +42,8 @@ CREATE PROCEDURE [dbo].[WriteTrace]
 	@Payload [nvarchar](4000),
 	@ActivityId [uniqueidentifier], 
 	@RelatedActivityId [uniqueidentifier],
+	@ProcessId [int],
+	@ThreadId [int],
 	@TraceId [bigint] OUTPUT
 )
 AS
@@ -60,7 +64,9 @@ BEGIN
 		[FormattedMessage],
 		[Payload],
 		[ActivityId],
-		[RelatedActivityId]
+		[RelatedActivityId],
+		[ProcessId],
+		[ThreadId]
 	)
 	VALUES (
 		@InstanceName,
@@ -76,7 +82,9 @@ BEGIN
 		@FormattedMessage,
 		@Payload,
 		@ActivityId,
-		@RelatedActivityId)
+		@RelatedActivityId,
+		@ProcessId,
+		@ThreadId)
 
 	SET @TraceId = @@IDENTITY
 	RETURN @TraceId
@@ -104,7 +112,9 @@ BEGIN
 		[FormattedMessage],
 		[Payload],
 		[ActivityId],
-		[RelatedActivityId]
+		[RelatedActivityId],
+		[ProcessId],
+		[ThreadId]
 	)
   SELECT * FROM @InsertTraces;
 END
@@ -126,6 +136,8 @@ CREATE TABLE [dbo].[Traces](
 	[Payload] [nvarchar](4000) NULL,
 	[ActivityId] [uniqueidentifier],
 	[RelatedActivityId] [uniqueidentifier],
+	[ProcessId] [int],
+	[ThreadId] [int],
  CONSTRAINT [PK_Traces] PRIMARY KEY CLUSTERED 
 (
 	[id] ASC

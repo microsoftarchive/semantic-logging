@@ -119,6 +119,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         public Dictionary<string, object> Payload { get; set; }
 
         /// <summary>
+        /// Gets or sets the process id.
+        /// </summary>
+        /// <value>The process id.</value>
+        public int ProcessId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thread id.
+        /// </summary>
+        /// <value>The thread id.</value>
+        public int ThreadId { get; set; }
+
+        /// <summary>
         /// Gets or sets the activity id for the event.
         /// </summary>
         /// <value>

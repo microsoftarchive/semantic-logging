@@ -119,6 +119,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                     xmlWriter.WriteEndElement();
                 }
 
+                xmlWriter.WriteStartElement("Execution");
+                xmlWriter.WriteAttributeString("ProcessID", eventEntry.ProcessId.ToString(CultureInfo.InvariantCulture));
+                xmlWriter.WriteAttributeString("ThreadID", eventEntry.ThreadId.ToString(CultureInfo.InvariantCulture));
+                xmlWriter.WriteEndElement();
+
                 xmlWriter.WriteElementString("Computer", this.machine);
                 xmlWriter.WriteEndElement(); // System
 

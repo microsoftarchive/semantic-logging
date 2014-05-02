@@ -28,6 +28,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
         public string Payload { get; set; }
         public Dictionary<string, object> DeserializedPayload { get; private set; }
         public Dictionary<string, EntityProperty> RawPayloadProperties { get; private set; }
+        public int ProcessId { get; set; }
+        public int ThreadId { get; set; }
         public Guid? ActivityId { get; set; }
         public Guid? RelatedActivityId { get; set; }
 

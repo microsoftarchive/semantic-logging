@@ -219,6 +219,72 @@ EventName : FailureInfo");
         }
 
         [TestMethod]
+        public void WritesProcessIdAndThreadId()
+        {
+            var formatter = new EventTextFormatter();
+            using (var writer = new StringWriter())
+            {
+                var processId = 200;
+                var threadId = 300;
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        processId,
+                        threadId,
+                        Guid.Empty,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var processIdMatch = Regex.Match(message, "\\bProcessId : (?<id>\\d+)\\w?").Groups["id"].Value;
+                var threadIdMatch = Regex.Match(message, "\\bThreadId : (?<id>\\d+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(processId.ToString(), processIdMatch);
+                Assert.AreEqual(threadId.ToString(), threadIdMatch);
+            }
+        }
+
+        [TestMethod]
+        public void WritesProcessIdAndThreadIdOnSummary()
+        {
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.Critical);
+            using (var writer = new StringWriter())
+            {
+                var processId = 200;
+                var threadId = 300;
+
+                formatter.WriteEvent(
+                    new EventEntry(
+                        Guid.NewGuid(),
+                        0,
+                        string.Empty,
+                        new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
+                        DateTimeOffset.MaxValue,
+                        processId,
+                        threadId,
+                        Guid.Empty,
+                        Guid.Empty,
+                        new EventSourceSchemaReader().GetSchema(Logger).Values.First()),
+                    writer);
+
+                var message = writer.ToString();
+
+                var processIdMatch = Regex.Match(message, "\\bProcessId : (?<id>\\d+)\\w?").Groups["id"].Value;
+                var threadIdMatch = Regex.Match(message, "\\bThreadId : (?<id>\\d+)\\w?").Groups["id"].Value;
+
+                Assert.AreEqual(processId.ToString(), processIdMatch);
+                Assert.AreEqual(threadId.ToString(), threadIdMatch);
+            }
+        }
+
+        [TestMethod]
         public void WritesNonEmptyActivityIds()
         {
             var formatter = new EventTextFormatter();
@@ -234,6 +300,8 @@ EventName : FailureInfo");
                         string.Empty,
                         new System.Collections.ObjectModel.ReadOnlyCollection<object>(new object[0]),
                         DateTimeOffset.MaxValue,
+                        200,
+                        300,
                         activityId,
                         relatedActivityId,
                         new EventSourceSchemaReader().GetSchema(Logger).Values.First()),

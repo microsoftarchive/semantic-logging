@@ -83,6 +83,31 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         }
 
         [TestMethod]
+        public void when_serializing_a_log_entry_then_object_can_serialize_process_and_thread_id()
+        {
+            var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
+            var logObject = new JsonEventEntry
+            {
+                EventDate = DateTime.UtcNow,
+                Payload = payload,
+                InstanceName = "instance",
+                ProcessId = 300,
+                ThreadId = 500
+            };
+
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+
+            Assert.IsNotNull(actual);
+            Assert.IsTrue(this.IsValidBulkMessage(actual));
+
+            var serializedEntry = actual.Split('\n')[1];
+            var jsonObject = JObject.Parse(serializedEntry);
+
+            Assert.AreEqual(300, jsonObject["ProcessId"]);
+            Assert.AreEqual(500, jsonObject["ThreadId"]);
+        }
+
+        [TestMethod]
         public void when_serializing_a_log_entry_with_activtyid_then_activityid_serialized()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
@@ -100,8 +125,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
 
-            Assert.IsTrue(jsonObject["ActivityId"] != null);
-            Assert.IsTrue(jsonObject["RelatedActivityId"] != null);
+            Assert.AreEqual(logObject.ActivityId.ToString(), jsonObject["ActivityId"]);
+            Assert.AreEqual(logObject.RelatedActivityId.ToString(), jsonObject["RelatedActivityId"]);
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
         }
@@ -240,13 +265,82 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 sink.OnNext(new JsonEventEntry());
 
                 var flushCompleteInTime = sink.FlushAsync().Wait(TimeSpan.FromSeconds(45));
-                
+
                 mockHttpListener.Stop();
 
                 // Make sure the exception is logged
                 Assert.IsTrue(collectErrorsListener.WrittenEntries.First().Payload.Single(m => m.ToString().Contains("InvalidIndexNameException")) != null);
                 Assert.IsTrue(flushCompleteInTime);
             }
+        }
+    }
+
+    [TestClass]
+    public class given_logged_entry : ContextBase
+    {
+        private InMemorySink sink;
+
+        protected override void Given()
+        {
+            this.sink = new InMemorySink();
+
+            using (var listener = new ObservableEventListener())
+            {
+                listener.Subscribe(this.sink);
+
+                listener.EnableEvents(TestEventSource.Log, EventLevel.LogAlways, ~EventKeywords.None);
+
+                Guid currentActivityId;
+                EventSource.SetCurrentThreadActivityId(Guid.NewGuid(), out currentActivityId);
+                try
+                {
+                    TestEventSource.Log.EventWithPayloadAndMessageAndRelatedActivityId(Guid.NewGuid(), "p1", 2);
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(currentActivityId);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void when_mapped_to_json_entry_then_copies_properties()
+        {
+            Assert.AreEqual(1, this.sink.Entries.Count);
+
+            var entry = this.sink.Entries.Single();
+            var jsonEntry = entry.TryConvertToJsonEventEntry();
+
+            Assert.AreEqual(entry.EventId, jsonEntry.EventId);
+
+            Assert.AreEqual(entry.ProcessId, jsonEntry.ProcessId);
+            Assert.AreEqual(entry.ThreadId, jsonEntry.ThreadId);
+
+            Assert.AreEqual(entry.ActivityId, entry.ActivityId);
+            Assert.AreEqual(entry.RelatedActivityId, entry.RelatedActivityId);
+        }
+
+        private class InMemorySink : IObserver<EventEntry>
+        {
+            public InMemorySink()
+            {
+                this.Entries = new List<EventEntry>();
+            }
+
+            public void OnCompleted()
+            {
+            }
+
+            public void OnError(Exception error)
+            {
+            }
+
+            public void OnNext(EventEntry value)
+            {
+                this.Entries.Add(value);
+            }
+
+            public IList<EventEntry> Entries { get; private set; }
         }
     }
 }

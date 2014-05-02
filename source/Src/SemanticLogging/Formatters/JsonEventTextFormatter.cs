@@ -96,6 +96,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 jsonWriter.WriteValue(eventEntry.Schema.EventName);
                 jsonWriter.WritePropertyName(PropertyNames.Timestamp);
                 jsonWriter.WriteValue(eventEntry.GetFormattedTimestamp(this.DateTimeFormat));
+                jsonWriter.WritePropertyName(PropertyNames.ProcessId);
+                jsonWriter.WriteValue(eventEntry.ProcessId);
+                jsonWriter.WritePropertyName(PropertyNames.ThreadId);
+                jsonWriter.WriteValue(eventEntry.ThreadId);
 
                 if (eventEntry.ActivityId != Guid.Empty)
                 {

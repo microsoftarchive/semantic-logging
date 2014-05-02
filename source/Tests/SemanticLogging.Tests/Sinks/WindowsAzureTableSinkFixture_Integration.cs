@@ -139,6 +139,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
                                  Task = 24,
                                  Version = 2,
                                  Payload = { { "arg1", "value arg1" } },
+                                 ProcessId = 200,
+                                 ThreadId = 300,
                                  ActivityId = Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}"),
                                  RelatedActivityId = Guid.Parse("{23408E19-3133-47E1-9307-C99A4F9AC8CC}")
                              };
@@ -168,6 +170,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             StringAssert.Contains(actual.Payload, "arg1");
             StringAssert.Contains(actual.Payload, (string)entry.Payload["arg1"]);
             Assert.AreEqual("value arg1", actual.RawPayloadProperties["Payload_arg1"].StringValue);
+            Assert.AreEqual(entry.ProcessId, actual.ProcessId);
+            Assert.AreEqual(entry.ThreadId, actual.ThreadId);
             Assert.AreEqual(entry.ActivityId, actual.ActivityId.Value);
             Assert.AreEqual(entry.RelatedActivityId, actual.RelatedActivityId.Value);
         }
