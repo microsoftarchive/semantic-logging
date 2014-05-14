@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.30324.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging", "Src\SemanticLogging\SemanticLogging.csproj", "{2CD4105B-0DD6-4C18-9B37-05D8E8F57303}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Tests", "Tests\SemanticLogging.Tests\SemanticLogging.Tests.csproj", "{1735E7F3-65BA-4E29-B319-6C2CA03659D1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Etw", "Src\SemanticLogging.Etw\SemanticLogging.Etw.csproj", "{8440AEA2-CD55-42A0-8724-2ECCE2B32374}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TraceEvent", "Src\TraceEvent1.2.7\TraceEvent.csproj", "{B68F4968-A7CF-41CC-AD6E-373DB5E67944}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Etw.WindowsService", "Src\SemanticLogging.Etw.WindowsService\SemanticLogging.Etw.WindowsService.csproj", "{0EBF89E7-D2B2-4968-BC17-0DA066029C46}"
 EndProject
@@ -37,10 +35,6 @@ Global
 		{8440AEA2-CD55-42A0-8724-2ECCE2B32374}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8440AEA2-CD55-42A0-8724-2ECCE2B32374}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8440AEA2-CD55-42A0-8724-2ECCE2B32374}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B68F4968-A7CF-41CC-AD6E-373DB5E67944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B68F4968-A7CF-41CC-AD6E-373DB5E67944}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B68F4968-A7CF-41CC-AD6E-373DB5E67944}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B68F4968-A7CF-41CC-AD6E-373DB5E67944}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0EBF89E7-D2B2-4968-BC17-0DA066029C46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0EBF89E7-D2B2-4968-BC17-0DA066029C46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EBF89E7-D2B2-4968-BC17-0DA066029C46}.Release|Any CPU.ActiveCfg = Release|Any CPU

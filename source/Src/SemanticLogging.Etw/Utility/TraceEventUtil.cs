@@ -3,10 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Globalization;
 using System.Linq;
-using Diagnostics.Tracing;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Session;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility
 {
@@ -32,8 +31,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility
         {
             // Make explicit the invocation for requesting the manifest from the EventSource (Provider).
             var values = sendManifest ? new Dictionary<string, string>() { { "Command", "SendManifest" } } : null;
+            var options =
+                new TraceEventProviderOptions
+                {
+                    Arguments = values
+                };
 
-            session.EnableProvider(providerId, (TraceEventLevel)level, (ulong)matchAnyKeyword, 0, TraceEventOptions.None, values);
+            session.EnableProvider(providerId, (TraceEventLevel)level, (ulong)matchAnyKeyword, options);
         }
     }
 }

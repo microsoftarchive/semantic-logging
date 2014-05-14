@@ -2,7 +2,7 @@
 
 using System;
 using System.Diagnostics.Tracing;
-using Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Session;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
 {
@@ -29,7 +29,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
                     throw new ConfigurationException(Properties.Resources.MissingEventSourceNameAndId);
                 }
 
-                eventSourceId = TraceEventSession.GetEventSourceGuidFromName(name);
+                eventSourceId = TraceEventProviders.GetEventSourceGuidFromName(name);
             }
             else if (!string.IsNullOrWhiteSpace(name))
             {

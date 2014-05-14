@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Diagnostics.Tracing;
-using Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing;
+using Microsoft.Diagnostics.Tracing.Parsers;
+using Microsoft.Diagnostics.Tracing.Session;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
@@ -92,8 +92,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                 this.workerTask.Wait();
                 this.session.Dispose();
                 this.session = null;
-                this.source = null;              
-                
+                this.source = null;
+
                 this.disposed = true;
             }
         }
@@ -107,17 +107,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
 
             this.manifestCache = new TraceEventManifestsCache(this.source.Dynamic);
 
-            // get any previously cached manifest
-            this.manifestCache.Read();
+            // get any previously cached manifest and update the schema cache
+            this.UpdateCaches();
 
             // hook up to all incoming events and filter out manifests
             this.source.Dynamic.All += e => this.ProcessEvent(e);
 
             // listen to new manifests
-            this.source.Dynamic.ManifestReceived += m => this.OnManifestReceived(m);
+            this.source.Dynamic.DynamicProviderAdded += m => this.OnManifestReceived(m);
 
             // We collect all the manifests and save/terminate process when done
-            this.source.UnhandledEvent += e => this.ProcessUnhandledEvent(e);
+            this.source.UnhandledEvents += e => this.ProcessUnhandledEvent(e);
 
             foreach (var eventSource in this.eventSources)
             {
@@ -130,27 +130,33 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                                            ContinueWith(t => this.HandleProcessTaskFault(t));
         }
 
+        private void UpdateCaches()
+        {
+            this.manifestCache.Read();
+            foreach (var provider in this.source.Dynamic.DynamicProviders)
+            {
+                this.schemaCache.UpdateSchemaFromManifest(provider.Guid, provider.Manifest);
+            }
+        }
+
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged")]
         private void ProcessEvent(TraceEvent evt)
         {
-            try
+            if (evt.ID != (TraceEventID)0xFFFE)
             {
-                this.sink.OnNext(this.CreateEventEntry(evt));
-            }
-            catch (Exception exception)
-            {
-                this.logger.TraceEventServiceSinkUnhandledFault(this.sessionName, exception.ToString());
+                try
+                {
+                    this.sink.OnNext(this.CreateEventEntry(evt));
+                }
+                catch (Exception exception)
+                {
+                    this.logger.TraceEventServiceSinkUnhandledFault(this.sessionName, exception.ToString());
+                }
             }
         }
 
         private void OnManifestReceived(ProviderManifest providerManifest)
         {
-            if (providerManifest.Error != null)
-            {
-                this.logger.TraceEventServiceManifestGenerationFault(providerManifest.Guid, providerManifest.Error.ToString());
-                return;
-            }
-
             // Update schemas for this provider 
             this.schemaCache.UpdateSchemaFromManifest(providerManifest.Guid, providerManifest.Manifest);
 
@@ -175,7 +181,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                 (int)traceEvent.ID,
                 traceEvent.FormattedMessage,
                 this.CreatePayload(traceEvent),
-                DateTimeOffset.FromFileTime(traceEvent.TimeStamp100ns),
+                new DateTimeOffset(traceEvent.TimeStamp),
                 traceEvent.ProcessID,
                 traceEvent.ThreadID,
                 traceEvent.ActivityID,

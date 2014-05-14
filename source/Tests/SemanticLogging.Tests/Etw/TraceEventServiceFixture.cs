@@ -1,17 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-extern alias TraceEvent;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using Microsoft.Diagnostics.Tracing.Session;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Tracing = TraceEvent::Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
@@ -71,15 +70,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
         protected bool IsCreatedSessionAlive()
         {
-            return Tracing.TraceEventSession.GetActiveSessionNames().Any(s =>
+            return TraceEventSession.GetActiveSessionNames().Any(s =>
                 s.StartsWith(this.configuration.Settings.SessionNamePrefix, StringComparison.OrdinalIgnoreCase));
         }
 
         protected void RemoveAnyExistingSession(string sessionName = Constants.DefaultSessionNamePrefix)
         {
-            Tracing.TraceEventSession.GetActiveSessionNames().
+            TraceEventSession.GetActiveSessionNames().
                 Where(s => s.StartsWith(sessionName, StringComparison.OrdinalIgnoreCase)).ToList().
-                ForEach(n => new Tracing.TraceEventSession(n) { StopOnDispose = true }.Dispose());
+                ForEach(n => new TraceEventSession(n) { StopOnDispose = true }.Dispose());
         }
 
         [TestClass]
@@ -843,6 +842,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             }
 
             [TestMethod]
+            [Ignore]    // TraceEvent does not notify of manifest failures
             public void then_error_is_logged_to_slab_eventsource()
             {
                 // Wait for event to be processed

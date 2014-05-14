@@ -59,5 +59,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
         public void WithRelatedActivityId(Guid relatedActivityId) { WriteEventWithRelatedActivityId(11, relatedActivityId); }
 
         public static readonly MyCompanyEventSource Log = new MyCompanyEventSource();
+
+        public MyCompanyEventSource()
+        {
+        }
+
+        protected override void OnEventCommand(EventCommandEventArgs command)
+        {
+            base.OnEventCommand(command);
+        }
     }
 }

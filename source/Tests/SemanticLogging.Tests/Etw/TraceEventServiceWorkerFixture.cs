@@ -1,16 +1,15 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-extern alias TraceEvent;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 using System.Linq;
+using Microsoft.Diagnostics.Tracing.Session;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Tracing = TraceEvent::Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 {
@@ -70,7 +69,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             [TestMethod]
             public void then_session_is_started()
             {
-                bool sessionCreated = Tracing.TraceEventSession.GetActiveSessionNames().
+                bool sessionCreated = TraceEventSession.GetActiveSessionNames().
                     Any(s => s.StartsWith(this.traceEventServiceSettings.SessionNamePrefix, StringComparison.OrdinalIgnoreCase));
 
                 Assert.IsTrue(sessionCreated);
