@@ -120,6 +120,7 @@
     <Compile Include="TestSupport\AssemblyBuilder.cs" />
     <Compile Include="TestSupport\ConfigurationHelper.cs" />
     <Compile Include="TestSupport\DisposableDomain.cs" />
+    <Compile Include="TestSupport\EnumerableAssert.cs" />
     <Compile Include="UsingEventListener\DeferredEnablementFixture.cs" />
     <Compile Include="Utility\EventSourceAnalyzerFixture.cs" />
     <Compile Include="UsingEventListener\ObservableEventListenerFixture.cs" />
@@ -218,6 +219,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Etw\Configuration\WithEmptyNonStringValues.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Etw\Configuration\WithManyEventSourcesWithArgumentsAndFilters.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

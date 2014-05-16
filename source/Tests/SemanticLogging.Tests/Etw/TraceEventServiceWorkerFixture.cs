@@ -21,7 +21,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
         protected override void Given()
         {
-            this.sinkSettings = new SinkSettings("test", new InMemoryEventListener(), new EventSourceSettings[] { new EventSourceSettings("Test") });
+            this.sinkSettings = new SinkSettings("test", new InMemoryEventListener(), new[] { new EventSourceSettings("Test") });
             this.traceEventServiceSettings = new TraceEventServiceSettings();
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    Assert.Inconclusive("In order to run the tests, please run Visual Studio as Administrator.\r\n{0}", ex.ToString());
+                    Assert.Inconclusive("In order to run the tests, please run Visual Studio as Administrator.\r\n{0}", ex);
                 }
             }
 
@@ -87,7 +87,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    Assert.Inconclusive("In order to run the tests, please run Visual Studio as Administrator.\r\n{0}", ex.ToString());
+                    Assert.Inconclusive("In order to run the tests, please run Visual Studio as Administrator.\r\n{0}", ex);
                 }
             }
 
@@ -104,9 +104,32 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 var currentEventSource = this.sinkSettings.EventSources.First();
                 var newEventSource = new EventSourceSettings(currentEventSource.Name, level: currentEventSource.Level, matchAnyKeyword: EventKeywords.AuditSuccess);
 
-                this.Sut.UpdateSession(new List<EventSourceSettings>() { newEventSource });
+                this.Sut.UpdateSession(new List<EventSourceSettings> { newEventSource });
 
+                Assert.AreEqual(newEventSource.Level, currentEventSource.Level);
                 Assert.AreEqual(newEventSource.MatchAnyKeyword, currentEventSource.MatchAnyKeyword);
+                EnumerableAssert.AreEqual(newEventSource.Arguments, currentEventSource.Arguments);
+                EnumerableAssert.AreEqual(newEventSource.ProcessNamesToFilter, currentEventSource.ProcessNamesToFilter);
+            }
+
+            [TestMethod]
+            public void then_session_is_updated_with_new_eventSources_with_filters_and_arguments()
+            {
+                var currentEventSource = this.sinkSettings.EventSources.First();
+                var newEventSource =
+                    new EventSourceSettings(
+                        currentEventSource.Name,
+                        level: currentEventSource.Level,
+                        matchAnyKeyword: currentEventSource.MatchAnyKeyword,
+                        arguments: new[] { new KeyValuePair<string, string>("key", "value") },
+                        processNameFilters: new[] { "process" });
+
+                this.Sut.UpdateSession(new List<EventSourceSettings> { newEventSource });
+
+                Assert.AreEqual(newEventSource.Level, currentEventSource.Level);
+                Assert.AreEqual(newEventSource.MatchAnyKeyword, currentEventSource.MatchAnyKeyword);
+                EnumerableAssert.AreEqual(newEventSource.Arguments, currentEventSource.Arguments);
+                EnumerableAssert.AreEqual(newEventSource.ProcessNamesToFilter, currentEventSource.ProcessNamesToFilter);
             }
         }
     }

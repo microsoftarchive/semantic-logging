@@ -36,5 +36,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                 this.parser.WriteAllManifests(ManifestsPath);
             }
         }
+
+        public static void Clear()
+        {
+            lock (LockObject)
+            {
+                if (Directory.Exists(ManifestsPath))
+                {
+                    Directory.Delete(ManifestsPath, true);
+                }
+            }
+        }
     }
 }

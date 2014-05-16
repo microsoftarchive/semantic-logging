@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using Microsoft.Diagnostics.Tracing.Session;
@@ -39,12 +40,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
         protected override void Given()
         {
+            TraceEventManifestsCache.Clear();
+
             this.formatter = new MockFormatter();
             this.inMemoryListener = new InMemoryEventListener(this.formatter);
             var sink = new Lazy<IObserver<EventEntry>>(() => this.inMemoryListener);
             this.sourceSettings = this.sourceSettings ?? new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)));
-            this.eventSources = new List<EventSourceSettings>() { { this.sourceSettings } };
-            this.sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, this.eventSources) } };
+            this.eventSources = new List<EventSourceSettings> { this.sourceSettings };
+            this.sinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, this.eventSources) };
             this.configuration = new TraceEventServiceConfiguration(sinkSettings, this.serviceSettings);
 
             try
@@ -322,8 +325,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 base.Given();
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener);
                 sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Warning);
-                eventSources = new List<EventSourceSettings>() { { sourceSettings } };
-                sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, eventSources) } };
+                eventSources = new List<EventSourceSettings> { sourceSettings };
+                sinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, eventSources) };
                 configuration = new TraceEventServiceConfiguration(sinkSettings);
                 this.sut = new TraceEventService(configuration);
                 this.sut.Start();
@@ -362,8 +365,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 base.Given();
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener);
                 sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Warning, matchAnyKeyword: MyCompanyEventSource.Keywords.Diagnostic);
-                eventSources = new List<EventSourceSettings>() { { sourceSettings } };
-                sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, eventSources) } };
+                eventSources = new List<EventSourceSettings> { sourceSettings };
+                sinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, eventSources) };
                 configuration = new TraceEventServiceConfiguration(sinkSettings);
                 this.sut = new TraceEventService(configuration);
                 this.sut.Start();
@@ -437,9 +440,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 base.Given();
                 inMemoryListener.WaitSignalCondition = () => inMemoryListener.EventWrittenCount == 2;
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener);
-                var sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(TestEventSource)));
-                this.eventSources.Add(sourceSettings);
-                sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, eventSources) } };
+                var localSourceSettings = new EventSourceSettings(EventSource.GetName(typeof(TestEventSource)));
+                this.eventSources.Add(localSourceSettings);
+                sinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, eventSources) };
                 configuration = new TraceEventServiceConfiguration(sinkSettings);
                 this.sut = new TraceEventService(configuration);
                 this.sut.Start();
@@ -480,11 +483,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             protected override void Given()
             {
                 base.Given();
-                inMemoryListener = new InMemoryEventListener(new MockFormatter() { BeforeWriteEventAction = (f) => { throw new Exception("unhandled_exception_test"); } });
+                inMemoryListener = new InMemoryEventListener(new MockFormatter { BeforeWriteEventAction = f => { throw new Exception("unhandled_exception_test"); } });
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener);
                 sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)));
-                eventSources = new List<EventSourceSettings>() { { sourceSettings } };
-                sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, eventSources) } };
+                eventSources = new List<EventSourceSettings> { sourceSettings };
+                sinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, eventSources) };
                 configuration = new TraceEventServiceConfiguration(sinkSettings);
                 this.sut = new TraceEventService(configuration);
 
@@ -518,23 +521,23 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
         [TestClass]
         public class when_logging_to_provider_created_in_two_different_sessions : given_traceEventService
         {
-            private readonly string sessionName2 = "when_logging_to_provider_created_in_two_different_sessions";
+            private const string SessionName2 = "when_logging_to_provider_created_in_two_different_sessions";
             private TraceEventService sut2;
             private InMemoryEventListener inMemoryListener2;
             private MyCompanyEventSource logger;
 
             protected override void Given()
             {
-                RemoveAnyExistingSession(sessionName2);
+                RemoveAnyExistingSession(SessionName2);
                 base.Given();
 
                 inMemoryListener2 = new InMemoryEventListener(formatter);
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener2);
-                var sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Informational, matchAnyKeyword: MyCompanyEventSource.Keywords.Page);
-                var eventSources = new List<EventSourceSettings>() { { sourceSettings } };
-                var sinkSettings = new List<SinkSettings>() { { new SinkSettings("test", sink, eventSources) } };
-                var configuration = new TraceEventServiceConfiguration(sinkSettings, new TraceEventServiceSettings() { SessionNamePrefix = sessionName2 });
-                this.sut2 = new TraceEventService(configuration);
+                var localSourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Informational, matchAnyKeyword: MyCompanyEventSource.Keywords.Page);
+                var localEventSources = new List<EventSourceSettings> { localSourceSettings };
+                var localSinkSettings = new List<SinkSettings> { new SinkSettings("test", sink, localEventSources) };
+                var localConfiguration = new TraceEventServiceConfiguration(localSinkSettings, new TraceEventServiceSettings { SessionNamePrefix = SessionName2 });
+                this.sut2 = new TraceEventService(localConfiguration);
             }
 
             protected override void When()
@@ -625,7 +628,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             protected override void When()
             {
                 var current = this.configuration.SinkSettings[0];
-                List<EventSourceSettings> newSources = new List<EventSourceSettings>(current.EventSources);
+                var newSources = new List<EventSourceSettings>(current.EventSources);
                 newSources.Add(new EventSourceSettings(EventSource.GetName(typeof(TestEventSource))));
                 var newSink = new SinkSettings(current.Name, current.Sink, newSources);
 
@@ -668,9 +671,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 inMemoryListener.WaitSignalCondition = () => inMemoryListener.EventWrittenCount == 3;
 
                 var sink = new Lazy<IObserver<EventEntry>>(() => inMemoryListener);
-                var sourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Warning);
-                var eventSources = new List<EventSourceSettings>() { { sourceSettings } };
-                this.configuration.SinkSettings.Add(new SinkSettings("test2", sink, eventSources));
+                var localSourceSettings = new EventSourceSettings(EventSource.GetName(typeof(MyCompanyEventSource)), level: EventLevel.Warning);
+                var localEventSources = new List<EventSourceSettings> { localSourceSettings };
+                this.configuration.SinkSettings.Add(new SinkSettings("test2", sink, localEventSources));
             }
 
             [TestMethod]
@@ -684,8 +687,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 // Wait for event to be processed
                 Assert.IsTrue(inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout), "wait timed out");
 
-                Assert.AreEqual(2, formatter.WriteEventCalls.Where(e => e.FormattedMessage == "Application Failure: failure").Count());
-                Assert.AreEqual(1, formatter.WriteEventCalls.Where(e => e.FormattedMessage == "loading page test activityID=10").Count());
+                Assert.AreEqual(2, formatter.WriteEventCalls.Count(e => e.FormattedMessage == "Application Failure: failure"));
+                Assert.AreEqual(1, formatter.WriteEventCalls.Count(e => e.FormattedMessage == "loading page test activityID=10"));
             }
         }
 
@@ -943,6 +946,173 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
                 Assert.AreEqual(LargeManifestEventSource.Log.Name, entry1.Schema.ProviderName);
                 Assert.AreEqual(sourceSettings.EventSourceId, entry1.ProviderId);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_an_event_from_a_process_process_included_in_filters : given_traceEventService
+        {
+            protected override void Given()
+            {
+                this.sourceSettings =
+                    new EventSourceSettings(
+                        EventSource.GetName(typeof(MyCompanyEventSource)),
+                    processNameFilters: new[] { System.IO.Path.GetFileName(Process.GetCurrentProcess().MainModule.FileName) });
+                base.Given();
+                this.sut.Start();
+            }
+
+            protected override void When()
+            {
+                MyCompanyEventSource.Log.PageStart(10, "test");
+            }
+
+            [TestMethod]
+            public void then_event_is_collected_and_processed()
+            {
+                // Wait for event to be processed
+                inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout);
+
+                Assert.AreEqual(1, inMemoryListener.EventWrittenCount);
+                var entry = formatter.WriteEventCalls.FirstOrDefault();
+                Assert.IsNotNull(entry);
+
+                Assert.AreEqual(MyCompanyEventSource.Log.Name, entry.Schema.ProviderName);
+                Assert.AreEqual(sourceSettings.EventSourceId, entry.ProviderId);
+                Assert.AreEqual("loading page test activityID=10", entry.FormattedMessage);
+                Assert.AreEqual(EventOpcode.Start, entry.Schema.Opcode);
+                Assert.AreEqual(3, entry.EventId);
+                Assert.AreEqual(Guid.Empty, entry.ActivityId);
+                Assert.AreEqual(Guid.Empty, entry.RelatedActivityId);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_an_event_from_a_process_process_not_included_in_filters : given_traceEventService
+        {
+            protected override void Given()
+            {
+                this.sourceSettings =
+                    new EventSourceSettings(
+                        EventSource.GetName(typeof(MyCompanyEventSource)),
+                    processNameFilters: new[] { Guid.NewGuid().ToString() });
+                base.Given();
+                this.sut.Start();
+            }
+
+            protected override void When()
+            {
+                MyCompanyEventSource.Log.PageStart(10, "test");
+            }
+
+            [TestMethod]
+            public void then_event_is_not_collected()
+            {
+                // Wait for event to be processed
+                Assert.IsFalse(inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout));
+
+                Assert.AreEqual(0, inMemoryListener.EventWrittenCount);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_multiple_events_from_a_process_process_without_sampling : given_traceEventService
+        {
+            protected override void Given()
+            {
+                this.sourceSettings =
+                    new EventSourceSettings(
+                        EventSource.GetName(typeof(MyCompanyEventSource)));
+                base.Given();
+                this.inMemoryListener.WaitSignalCondition = () => inMemoryListener.EventWrittenCount == 15;
+                this.sut.Start();
+            }
+
+            protected override void When()
+            {
+                Guid currentActivityGuid = EventSource.CurrentThreadActivityId;
+
+                try
+                {
+                    for (int i = 0; i < 15; i++)
+                    {
+                        EventSource.SetCurrentThreadActivityId(Guid.NewGuid());
+                        MyCompanyEventSource.Log.PageStart(i, "test");
+                    }
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(currentActivityGuid);
+                }
+            }
+
+            [TestMethod]
+            public void then_all_events_are_collected_and_processed()
+            {
+                // Wait for event to be processed
+                inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout);
+
+                Assert.AreEqual(15, this.inMemoryListener.EventWrittenCount);
+                Assert.AreEqual(0, this.formatter.WriteEventCalls[0].Payload[0]);
+                Assert.AreEqual(1, this.formatter.WriteEventCalls[1].Payload[0]);
+                Assert.AreEqual(2, this.formatter.WriteEventCalls[2].Payload[0]);
+                Assert.AreEqual(3, this.formatter.WriteEventCalls[3].Payload[0]);
+                Assert.AreEqual(4, this.formatter.WriteEventCalls[4].Payload[0]);
+                Assert.AreEqual(5, this.formatter.WriteEventCalls[5].Payload[0]);
+                Assert.AreEqual(6, this.formatter.WriteEventCalls[6].Payload[0]);
+                Assert.AreEqual(7, this.formatter.WriteEventCalls[7].Payload[0]);
+                Assert.AreEqual(8, this.formatter.WriteEventCalls[8].Payload[0]);
+                Assert.AreEqual(9, this.formatter.WriteEventCalls[9].Payload[0]);
+                Assert.AreEqual(10, this.formatter.WriteEventCalls[10].Payload[0]);
+                Assert.AreEqual(11, this.formatter.WriteEventCalls[11].Payload[0]);
+                Assert.AreEqual(12, this.formatter.WriteEventCalls[12].Payload[0]);
+                Assert.AreEqual(13, this.formatter.WriteEventCalls[13].Payload[0]);
+                Assert.AreEqual(14, this.formatter.WriteEventCalls[14].Payload[0]);
+            }
+        }
+
+        [TestClass]
+        public class when_logging_multiple_events_from_a_process_process_with_sampling : given_traceEventService
+        {
+            protected override void Given()
+            {
+                this.sourceSettings =
+                    new EventSourceSettings(
+                        EventSource.GetName(typeof(MyCompanyEventSource)),
+                    arguments: new[] { new KeyValuePair<string, string>("ActivitySamplingStartEvent", "PageStart:5") });
+                base.Given();
+                this.inMemoryListener.WaitSignalCondition = () => inMemoryListener.EventWrittenCount == 3;
+                this.sut.Start();
+            }
+
+            protected override void When()
+            {
+                Guid currentActivityGuid = EventSource.CurrentThreadActivityId;
+
+                try
+                {
+                    for (int i = 0; i < 15; i++)
+                    {
+                        EventSource.SetCurrentThreadActivityId(Guid.NewGuid());
+                        MyCompanyEventSource.Log.PageStart(i, "test");
+                    }
+                }
+                finally
+                {
+                    EventSource.SetCurrentThreadActivityId(currentActivityGuid);
+                }
+            }
+
+            [TestMethod]
+            public void then_sampled_events_are_collected_and_processed()
+            {
+                // Wait for event to be processed
+                inMemoryListener.WaitOnAsyncEvents.WaitOne(this.AsyncProcessTimeout);
+
+                Assert.AreEqual(3, this.inMemoryListener.EventWrittenCount);
+                Assert.AreEqual(0, this.formatter.WriteEventCalls[0].Payload[0]);
+                Assert.AreEqual(5, this.formatter.WriteEventCalls[1].Payload[0]);
+                Assert.AreEqual(10, this.formatter.WriteEventCalls[2].Payload[0]);
             }
         }
     }
