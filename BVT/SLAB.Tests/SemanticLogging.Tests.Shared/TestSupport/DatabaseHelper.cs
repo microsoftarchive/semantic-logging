@@ -52,7 +52,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
 
         public static DataTable PollUntilEventsAreWritten(string databaseConnectionString, int eventsCount)
         {
-            var timeoutToWaitUntilEventIsReceived = DateTime.UtcNow.AddSeconds(10);
+            var timeoutToWaitUntilEventIsReceived = DateTime.UtcNow.AddSeconds(20);
             var datatable = new DataTable();
             while (DateTime.UtcNow < timeoutToWaitUntilEventIsReceived)
             {

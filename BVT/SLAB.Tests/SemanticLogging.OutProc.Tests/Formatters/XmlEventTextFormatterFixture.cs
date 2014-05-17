@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -24,21 +24,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<XElement> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterIndentedOutProc.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<XElement> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterIndentedOutProc.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using xml Formatter indented");
                     entries = FlatFileHelper.PollUntilXmlEventsAreWritten(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             XmlFormattedEntry.Fill(entries.Single());
             Assert.AreEqual<Guid>(MockEventSourceOutProc.Logger.Guid, Guid.Parse(XmlFormattedEntry.Provider.Attribute("Guid").Value));
@@ -69,21 +63,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             var logger = MockEventSourceOutProcEnum.Logger;
 
             var testGuid = Guid.NewGuid();
-            IEnumerable<XElement> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterAndGuids.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<XElement> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterAndGuids.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.SaveExpenseStarted(testGuid);
                     entries = FlatFileHelper.PollUntilXmlEventsAreWritten(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             XmlFormattedEntry.Fill(entries.Single());
@@ -99,21 +87,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProcEnum.Logger;
 
-            IEnumerable<XElement> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterAndEnums.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<XElement> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterAndEnums.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.SendEnumsEvent16(MockEventSourceOutProcEnum.MyColor.Red, MockEventSourceOutProcEnum.MyFlags.Flag3);
                     entries = FlatFileHelper.PollUntilXmlEventsAreWritten(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             XmlFormattedEntry.Fill(entries.Single());
@@ -136,21 +118,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<XElement> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterOutProc.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<XElement> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterOutProc.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using xml Formatter not indented");
                     entries = FlatFileHelper.PollUntilXmlEventsAreWritten(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             XmlFormattedEntry.Fill(entries.Single());
@@ -173,21 +149,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<XElement> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterDateTimeFormat.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<XElement> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileXmlFormatterDateTimeFormat.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using xml Formatter not indented");
                     entries = FlatFileHelper.PollUntilXmlEventsAreWritten(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             XmlFormattedEntry.Fill(entries.Single());

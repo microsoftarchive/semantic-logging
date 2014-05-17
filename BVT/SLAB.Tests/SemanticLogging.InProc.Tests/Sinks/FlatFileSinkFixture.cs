@@ -2,8 +2,8 @@
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -29,19 +29,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -56,38 +51,28 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.AreEqual<int>(1, entries.Count());
 
             File.Delete(fileName);
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
         }
@@ -100,22 +85,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter("------======------");
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int n = 0; n < 300; n++)
                     {
                         logger.Informational("some message to flat file " + n.ToString());
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -132,37 +112,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.AreEqual<int>(1, entries.Count());
 
-            using (var eventListener2 = new ObservableEventListener())
-            {
-                eventListener2.LogToFlatFile(fileName, formatter);
-                eventListener2.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 2");
-                }
-                finally
-                {
-                    eventListener2.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries2 = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -178,19 +148,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -205,19 +170,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -247,9 +207,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             try
             {
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(fileName, formatter);
+                    listener.LogToFlatFile(fileName, formatter);
                 }
             }
             catch (DirectoryNotFoundException ex)
@@ -270,9 +230,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             try
             {
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(fileName, formatter);
+                    listener.LogToFlatFile(fileName, formatter);
                 }
             }
             catch (UnauthorizedAccessException ex)
@@ -292,45 +252,36 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             try
             {
-                using (var eventListener = new ObservableEventListener())
-                {
-                    eventListener.LogToFlatFile(fileName, formatter);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    try
+                TestScenario.With1Listener(
+                    logger,
+                    listener =>
                     {
+                        listener.LogToFlatFile(fileName, formatter);
+                        listener.EnableEvents(logger, EventLevel.LogAlways);
                         logger.Informational("Message 1");
-                    }
-                    finally
-                    {
-                        eventListener.DisableEvents(logger);
-                    }
+                        listener.DisableEvents(logger);
 
-                    Assert.IsTrue(File.Exists(fileName));
-                    var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
-                    Assert.AreEqual<int>(1, entries.Count());
+                        Assert.IsTrue(File.Exists(fileName));
+                        var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
+                        Assert.AreEqual<int>(1, entries.Count());
 
-                    // Make file readonly
-                    File.SetAttributes(fileName, FileAttributes.ReadOnly);
+                        // Make file readonly
+                        File.SetAttributes(fileName, FileAttributes.ReadOnly);
 
-                    using (var eventListener2 = new ObservableEventListener())
-                    {
-                        eventListener2.LogToFlatFile(fileName, formatter);
+                        TestScenario.With1Listener(
+                            logger,
+                            listener2 =>
+                            {
+                                listener2.LogToFlatFile(fileName, formatter);
 
-                        // Try logging into readonly file
-                        eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                        try
-                        {
-                            logger.Verbose("Message 2");
-                        }
-                        finally
-                        {
-                            eventListener2.DisableEvents(logger);
-                        }
-                    }
+                                // Try logging into readonly file
+                                listener.EnableEvents(logger, EventLevel.LogAlways);
+                                logger.Verbose("Message 2");
+                            });
 
-                    var entries2 = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
-                    Assert.AreEqual<int>(1, entries2.Count());
-                }
+                        var entries2 = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
+                        Assert.AreEqual<int>(1, entries2.Count());
+                    });
             }
             catch (UnauthorizedAccessException ex)
             {
@@ -346,19 +297,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -376,19 +322,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(folderfilePath, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(folderfilePath, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(folderName + "\\" + fileName));
             var entries = Regex.Split(ReadFileWithoutLock(folderName + "\\" + fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -406,19 +347,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(folderfilePath, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(folderfilePath, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(folderName + "\\" + fileName));
             var entries = Regex.Split(ReadFileWithoutLock(folderName + "\\" + fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -445,9 +381,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 Directory.CreateDirectory(completePath);
                 dir.Attributes |= FileAttributes.ReadOnly;
                 var folderfilePath = Path.Combine(completePath, fileName);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(folderfilePath, formatter);
+                    listener.LogToFlatFile(folderfilePath, formatter);
                 }
 
                 Assert.IsFalse(File.Exists(fileName));
@@ -489,19 +425,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 var folderfilePath = completePath + "\\" + fileName;
                 try
                 {
-                    using (var eventListener = new ObservableEventListener())
-                    {
-                        eventListener.LogToFlatFile(folderfilePath, formatter);
-                        eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                        try
+                    TestScenario.With1Listener(
+                        logger,
+                        listener =>
                         {
+                            listener.LogToFlatFile(folderfilePath, formatter);
+                            listener.EnableEvents(logger, EventLevel.LogAlways);
                             logger.Informational("Message 1");
-                        }
-                        finally
-                        {
-                            eventListener.DisableEvents(logger);
-                        }
-                    }
+                        });
 
                     Assert.IsTrue(File.Exists(folderfilePath));
                     var entries = Regex.Split(ReadFileWithoutLock(folderfilePath), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -530,20 +461,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             formatter.VerbosityThreshold = EventLevel.LogAlways;
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     string strDateTime = DateTimeOffset.Now.ToString();
                     logger.Verbose("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string strLog = ReadFileWithoutLock(fileName);
@@ -556,26 +482,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var fileName = "ErrorInFormatterIsHandled.log";
             File.Delete(fileName);
-            var loggerNonTransient = TestEventSourceNonTransient.Logger;
-            InMemoryEventListener collectErrorsListener;
+            var logger = TestEventSourceNonTransient.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, new MockFormatter(true));
-                eventListener.EnableEvents(loggerNonTransient, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    collectErrorsListener = new InMemoryEventListener(true);
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, SemanticLoggingEventSource.Keywords.Sink);
-                    loggerNonTransient.EventWithPayload("payload1", 100);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(loggerNonTransient);
-                }
-            }
+                    listener.LogToFlatFile(fileName, new MockFormatter(true));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.EventWithPayload("payload1", 100);
 
-            StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                    StringAssert.Contains(errorsListener.ToString(), "Payload : [message : System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                });
         }
 
         [TestMethod]
@@ -583,26 +501,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var fileName = "OtherExceptionInFormatterIsHandled.log";
             File.Delete(fileName);
-            var loggerNonTransient = TestEventSourceNonTransient.Logger;
-            InMemoryEventListener collectErrorsListener;
+            var logger = TestEventSourceNonTransient.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, new MockFormatter2(true));
-                eventListener.EnableEvents(loggerNonTransient, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    collectErrorsListener = new InMemoryEventListener(true);
-                    collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, SemanticLoggingEventSource.Keywords.Sink);
-                    loggerNonTransient.EventWithPayload("TryingToLog", 100);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(loggerNonTransient);
-                }
-            }
+                    listener.LogToFlatFile(fileName, new MockFormatter2(true));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.EventWithPayload("TryingToLog", 100);
 
-            StringAssert.Contains(collectErrorsListener.ToString(), "Payload : [message : System.ObjectDisposedException: Cannot write to a closed TextWriter.");
+                    StringAssert.Contains(errorsListener.ToString(), "Payload : [message : System.ObjectDisposedException: Cannot write to a closed TextWriter.");
+                });
         }
 
         [TestMethod]
@@ -612,20 +522,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             File.Delete(fileName);
             var logger = TestEventSourceNonTransient.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, new MockFormatter3("header"));
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, new MockFormatter3("header"));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.EventWithPayload("error", 100);
                     logger.EventWithPayload("not an error", 100);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string strLog = ReadFileWithoutLock(fileName);
@@ -642,20 +547,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
                     logger.Verbose("Message 2");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             File.Delete(fileName);
             Assert.IsFalse(File.Exists(fileName));
@@ -670,20 +570,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
                     logger.Verbose("Message 2");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // Edit file
             File.AppendText(fileName);
@@ -710,9 +605,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 var folderfilePath = completePath + "\\" + fileName;
 
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(folderfilePath, formatter);
+                    listener.LogToFlatFile(folderfilePath, formatter);
                 }
 
                 Assert.IsFalse(File.Exists(folderfilePath));
@@ -730,30 +625,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             File.Delete(fileName);
             var logger = BasicTestEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, new EventTextFormatter());
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, new EventTextFormatter());
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.RaiseBasicTestEventSourceEvent("Test message1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
+                    listener.DisableEvents(logger);
 
-                logger.RaiseBasicTestEventSourceEvent("Test message2");
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
-                {
+                    logger.RaiseBasicTestEventSourceEvent("Test message2");
+
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.RaiseBasicTestEventSourceEvent("Test message3");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.IsTrue(fileContents.Count == 2);
@@ -768,22 +653,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             File.Delete(fileName);
             var logger = BasicTestEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, new EventTextFormatter());
-                eventListener.EnableEvents(logger, EventLevel.Error);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, new EventTextFormatter());
+                    listener.EnableEvents(logger, EventLevel.Error);
                     logger.RaiseEventWithMaxVerbosityAsError("Error message");
                     logger.RaiseEventWithMaxVerbosityAsInformational("Informational message");
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.RaiseEventWithMaxVerbosityAsCritical("Critical message");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.IsTrue(fileContents.Count == 2);
@@ -799,9 +679,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(null, formatter);
+                    listener.LogToFlatFile(null, formatter);
                 }
             }
             catch (ArgumentNullException ex)
@@ -816,9 +696,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(string.Empty, formatter);
+                    listener.LogToFlatFile(string.Empty, formatter);
                 }
             }
             catch (ArgumentException ex)
@@ -833,9 +713,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(@">", formatter);
+                    listener.LogToFlatFile(@">", formatter);
                 }
             }
             catch (ArgumentException ex)
@@ -850,9 +730,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(@"|", formatter);
+                    listener.LogToFlatFile(@"|", formatter);
                 }
             }
             catch (ArgumentException ex)
@@ -867,9 +747,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(@"..\", formatter);
+                    listener.LogToFlatFile(@"..\", formatter);
                 }
             }
             catch (ArgumentException ex)
@@ -884,9 +764,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             try
             {
                 var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-                using (var eventListener = new ObservableEventListener())
+                using (var listener = new ObservableEventListener())
                 {
-                    eventListener.LogToFlatFile(".", formatter);
+                    listener.LogToFlatFile(".", formatter);
                 }
             }
             catch (ArgumentException ex)
@@ -903,19 +783,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, null);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, null);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -931,19 +806,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -959,19 +829,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational(new string('a', 50000000));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains(new string('a', 50000000)));
         }
@@ -984,21 +849,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator, EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Error);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Error);
                     logger.Informational("Message 1");
                     logger.Error("Error 1");
                     logger.Critical("Critical 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = File.ReadAllText(fileName);
@@ -1016,20 +876,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator, EventTextFormatter.DashSeparator, EventLevel.LogAlways);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.VerboseWithKeywordPage("VerboseWithKeywordPage");
                     logger.InfoWithKeywordDiagnostic("InfoWithKeywordDiagnostic");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = ReadFileWithoutLock(fileName);
@@ -1046,19 +901,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             formatter.VerbosityThreshold = EventLevel.Error;
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Error);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Error);
                     logger.ErrorWithKeywordDiagnostic("ErrorWithKeywordDiagnostic");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = File.ReadAllText(fileName);
@@ -1074,21 +924,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             formatter.VerbosityThreshold = EventLevel.Error;
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Error("Error message");
                     logger.Warning("Warning message");
                     logger.Critical("Critical message");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = File.ReadAllText(fileName);
@@ -1105,20 +950,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator, EventTextFormatter.DashSeparator, EventLevel.LogAlways);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.CriticalWithTaskName("CriticalWithTaskName");
                     logger.InfoWithKeywordDiagnostic("InfoWithKeywordDiagnostic");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = ReadFileWithoutLock(fileName);
@@ -1135,12 +975,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator, EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter, true);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter, true);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     var loggerTasks = new Task[count];
                     for (int i = 0; i < count; i++)
                     {
@@ -1148,12 +988,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Task.WaitAll(loggerTasks);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.AreEqual(count, entries.Count());
@@ -1166,12 +1001,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             File.Delete(fileName);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     Thread[] threads = new Thread[10];
                     for (int i = 0; i < 10; i++)
                     {
@@ -1190,12 +1025,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         threads[i].Join();
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.ReadAllText(fileName).Contains("TestMsg 0"));
             Assert.IsTrue(File.ReadAllText(fileName).Contains("TestMsg 999"));
@@ -1211,9 +1041,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             using (var listener = FlatFileLog.CreateListener(fileName, formatter, false))
             {
-                listener.EnableEvents(logger, EventLevel.LogAlways);
                 try
                 {
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int n = 0; n < 2; n++)
                     {
                         logger.Informational("some message to flat file " + n.ToString());
@@ -1238,19 +1068,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ObjectArrayEvent4(10, "stringarg1", 20, "stringarg3", 30);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -1270,19 +1095,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             jsonformatter.DateTimeFormat = "dd/MM/yyyy";
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, jsonformatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, jsonformatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ObjectArrayEvent4(10, "stringarg1", 20, "stringarg3", 30);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -1302,19 +1122,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             xmlformat.DateTimeFormat = "dd/MM/yyyy";
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, xmlformat);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, xmlformat);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ObjectArrayEvent4(20, "stringarg1", 30, "stringarg3", 40);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -1334,19 +1149,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("Message 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -1354,21 +1164,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             File.SetAttributes(fileName, FileAttributes.ReadOnly);
             Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-            using (var eventListener2 = new ObservableEventListener())
-            {
-                File.SetAttributes(fileName, FileAttributes.Normal);
-                Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                eventListener2.LogToFlatFile(fileName, formatter);
-                eventListener2.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    File.SetAttributes(fileName, FileAttributes.Normal);
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Verbose("Message 2");
-                }
-                finally
-                {
-                    eventListener2.DisableEvents(logger);
-                }
-            }
+                });
 
             var entries2 = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.AreEqual<int>(2, entries2.Count());
@@ -1382,19 +1187,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator, EventTextFormatter.DashSeparator);
             var logger = MockEventSourceInProcEnum.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter, true);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter, true);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.SendEnumsEvent16(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var entries = Regex.Split(ReadFileWithoutLock(fileName), formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.AreEqual(1, entries.Count());
@@ -1407,26 +1207,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             EventTextFormatter eventTextFormatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var fileName = "newflatfile.log";
             File.Delete(fileName);
+            var logger1 = MockEventSource.Logger;
+            var logger2 = MockEventSource2.Logger;
+            var logger3 = MockEventSource3.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, eventTextFormatter);
-                eventListener.EnableEvents(MockEventSource.Logger, EventLevel.LogAlways);
-                eventListener.EnableEvents(MockEventSource2.Logger, EventLevel.LogAlways);
-                eventListener.EnableEvents(MockEventSource3.Logger, EventLevel.LogAlways);
-                try
+            TestScenario.With1Listener(
+                new EventSource[] { logger1, logger2, logger3 },
+                listener =>
                 {
-                    MockEventSource.Logger.Informational("message 1");
-                    MockEventSource2.Logger.Error("error 1");
-                    MockEventSource3.Logger.Critical("critical 1");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(MockEventSource.Logger);
-                    eventListener.DisableEvents(MockEventSource2.Logger);
-                    eventListener.DisableEvents(MockEventSource3.Logger);
-                }
-            }
+                    listener.LogToFlatFile(fileName, eventTextFormatter);
+                    listener.EnableEvents(logger1, EventLevel.LogAlways);
+                    listener.EnableEvents(logger2, EventLevel.LogAlways);
+                    listener.EnableEvents(logger3, EventLevel.LogAlways);
+                    logger1.Informational("message 1");
+                    logger2.Error("error 1");
+                    logger3.Critical("critical 1");
+                });
 
             Assert.IsTrue(File.Exists(fileName));
             var entries = Regex.Split(LogFileReader.ReadFileWithoutLock(fileName), eventTextFormatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
@@ -1448,22 +1244,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = TestEventSourceNoAttributes.Logger;
 
             List<EventSchema> events = new List<EventSchema>();
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     for (int i = 1; i < 16; i++)
                     {
                         events.Add(EventSourceSchemaCache.Instance.GetSchema(i, logger));
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.AreEqual<string>("NoArgEvent1", events[0].TaskName);
             Assert.AreEqual<string>("IntArgEvent2", events[1].TaskName);
@@ -1490,19 +1281,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.NoArgEvent1();
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("1", fileContents[0]["EventId"]);
@@ -1517,19 +1303,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.IntArgEvent2(10);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("2", fileContents[0]["EventId"]);
@@ -1545,19 +1326,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.LongArgEvent3((long)10);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("3", fileContents[0]["EventId"]);
@@ -1573,19 +1349,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.ObjectArrayEvent4(10, "stringarg1", 20, "stringarg3", 30);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("4", fileContents[0]["EventId"]);
@@ -1605,19 +1376,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.TwoIntArgEvent6(10, 30);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("6", fileContents[0]["EventId"]);
@@ -1634,19 +1400,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.ThreeStringArgEvent14("message1", "message2", "message3");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("14", fileContents[0]["EventId"]);
@@ -1664,19 +1425,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.StringAndLongArgEvent9("message1", 20);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("9", fileContents[0]["EventId"]);
@@ -1693,19 +1449,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.SendEnumsEvent15(MyColor.Green, MyFlags.Flag1 | MyFlags.Flag3);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("15", fileContents[0]["EventId"]);
@@ -1722,19 +1473,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestAttributesEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Verbose);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
                     logger.NoTaskSpecfied(1, 3, 5);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual("104", fileContents[0]["EventId"]);
@@ -1748,19 +1494,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestAttributesEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Verbose);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
                     logger.NonDefaultOpcodeNonDefaultVersionEvent(1, 3, 5);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual("103", fileContents[0]["EventId"]);
@@ -1775,19 +1516,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestAttributesEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Verbose);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
                     logger.NonDefaultOpcodeNonDefaultVersionEvent(1, 3, 5);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual("2", fileContents[0]["Version"]);
@@ -1801,19 +1537,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
             var logger = TestAttributesEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Verbose);
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
                     logger.NonDefaultOpcodeNonDefaultVersionEvent(1, 3, 5);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual("arg1- 1,arg2- 3,arg3- 5", fileContents[0]["Message"]);
@@ -1829,21 +1560,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var activityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.IntArgEvent2(10);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("2", fileContents[0]["EventId"]);
@@ -1864,21 +1591,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var activityId = Guid.NewGuid();
             var relatedActivityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToFlatFile(fileName, formatter);
-                eventListener.EnableEvents(logger, EventLevel.Informational);
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
                     logger.IntArgEventWithRelatedActivityId(10, relatedActivityId);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var fileContents = LogFileReader.GetEntries(fileName);
             Assert.AreEqual<string>("16", fileContents[0]["EventId"]);

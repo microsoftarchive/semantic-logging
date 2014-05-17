@@ -5,6 +5,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -136,10 +137,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             SinkSettings sinkSettings = new SinkSettings("dbSink", subject, new List<EventSourceSettings>() { settings, settings2 });
             List<SinkSettings> sinks = new List<SinkSettings>() { sinkSettings };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 200; n++)
                     {
@@ -160,12 +160,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     var eventsDataTable2 = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 200);
                     Assert.AreEqual(200, eventsDataTable2.Rows.Count);
                     StringAssert.Contains(eventsDataTable2.Rows[0]["payload"].ToString(), "some message");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
         }
 
         [TestMethod]
@@ -184,10 +179,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
             IEnumerable<string> entries = null;
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 200; n++)
                     {
@@ -195,12 +189,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     }
 
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 200, EventTextFormatter.DashSeparator);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(0, entries.Count());
         }
@@ -221,23 +210,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
             IEnumerable<string> entries = null;
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     for (int n = 0; n < 200; n++)
                     {
                         logger.LogSomeMessage("some message " + n.ToString());
                         logger.Critical("some error " + n.ToString());
                     }
+
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 200, EventTextFormatter.DashSeparator);
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(200, entries.Count());
             StringAssert.Contains(entries.First(), "some error 0");
@@ -258,11 +242,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             IEnumerable<string> entries = null;
             IEnumerable<string> entries2 = null;
             IEnumerable<string> entries3 = null;
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\LevelFiltering\\LevelFiltering.xml"))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\LevelFiltering\\LevelFiltering.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.Informational("some informational message");
                     logger.Verbose("some verbose");
@@ -273,12 +256,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "======");
                     entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "======");
                     entries3 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName3, 3, "======");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             StringAssert.Contains(entries.First().ToString(), "some critical");
             StringAssert.Contains(entries2.First().ToString(), "some critical");
@@ -296,22 +274,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             var logger = MockEventSourceOutProcKeywords.Logger;
 
             IEnumerable<string> entries = null;
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\KeywordFiltering\\keywordFiltering.xml"))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\KeywordFiltering\\keywordFiltering.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.InformationalPage("some informational message filtered by Page keyword");
                     logger.InformationalDatabase("some informational message filtered by Database keyword");
                     logger.InformationalDiagnostic("some informational message filtered by Diagnostic keyword");
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 2, "======");
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(2, entries.Count());
             StringAssert.Contains(entries.First().ToString(), "some informational message filtered by Page keyword");

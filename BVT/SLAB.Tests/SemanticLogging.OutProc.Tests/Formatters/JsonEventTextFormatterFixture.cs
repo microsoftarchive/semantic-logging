@@ -1,8 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -23,21 +23,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<TestEventEntry> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterIndentedOutProc.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<TestEventEntry> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterIndentedOutProc.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using Json Formatter indented");
                     entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntry>(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             var entry = entries.First();
@@ -59,21 +53,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<TestEventEntry> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterOutProc.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<TestEventEntry> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterOutProc.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using Json Formatter not indented");
                     entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntry>(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             var entry = entries.First();
@@ -94,21 +82,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
 
-            IEnumerable<TestEventEntryCustomTimeStamp> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterDateTimeFormat.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<TestEventEntryCustomTimeStamp> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonFormatterDateTimeFormat.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.LogSomeMessage("logging using custom DateTime format");
                     entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntryCustomTimeStamp>(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             var dt = DateTime.UtcNow;
             string expectedTimestamp = dt.Day.ToString() + dt.Month.ToString() + dt.Year.ToString();
@@ -122,21 +104,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             FlatFileHelper.DeleteDirectory(@".\Logs");
             var logger = MockEventSourceOutProcEnum.Logger;
 
-            IEnumerable<TestEventEntryCustomTimeStamp> entries;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonAndEnums.xml"))
-            using (var evtService = new TraceEventService(svcConfiguration))
-            {
-                evtService.Start();
-                try
+            IEnumerable<TestEventEntryCustomTimeStamp> entries = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\WithFormatter\\FlatFileJsonAndEnums.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     logger.SendEnumsEvent15(MockEventSourceOutProcEnum.MyColor.Blue, MockEventSourceOutProcEnum.MyFlags.Flag2);
                     entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntryCustomTimeStamp>(fileName, 1);
-                }
-                finally
-                {
-                    evtService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(1, entries.Count());
             var entry = entries.First();

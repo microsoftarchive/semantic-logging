@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -27,21 +26,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.Informational(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -60,19 +54,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational(null);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -92,20 +81,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     message = string.Concat("Error " + Guid.NewGuid());
                     logger.Error(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -124,20 +108,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     message = string.Concat("Critical " + Guid.NewGuid());
                     logger.Critical(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -156,20 +135,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.WriteWithOpCode(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -185,12 +159,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     var logTaskList = new List<Task>();
                     for (int i = 0; i < 9; i++)
                     {
@@ -199,12 +173,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 9);
             Assert.IsNotNull(dt, "No data logged");
@@ -226,13 +195,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var loggerNoTask = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                new EventSource[] { logger, loggerNoTask },
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.Critical);
-                    eventListener.EnableEvents(loggerNoTask, EventLevel.Informational);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    listener.EnableEvents(loggerNoTask, EventLevel.Informational);
                     string criticalMessage = string.Concat("CriticalMessage");
                     string infoMessage = string.Concat("InfoMessage");
                     var logTaskList = new List<Task>();
@@ -247,12 +216,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 18);
             Assert.IsNotNull(dt, "No data logged");
@@ -281,22 +245,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int n = 0; n < 300; n++)
                     {
                         logger.Informational("logging multiple messages " + n.ToString());
-                    } 
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                    }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 300);
             Assert.IsNotNull(dt, "No data logged");
@@ -314,24 +273,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             string errorMessage = string.Concat("Error ", Guid.NewGuid());
             string infoMessage = string.Concat("Message", Guid.NewGuid());
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener2.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener2.EnableEvents(logger, EventLevel.Error);
-                    eventListener.EnableEvents(logger, EventLevel.Informational);
+                    listener1.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener2.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener1.EnableEvents(logger, EventLevel.Informational);
+                    listener2.EnableEvents(logger, EventLevel.Error);
                     logger.Informational(infoMessage);
                     logger.Error(errorMessage);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    eventListener2.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 3);
             Assert.IsNotNull(dt, "No data logged");
@@ -346,24 +298,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
             var logger2 = MockEventSource2.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                new EventSource[] { logger, logger2 },
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
                     string message = string.Concat("Message ", Guid.NewGuid());
                     string errorMessage = string.Concat("Error ", Guid.NewGuid());
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    eventListener.EnableEvents(logger2, EventLevel.LogAlways);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.EnableEvents(logger2, EventLevel.LogAlways);
                     logger.Informational(message);
                     logger2.Error(errorMessage);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    eventListener.DisableEvents(logger2);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 2);
             Assert.IsNotNull(dt, "No data logged");
@@ -383,19 +329,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.NoTaskSpecfied1(1, 2, 3);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -411,19 +352,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.NoTaskNoOpCode1(1, 2, 3);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -445,23 +381,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var activityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.Informational(message);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -486,23 +417,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var relatedActivityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
             var message = string.Empty;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     message = string.Concat("Message ", Guid.NewGuid());
                     logger.InformationalWithRelatedActivityId(message, relatedActivityId);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                });
+
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -524,19 +450,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSourceNoTask.Logger;
 
             string largeMessage = new string('*', 3900);
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.MaxValues(largeMessage, long.MaxValue, int.MaxValue);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -555,19 +476,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.DifferentTypes("testString", 500000);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -585,19 +501,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSourceNoTask.Logger;
 
             var guidArg = Guid.NewGuid();
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.AllSupportedTypes(Int16.MinValue, Int32.MaxValue, Int64.MaxValue, 10 / 3, TestEnum.value1, guidArg);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -618,19 +529,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.DifferentTypes(null, 500000);
-                 }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -647,19 +553,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.Informational("testing");
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -675,20 +576,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceInProcEnum.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     string message = string.Concat("Message ", Guid.NewGuid());
                     logger.SendEnumsEvent15(MockEventSourceInProcEnum.MyColor.Blue, MockEventSourceInProcEnum.MyFlags.Flag3);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -707,24 +603,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
                     string message = string.Concat("Message ", Guid.NewGuid());
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
                     TransactionScope tran = new TransactionScope();
                     logger.Informational(message);
                     logger.Error(message);
                     tran.Dispose();
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -739,21 +630,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             string strGuid = Guid.NewGuid().ToString();
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.Error);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.Error);
                     logger.Informational(string.Concat("Informational ", strGuid));
                     logger.Error(string.Concat("Error ", strGuid));
                     logger.Critical(string.Concat("Critical ", strGuid));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 5);
             Assert.IsNotNull(dt, "No data logged");
@@ -773,36 +659,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, "WrongTable", bufferingCount: 200, bufferingInterval: TimeSpan.FromSeconds(1));
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    using (var collectErrorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, "WrongTable", bufferingCount: 200, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    for (int n = 0; n < 200; n++)
                     {
-                        try
-                        {
-                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Warning, Keywords.All);
-                            for (int n = 0; n <= 200; n++)
-                            {
-                                logger.Informational("Message: " + n);
-                            }
-
-                            collectErrorsListener.WaitEvents.Wait(2000);
-                            StringAssert.Contains(collectErrorsListener.ToString(), "Cannot access destination table 'WrongTable'.");
-                        }
-                        finally
-                        {
-                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.Informational("Message: " + n);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    errorsListener.WaitEvents.Wait(2000);
+                    StringAssert.Contains(errorsListener.ToString(), "Cannot access destination table 'WrongTable'.");
+                });
 
             var rowCount = DatabaseHelper.GetRowCount(validConnectionString);
             Assert.AreEqual(0, rowCount);
@@ -816,33 +686,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             var invalidConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["invalid"].ConnectionString;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", invalidConnectionString, bufferingCount: 1);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    using (var collectErrorsListener = new InMemoryEventListener(true))
-                    {
-                        try
-                        {
-                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Warning, Keywords.All);
-                            logger.Informational("Message 1");
+                    listener.LogToSqlDatabase("mytestinstance1", invalidConnectionString, bufferingCount: 1);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Informational("Message 1");
 
-                            collectErrorsListener.WaitEvents.Wait(1000);
-                            StringAssert.Contains(collectErrorsListener.ToString(), @"Cannot open database ""Invalid"" requested by the login. The login failed.");
-                        }
-                        finally
-                        {
-                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
-                    }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                    errorsListener.WaitEvents.Wait(1000);
+                    StringAssert.Contains(errorsListener.ToString(), @"Cannot open database ""Invalid"" requested by the login. The login failed.");
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsTrue(dt.Rows.Count == 0);
@@ -856,20 +710,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             string strGuid = Guid.NewGuid().ToString();
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            var invalidConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["invalid"].ConnectionString;
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
                     logger.ErrorWithKeywordDiagnostic(string.Concat("ErrorWithKeywordDiagnostic ", strGuid));
                     logger.CriticalWithKeywordPage(string.Concat("CriticalWithKeywordPage ", strGuid));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString, 5);
             Assert.IsNotNull(dt, "No data logged");
@@ -890,20 +740,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockEventSource.Logger;
 
             string strGuid = Guid.NewGuid().ToString();
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ErrorWithKeywordDiagnostic(string.Concat("ErrorWithKeywordDiagnostic ", strGuid));
                     logger.CriticalWithKeywordPage(string.Concat("CriticalWithKeywordPage ", strGuid));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             Assert.AreEqual(0, DatabaseHelper.GetRowCount(validConnectionString));
         }
@@ -918,22 +763,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var transaction = new TransactionScope();
             try
             {
-                using (ObservableEventListener eventListener = new ObservableEventListener())
+                TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    try
-                    {
-                        eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                        eventListener.EnableEvents(logger, EventLevel.Verbose);
-                        logger.Warning("warning1");
-                        logger.Informational("info1");
-                    }
-                    finally
-                    {
-                        eventListener.DisableEvents(logger);
-                    }
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
+                    logger.Warning("warning1");
+                    logger.Informational("info1");
 
                     throw new Exception();
-                }
+                });
             }
             catch { }
             finally
@@ -954,22 +794,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             using (var transaction = new System.Transactions.TransactionScope())
             {
-                using (ObservableEventListener eventListener = new ObservableEventListener())
+                TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    try
-                    {
-                        eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                        eventListener.EnableEvents(logger, EventLevel.Verbose);
-                        logger.Warning("warning1");
-                        logger.Informational("info1");
-                    }
-                    finally
-                    {
-                        eventListener.DisableEvents(logger);
-                    }
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.Verbose);
+                    logger.Warning("warning1");
+                    logger.Informational("info1");
 
                     transaction.Complete();
-                }
+                });
             }
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -983,19 +818,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     logger.ObjectArrayEvent4(10, "stringarg1", 20, "stringarg3", 30);
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -1012,18 +842,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener1 = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
-                    eventListener.LogToSqlDatabase("WaitFor_BufferingInterval", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(30));
-                    eventListener.LogToSqlDatabase("WaitFor_BufferingInterval", validConnectionString);
-                    eventListener.LogToSqlDatabase("WaitFor_BufferingInterval", validConnectionString);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    eventListener1.EnableEvents(logger, EventLevel.LogAlways);
-                    eventListener2.EnableEvents(logger, EventLevel.LogAlways);
+                    listener1.LogToSqlDatabase("WaitFor_BufferingInterval", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(30));
+                    listener2.LogToSqlDatabase("WaitFor_BufferingInterval", validConnectionString);
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
                     var logTaskList = new List<Task>();
                     for (int i = 0; i < 1000; i++)
                     {
@@ -1035,17 +861,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     }
 
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    eventListener1.DisableEvents(logger);
-                    eventListener2.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
-            Assert.AreEqual(3000, dt.Rows.Count);
+            Assert.AreEqual(2000, dt.Rows.Count);
         }
 
         [TestMethod]
@@ -1055,12 +874,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("MultipleThreads", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(20));
-                    eventListener.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("MultipleThreads", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(20));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     var threads = new System.Threading.Thread[10];
                     for (int i = 0; i < 10; i++)
                     {
@@ -1068,7 +887,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                             {
                                 for (int j = 0; j < 50; j++)
                                 {
-                                    TestEventSource.Logger.Critical("Test MultipleThreads");
+                                    logger.Critical("Test MultipleThreads");
                                 }
                             }));
 
@@ -1079,12 +898,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     {
                         threads[i].Join();
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 500);
             Assert.AreEqual<int>(500, dt.Rows.Count);
@@ -1097,22 +911,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 100);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 100);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int msg = 0; msg < 10; msg++)
                     {
                         logger.Informational("Message " + msg.ToString());
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.IsNotNull(dt, "No data logged");
@@ -1126,19 +935,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener1 = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                try
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(1);
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval2", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval3", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                    eventListener1.EnableEvents(logger, EventLevel.LogAlways);
-                    eventListener2.EnableEvents(logger, EventLevel.LogAlways);
+                    listener1.LogToSqlDatabase("WithMinBufferingInterval1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
+                    listener2.LogToSqlDatabase("WithMinBufferingInterval2", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
                     var logTaskList = new List<Task>();
                     for (int i = 0; i < 50; i++)
                     {
@@ -1152,27 +957,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Task.WaitAll(logTaskList.ToArray(), TimeSpan.FromSeconds(10));
 
                     // Wait for the buffer to flush at end of interval
-                    Task.Delay(new TimeSpan(0, 0, 0, 1, 800)).Wait();
+                    Task.Delay(TimeSpan.FromSeconds(2)).Wait();
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
-                    Assert.AreEqual(150, dt.Rows.Count);
+                    Assert.AreEqual(100, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval1'").Count());
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval2'").Count());
-                    Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval3'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                    eventListener1.DisableEvents(logger);
-                    eventListener2.DisableEvents(logger);
-                }
-            }
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
-            Assert.AreEqual(150, finalTable.Rows.Count);
+            Assert.AreEqual(100, finalTable.Rows.Count);
             Assert.AreEqual(50, finalTable.Select("InstanceName = 'WithMinBufferingInterval1'").Count());
             Assert.AreEqual(50, finalTable.Select("InstanceName = 'WithMinBufferingInterval2'").Count());
-            Assert.AreEqual(50, finalTable.Select("InstanceName = 'WithMinBufferingInterval3'").Count());
         }
 
         [TestMethod]
@@ -1182,35 +978,31 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener1 = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                eventListener.LogToSqlDatabase("WithMinBufferingCount1", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 1);
-                eventListener.LogToSqlDatabase("WithMinBufferingCount2", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 1);
-                eventListener.LogToSqlDatabase("WithMinBufferingCount3", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 1);
-                eventListener.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener1.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener2.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
+                {
+                    listener1.LogToSqlDatabase("WithMinBufferingCount1", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 1);
+                    listener2.LogToSqlDatabase("WithMinBufferingCount2", validConnectionString, bufferingInterval: TimeSpan.FromSeconds(10), bufferingCount: 1);
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
 
-                logger.Critical("Critical message 1");
-                logger.Critical("Critical message 2");
+                    logger.Critical("Critical message 1");
+                    logger.Critical("Critical message 2");
 
-                // Wait for the events to be written to the database in each listener
-                Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
-                Assert.AreEqual(6, dt.Rows.Count);
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount1'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount2'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount3'").Count());
-            }
+                    // Wait for the events to be written to the database in each listener
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+                    Assert.AreEqual(4, dt.Rows.Count);
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount1'").Count());
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount2'").Count());
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
-            Assert.AreEqual(6, finalTable.Rows.Count);
+            Assert.AreEqual(4, finalTable.Rows.Count);
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount1'").Count());
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount2'").Count());
-            Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount3'").Count());
         }
 
         [TestMethod]
@@ -1220,13 +1012,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var longBufferingInterval = TimeSpan.FromSeconds(30);
-                    eventListener.LogToSqlDatabase("WithBuffering_IntervalNotReached_MaxLogReached", validConnectionString, bufferingInterval: longBufferingInterval, bufferingCount: 10);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("WithBuffering_IntervalNotReached_MaxLogReached", validConnectionString, bufferingInterval: longBufferingInterval, bufferingCount: 10);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int i = 0; i < 15; i++)
                     {
                         logger.Critical(i + "Critical message");
@@ -1237,12 +1029,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(10, dt.Rows.Count);
                     Assert.AreEqual(10, dt.Select("InstanceName = 'WithBuffering_IntervalNotReached_MaxLogReached'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // The dispose should flush the remaining events
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -1257,13 +1044,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(4);
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 1000);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int i = 0; i < 50; i++)
                     {
                         logger.Critical(i + "Critical message");
@@ -1278,12 +1065,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(50, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -1298,13 +1080,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(2);
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 50);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 50);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
                     // When reaching 50 events the buffer will be flushed
                     for (int i = 0; i < 50; i++)
@@ -1317,12 +1099,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(50, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -1337,13 +1114,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
                     var bufferingInterval = TimeSpan.FromSeconds(2);
-                    eventListener.LogToSqlDatabase("WhenDefaultBufferingCountAndNonDefaultBufferInterval", validConnectionString, bufferingInterval: bufferingInterval);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("WhenDefaultBufferingCountAndNonDefaultBufferInterval", validConnectionString, bufferingInterval: bufferingInterval);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
                     for (int i = 0; i < 50; i++)
                     {
                         logger.Critical(i + "Critical message");
@@ -1354,12 +1131,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(50, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WhenDefaultBufferingCountAndNonDefaultBufferInterval'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -1374,12 +1146,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingCount: 50);
-                    eventListener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToSqlDatabase("WithMinBufferingInterval", validConnectionString, bufferingCount: 50);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
 
                     // When reaching 50 events the buffer will be flushed
                     for (int i = 0; i < 50; i++)
@@ -1392,12 +1164,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
                     Assert.AreEqual(50, dt.Rows.Count);
                     Assert.AreEqual(50, dt.Select("InstanceName = 'WithMinBufferingInterval'").Count());
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
@@ -1412,35 +1179,31 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener1 = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                eventListener.LogToSqlDatabase("WithMinBufferingCount1", validConnectionString, bufferingInterval: Timeout.InfiniteTimeSpan, bufferingCount: 1);
-                eventListener.LogToSqlDatabase("WithMinBufferingCount2", validConnectionString, bufferingInterval: Timeout.InfiniteTimeSpan, bufferingCount: 1);
-                eventListener.LogToSqlDatabase("WithMinBufferingCount3", validConnectionString, bufferingInterval: Timeout.InfiniteTimeSpan, bufferingCount: 1);
-                eventListener.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener1.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener2.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
+                {
+                    listener1.LogToSqlDatabase("WithMinBufferingCount1", validConnectionString, bufferingInterval: Timeout.InfiniteTimeSpan, bufferingCount: 1);
+                    listener2.LogToSqlDatabase("WithMinBufferingCount2", validConnectionString, bufferingInterval: Timeout.InfiniteTimeSpan, bufferingCount: 1);
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
 
-                logger.Critical("Critical message 1");
-                logger.Critical("Critical message 2");
+                    logger.Critical("Critical message 1");
+                    logger.Critical("Critical message 2");
 
-                // Wait for the events to be written to the database in each listener
-                Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
-                Assert.AreEqual(6, dt.Rows.Count);
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount1'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount2'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount3'").Count());
-            }
+                    // Wait for the events to be written to the database in each listener
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+                    Assert.AreEqual(4, dt.Rows.Count);
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount1'").Count());
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WithMinBufferingCount2'").Count());
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
-            Assert.AreEqual(6, finalTable.Rows.Count);
+            Assert.AreEqual(4, finalTable.Rows.Count);
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount1'").Count());
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount2'").Count());
-            Assert.AreEqual(2, finalTable.Select("InstanceName = 'WithMinBufferingCount3'").Count());
         }
 
         [TestMethod]
@@ -1450,36 +1213,32 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = TestEventSource.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            using (ObservableEventListener eventListener1 = new ObservableEventListener())
-            using (ObservableEventListener eventListener2 = new ObservableEventListener())
-            {
-                var bufferingInterval = TimeSpan.FromSeconds(2);
-                eventListener.LogToSqlDatabase("WhenBufferIntervalIsZeroAndCountIsExceeded1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 0);
-                eventListener.LogToSqlDatabase("WhenBufferIntervalIsZeroAndCountIsExceeded2", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 0);
-                eventListener.LogToSqlDatabase("WhenBufferIntervalIsZeroAndCountIsExceeded3", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 0);
-                eventListener.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener1.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                eventListener2.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
+                {
+                    var bufferingInterval = TimeSpan.FromSeconds(2);
+                    listener1.LogToSqlDatabase("WhenBufferIntervalIsZeroAndCountIsExceeded1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 0);
+                    listener2.LogToSqlDatabase("WhenBufferIntervalIsZeroAndCountIsExceeded2", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: 0);
+                    listener1.EnableEvents(logger, EventLevel.LogAlways);
+                    listener2.EnableEvents(logger, EventLevel.LogAlways);
 
-                logger.Critical("Critical message 1");
-                logger.Critical("Critical message 2");
+                    logger.Critical("Critical message 1");
+                    logger.Critical("Critical message 2");
 
-                // Wait for the buffer to flush at end of interval
-                Task.Delay(bufferingInterval).Wait();
-                var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
-                Assert.AreEqual(6, dt.Rows.Count);
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded1'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded2'").Count());
-                Assert.AreEqual(2, dt.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded3'").Count());
-            }
+                    // Wait for the buffer to flush at end of interval
+                    Task.Delay(bufferingInterval).Wait();
+                    var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+                    Assert.AreEqual(4, dt.Rows.Count);
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded1'").Count());
+                    Assert.AreEqual(2, dt.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded2'").Count());
+                });
 
             // There should not be remaining events flushed during Dispose
             var finalTable = DatabaseHelper.GetLoggedTable(validConnectionString);
-            Assert.AreEqual(6, finalTable.Rows.Count);
+            Assert.AreEqual(4, finalTable.Rows.Count);
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded1'").Count());
             Assert.AreEqual(2, finalTable.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded2'").Count());
-            Assert.AreEqual(2, finalTable.Select("InstanceName = 'WhenBufferIntervalIsZeroAndCountIsExceeded3'").Count());
         }
 
         [TestMethod]
@@ -1489,58 +1248,42 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, "Traces", TimeSpan.FromSeconds(3));
-                    using (InMemoryEventListener errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, "Traces", TimeSpan.FromSeconds(3));
+                    listener.EnableEvents(logger, EventLevel.Informational);
+                    for (int i = 0; i < 20; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Verbose);
-                            eventListener.EnableEvents(logger, EventLevel.Informational);
-                            for (int i = 0; i < 20; i++)
-                            {
-                                logger.InformationalNoMessage("test" + i);
-                            }
-
-                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            var result = DatabaseHelper.GetRowCount(validConnectionString);
-                            Assert.AreEqual<int>(20, result);
-
-                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            for (int i = 20; i < 50; i++)
-                            {
-                                logger.InformationalNoMessage("test" + i);
-                            }
-
-                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            var result2 = DatabaseHelper.GetRowCount(validConnectionString);
-                            Assert.AreEqual<int>(50, result2);
-
-                            for (int i = 50; i < 100; i++)
-                            {
-                                logger.InformationalNoMessage("test" + i);
-                            }
-
-                            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-                            var result3 = DatabaseHelper.GetRowCount(validConnectionString);
-                            Assert.AreEqual<int>(100, result3);
-                            errorsListener.WaitEvents.Wait(10000);
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.InformationalNoMessage("test" + i);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                    var result = DatabaseHelper.GetRowCount(validConnectionString);
+                    Assert.AreEqual<int>(20, result);
+
+                    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                    for (int i = 20; i < 50; i++)
+                    {
+                        logger.InformationalNoMessage("test" + i);
+                    }
+
+                    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                    var result2 = DatabaseHelper.GetRowCount(validConnectionString);
+                    Assert.AreEqual<int>(50, result2);
+
+                    for (int i = 50; i < 100; i++)
+                    {
+                        logger.InformationalNoMessage("test" + i);
+                    }
+
+                    Task.Delay(TimeSpan.FromSeconds(5)).Wait();
+                    var result3 = DatabaseHelper.GetRowCount(validConnectionString);
+                    Assert.AreEqual<int>(100, result3);
+                    errorsListener.WaitEvents.Wait(10000);
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
         }
 
         [TestMethod]
@@ -1552,64 +1295,48 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Wait for new next interval
-                            Task.Delay(bufferingInterval).Wait();
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Insert new events in next interval
-                            Task.Delay(bufferingInterval).Wait();
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Wait for new next interval
+                    Task.Delay(bufferingInterval).Wait();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Insert new events in next interval
+                    Task.Delay(bufferingInterval).Wait();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
@@ -1624,63 +1351,47 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Wait for new next interval
-                            Task.Delay(bufferingInterval).Wait();
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Wait for new next interval
+                    Task.Delay(bufferingInterval).Wait();
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
@@ -1695,62 +1406,47 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(30, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(30, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(30, DatabaseHelper.GetRowCount(validConnectionString));
@@ -1765,65 +1461,49 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // Insert new events in this interval
+                    for (int i = 0; i < 5; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // Insert new events in this interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Insert new events in next interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Insert new events in next interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Insert new events in next interval
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(10, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Insert new events in next interval
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
@@ -1838,65 +1518,49 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // Insert new events in this interval
+                    for (int i = 0; i < 5; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // Insert new events in this interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // Insert new events in next interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-                            Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // Insert new events in next interval
+                    for (int i = 0; i < 5; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+                    Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(20, DatabaseHelper.GetRowCount(validConnectionString));
@@ -1911,65 +1575,49 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             TimeSpan bufferingInterval = TimeSpan.FromSeconds(4);
             int bufferCount = 10;
-            using (ObservableEventListener eventListener = new ObservableEventListener())
-            {
-                try
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
                 {
-                    eventListener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
-                    using (var errorsListener = new InMemoryEventListener(true))
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString, bufferingInterval: bufferingInterval, bufferingCount: bufferCount);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    // Insert new events in this interval
+                    for (int i = 0; i < 5; i++)
                     {
-                        try
-                        {
-                            errorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
-                            eventListener.EnableEvents(logger, EventLevel.LogAlways);
-
-                            // Insert new events in this interval
-                            for (int i = 0; i < 5; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for interval to flush
-                            Task.Delay(bufferingInterval).Wait();
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            // The first 10 events reach the buffer size and should be flushed before interval ends
-                            for (int i = 0; i < 10; i++)
-                            {
-                                logger.MaxValues("test", long.MaxValue, int.MaxValue);
-                            }
-
-                            // Wait for events to be written
-                            Task.Delay(TimeSpan.FromSeconds(1)).Wait();
-                            Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
-
-                            errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
-                            Assert.AreEqual(string.Empty, errorsListener.ToString());
-                        }
-                        finally
-                        {
-                            errorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                        }
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
                     }
-                }
-                finally
-                {
-                    eventListener.DisableEvents(logger);
-                }
-            }
+
+                    // Wait for interval to flush
+                    Task.Delay(bufferingInterval).Wait();
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(5, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(15, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    // The first 10 events reach the buffer size and should be flushed before interval ends
+                    for (int i = 0; i < 10; i++)
+                    {
+                        logger.MaxValues("test", long.MaxValue, int.MaxValue);
+                    }
+
+                    // Wait for events to be written
+                    Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                    Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
+
+                    errorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(1));
+                    Assert.AreEqual(string.Empty, errorsListener.ToString());
+                });
 
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));

@@ -2,7 +2,7 @@
 
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestScenarios;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics.Tracing;
@@ -20,13 +20,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener()) 
-            { 
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.Informational("This is to log information in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Informational("This is to log information in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -39,13 +42,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.Error("This is to log error in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Error("This is to log error in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -58,13 +64,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("This is to log critical in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -77,13 +86,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.Verbose("This is to log verbose in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Verbose("This is to log verbose in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -96,24 +108,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
-            
-            using (var eventListener = new ObservableEventListener())
-            using (var eventListener2 = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(new EventTextFormatter(), null);
-                eventListener2.LogToConsole();
-                string errorMessage = string.Concat("Error ", Guid.NewGuid());
-                string infoMessage = string.Concat("Message", Guid.NewGuid());
-                eventListener2.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Error);
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Informational);
-                MockConsoleListenerEventSource.Logger.Informational(infoMessage);
-                MockConsoleListenerEventSource.Logger.Error(errorMessage);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-                var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
-                Assert.IsNotNull(entry);
-                StringAssert.Contains(entry, "100");
-                StringAssert.Contains(entry, "300");
-            }
+            string errorMessage = string.Concat("Error ", Guid.NewGuid());
+            string infoMessage = string.Concat("Message", Guid.NewGuid());
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
+                {
+                    listener1.LogToConsole(new EventTextFormatter(), null);
+                    listener2.LogToConsole();
+                    listener1.EnableEvents(logger, EventLevel.Informational);
+                    listener2.EnableEvents(logger, EventLevel.Error);
+                    logger.Informational(infoMessage);
+                    logger.Error(errorMessage);
+                });
+
+            var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+            Assert.IsNotNull(entry);
+            StringAssert.Contains(entry, "100");
+            StringAssert.Contains(entry, "300");
         }
 
         [TestMethod]
@@ -124,16 +138,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var logger = MockConsoleListenerEventSource.Logger;
             var logger2 = MockConsoleListenerEventSource2.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                string message = string.Concat("Message ", Guid.NewGuid());
-                string errorMessage = string.Concat("Error ", Guid.NewGuid());
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                eventListener.EnableEvents(logger2, EventLevel.LogAlways);
-                logger.Informational(message);
-                logger2.Informational(message);
-            }
+            string message = string.Concat("Message ", Guid.NewGuid());
+            string errorMessage = string.Concat("Error ", Guid.NewGuid());
+            TestScenario.With1Listener(
+                new EventSource[] { logger, logger2 },
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.EnableEvents(logger2, EventLevel.LogAlways);
+                    logger.Informational(message);
+                    logger2.Informational(message);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -147,15 +163,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {   
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                eventListener.LogToConsole();
-                for (int n = 0; n < 300; n++)
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    logger.Informational("Some message to console " + n);
-                }
-            }
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    listener.LogToConsole();
+                    for (int n = 0; n < 300; n++)
+                    {
+                        logger.Informational("Some message to console " + n);
+                    }
+                });
 
             var output = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c));
             Assert.IsNotNull(output);
@@ -169,23 +187,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockConsoleListenerEventSource.Logger;
-            
-            using (var eventListener = new ObservableEventListener())
-            using (var eventListener2 = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener2.LogToConsole();
-                int maxLoggedEntries = 9;
-                string criticalMessage = string.Concat("CriticalMessage");
-                string infoMessage = string.Concat("InfoMessage");
-                eventListener.EnableEvents(logger, EventLevel.Critical);
-                eventListener2.EnableEvents(logger, EventLevel.Critical);
-                Parallel.Invoke(Enumerable.Range(0, maxLoggedEntries).Select(i =>
-                new Action(() =>
+
+            TestScenario.With2Listeners(
+                logger,
+                (listener1, listener2) =>
                 {
-                    logger.Critical(i + criticalMessage);
-                })).ToArray());
-            }
+                    listener1.LogToConsole();
+                    listener2.LogToConsole();
+                    int maxLoggedEntries = 9;
+                    string criticalMessage = string.Concat("CriticalMessage");
+                    string infoMessage = string.Concat("InfoMessage");
+                    listener1.EnableEvents(logger, EventLevel.Critical);
+                    listener2.EnableEvents(logger, EventLevel.Critical);
+                    Parallel.Invoke(Enumerable.Range(0, maxLoggedEntries).Select(i =>
+                    new Action(() =>
+                    {
+                        logger.Critical(i + criticalMessage);
+                    })).ToArray());
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -198,12 +217,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.DifferentTypes("testString", 500000);
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.DifferentTypes("testString", 500000);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -218,12 +239,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.DifferentTypes(null, 500000);
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.DifferentTypes(null, 500000);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -239,12 +262,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockEventSourceNoTask.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.Informational("testing");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Informational("testing");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -259,12 +284,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
             var logger = MockHighEventIdEventSource.HigheventIdLogger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(logger, EventLevel.Warning);
-                logger.Warning();
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Warning);
+                    logger.Warning();
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -279,11 +306,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             try
             {
-                using (var eventListener = new ObservableEventListener())
+                TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.EnableEvents(logger, EventLevel.Warning);
+                    listener.EnableEvents(logger, EventLevel.Warning);
                     Assert.IsFalse(true, "Should throw when calling EnableEvents.");
-                }
+                });
             }
             catch (ArgumentException ex)
             {
@@ -294,20 +323,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         [TestMethod]
         public void WhenLoggingErrorOCcurs()
         {
-            InMemoryEventListener collectErrorsListener;
             var mockConsole = new MockConsoleOutputInterceptor();
+            var logger = TestEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(new MockFormatter(true));
-                eventListener.EnableEvents(TestEventSource.Logger, EventLevel.LogAlways);
-                collectErrorsListener = new InMemoryEventListener(true);
-                collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, SemanticLoggingEventSource.Keywords.Sink);
-                TestEventSource.Logger.EventWithPayload("payload1", 100);
-            }
+            TestScenario.With1Listener(
+                logger,
+                (listener, errorsListener) =>
+                {
+                    listener.LogToConsole(new MockFormatter(true));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.EventWithPayload("payload1", 100);
 
-            StringAssert.Contains(collectErrorsListener.ToString(), "System.InvalidOperationException: Operation is not valid due to the current state of the object.");
-            Assert.AreEqual(string.Empty, mockConsole.Ouput);
+                    StringAssert.Contains(errorsListener.ToString(), "System.InvalidOperationException: Operation is not valid due to the current state of the object.");
+                    Assert.AreEqual(string.Empty, mockConsole.Ouput);
+                });
         }
 
         [TestMethod]
@@ -315,14 +344,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(formatter);
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Error);
-                MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
-                MockConsoleListenerEventSource.Logger.Verbose("This is should not be logged in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole(formatter);
+                    listener.EnableEvents(logger, EventLevel.Error);
+                    logger.Critical("This is to log critical in Console");
+                    logger.Verbose("This is should not be logged in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -337,13 +369,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter("----", "====", EventLevel.LogAlways);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways, Keywords.All);
-                eventListener.LogToConsole(formatter);
-                MockConsoleListenerEventSource.Logger.InfoWithKeywordDiagnostic("Info with keyword Diagnostic");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    listener.LogToConsole(formatter);
+                    logger.InfoWithKeywordDiagnostic("Info with keyword Diagnostic");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -356,13 +391,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.InfoWithKeywordDiagnostic("Info with keyword Diagnostic");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.InfoWithKeywordDiagnostic("Info with keyword Diagnostic");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNull(entry);
@@ -373,14 +411,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(formatter);
-                formatter.VerbosityThreshold = EventLevel.Critical;
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
-                MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole(formatter);
+                    formatter.VerbosityThreshold = EventLevel.Critical;
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.Critical("This is to log critical in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -394,13 +435,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
-                MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.Critical("This is to log critical in Console");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -414,25 +458,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
             var activityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToConsole();
-                    eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.Critical("This is to log critical in Console");
+                });
 
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
-                    MockConsoleListenerEventSource.Logger.Critical("This is to log critical in Console");
-                }
-                finally
-                {
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
-
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
+                
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
             StringAssert.Contains(entry, "200");
@@ -447,25 +488,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
             var activityId = Guid.NewGuid();
             var relatedActivityId = Guid.NewGuid();
             var previousActivityId = Guid.Empty;
-            using (var eventListener = new ObservableEventListener())
-            {
-                try
+            EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
+            TestScenario.With1Listener(
+                logger,
+                listener =>
                 {
-                    eventListener.LogToConsole();
-                    eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.Critical);
-
-                    EventSource.SetCurrentThreadActivityId(activityId, out previousActivityId);
-                    MockConsoleListenerEventSource.Logger.CriticalWithRelatedActivityId("This is to log critical in Console", relatedActivityId);
-                }
-                finally
-                {
-                    EventSource.SetCurrentThreadActivityId(previousActivityId);
-                }
-            }
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.CriticalWithRelatedActivityId("This is to log critical in Console", relatedActivityId);
+                });
+            
+            EventSource.SetCurrentThreadActivityId(previousActivityId);
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -481,13 +519,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways, Keywords.All);
-                MockConsoleListenerEventSource.Logger.CriticalWithTaskName("Critical with taskname Page");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways, Keywords.All);
+                    logger.CriticalWithTaskName("Critical with taskname Page");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -500,13 +541,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         {
             var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
             var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole();
-                eventListener.EnableEvents(MockConsoleListenerEventSource.Logger, EventLevel.LogAlways);
-                MockConsoleListenerEventSource.Logger.Critical("Critical with taskname or eventname as Critical");
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("Critical with taskname or eventname as Critical");
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -523,12 +567,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             eventformatter.DateTimeFormat = "dd/MM/yyyy";
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(eventformatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole(eventformatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -545,12 +591,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             jsonFormatter.DateTimeFormat = "dd/MM/yyyy";
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(jsonFormatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole(jsonFormatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
@@ -567,12 +615,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             xmlFormatter.DateTimeFormat = "dd/MM/yyyy";
             var logger = TestEventSourceNoAttributes.Logger;
 
-            using (var eventListener = new ObservableEventListener())
-            {
-                eventListener.LogToConsole(xmlFormatter);
-                eventListener.EnableEvents(logger, EventLevel.LogAlways);
-                logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
-            }
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole(xmlFormatter);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.ObjectArrayEvent4(1000, "stringstringarg10", 2000, "stringstringarg20", 3000);
+                });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);

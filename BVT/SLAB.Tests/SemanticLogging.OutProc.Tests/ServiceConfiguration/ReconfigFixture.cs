@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using Diagnostics.Tracing;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -42,11 +42,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
 
             IEnumerable<string> entries = null;
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig", 1);
                     UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
@@ -54,13 +53,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
 
                     MockEventSourceOutProc.Logger.LogSomeMessage("some message to new added flat file");
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "======");
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "some message to new added flat file");
@@ -75,11 +70,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             var configFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Configurations\\Reconfiguration\\temp\\configFile.xml";
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
 
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     MockEventSourceOutProc.Logger.LogSomeMessage("some message to new added flat file");
@@ -90,17 +84,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
-                    
+
                     MockEventSourceOutProc.Logger.LogSomeMessage("this message should not be logged");
                     var entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "======");
                     Assert.AreEqual(1, entries2.Count());
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -112,11 +102,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             var configFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Configurations\\Reconfiguration\\temp\\configFile.xml";
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
 
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     MockEventSourceOutProc.Logger.LogSomeMessage("some message to new added flat file");
@@ -136,13 +125,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     Assert.AreEqual(2, entries2.Count());
                     StringAssert.Contains(entries2.First(), "some message to new added flat file");
                     StringAssert.Contains(entries2.Last(), "this critical message should pass the filter");
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -154,11 +139,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             var configFile = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\Configurations\\Reconfiguration\\temp\\configFile.xml";
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerNoKeywordFiltered.xml", configFile);
 
-            using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true))
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
 
@@ -178,13 +162,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     StringAssert.Contains(entries2.First(), "No keyword filtering");
                     StringAssert.Contains(entries2.ElementAt(1).ToString(), "InformationalPage ok");
                     StringAssert.Contains(entries2.Last(), "InformationalDatabase ok");
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -197,35 +177,37 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (var collector = new TraceEventService(svcConfiguration))
-            using (var collectErrorsListener = new InMemoryEventListener(true))
-            {
-                collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, Keywords.All);
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig", 1);
-                    UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerError.xml", configFile);
-                    TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
-                    TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-2flatFileListener", 1);
+                    using (var collectErrorsListener = new InMemoryEventListener())
+                    {
+                        collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, Keywords.All);
+                        try
+                        {
+                            TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig", 1);
+                            UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerError.xml", configFile);
+                            TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
+                            TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-2flatFileListener", 1);
 
-                    MockEventSourceOutProc.Logger.LogSomeMessage("Some informational from a new listener.");
-                    var entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "======");
-                    Assert.AreEqual(1, entries2.Count());
-                    StringAssert.Contains(entries2.First(), "Some informational from a new listener.");
+                            MockEventSourceOutProc.Logger.LogSomeMessage("Some informational from a new listener.");
+                            var entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, "======");
+                            Assert.AreEqual(1, entries2.Count());
+                            StringAssert.Contains(entries2.First(), "Some informational from a new listener.");
 
-                    collectErrorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(3));
-                    StringAssert.Contains(collectErrorsListener.ToString(), "One or more errors occurred when loading the TraceEventService configuration file.");
-                    StringAssert.Contains(collectErrorsListener.ToString(), "The given path's format is not supported.");
-                    StringAssert.Contains(collectErrorsListener.ToString(), "The configuration was partially successfully loaded. Check logs for further error details.");
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                    collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
-                }
-            }
+                            collectErrorsListener.WaitEvents.Wait(TimeSpan.FromSeconds(3));
+                            StringAssert.Contains(collectErrorsListener.ToString(), "One or more errors occurred when loading the TraceEventService configuration file.");
+                            StringAssert.Contains(collectErrorsListener.ToString(), "The given path's format is not supported.");
+                            StringAssert.Contains(collectErrorsListener.ToString(), "The configuration was partially successfully loaded. Check logs for further error details.");
+                        }
+                        finally
+                        {
+                            File.Delete(configFile);
+                            collectErrorsListener.DisableEvents(SemanticLoggingEventSource.Log);
+                        }
+                    }
+                });
         }
 
         [TestMethod]
@@ -238,10 +220,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerTwoSources.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
 
@@ -271,13 +252,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
 
                     UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerTwoSourcesNoListener.xml", configFile);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -290,28 +267,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
 
-                    using (TraceEventServiceConfiguration newConfig = TraceEventServiceConfiguration.Load("Configurations\\Reconfiguration\\NoListener.xml"))
-                    {
-                        UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
-                    }
+                    TraceEventServiceConfiguration newConfig = TraceEventServiceConfiguration.Load("Configurations\\Reconfiguration\\NoListener.xml");
+                    UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\NoListener.xml", configFile);
 
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 0);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -324,11 +294,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
@@ -337,13 +305,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
 
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -356,35 +320,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
-                    collector.Start();
-
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
 
                     UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListenerDiffSession.xml", configFile);
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
 
-            //using (TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\Reconfiguration\\FlatFileListenerDiffSession.xml"))
-            //using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            //{
-            //    collector.Start();
-
-            //    Assert.AreEqual(0, TraceSessionHelper.CountSessionStartingWith("ServiceReconfig-flatFileListener"));
-            //    Assert.AreEqual(0, TraceSessionHelper.CountSessionStartingWith("ServiceReconfig-dummyListener"));
-
-            //    Assert.AreEqual(1, TraceSessionHelper.CountSessionStartingWith("ServiceReconfig2-flatFileListener"));
-            //    Assert.AreEqual(1, TraceSessionHelper.CountSessionStartingWith("ServiceReconfig2-dummyListener"));
-            //}
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -397,10 +343,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             UpdateServiceConfigurationFile("Configurations\\Reconfiguration\\FlatFileListener.xml", configFile);
 
             TraceEventServiceConfiguration svcConfiguration = TraceEventServiceConfiguration.Load(configFile, true);
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-flatFileListener", 1);
                     TraceSessionHelper.WaitAndAssertCountOfSessions("ServiceReconfig-dummyListener", 1);
@@ -417,13 +362,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     var entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 2, "======");
                     Assert.AreEqual(2, entries2.Count());
                     StringAssert.Contains(entries2.First(), "some message to new added flat file");
-                }
-                finally
-                {
-                    collector.Stop();
-                    File.Delete(configFile);
-                }
-            }
+                });
+
+            File.Delete(configFile);
         }
 
         [TestMethod]
@@ -435,10 +376,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             File.Delete(fileName2);
 
             var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\Reconfiguration\\TwoFlatFileListeners.xml");
-            using (TraceEventService collector = new TraceEventService(svcConfiguration))
-            {
-                collector.Start();
-                try
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     var newDomain = AppDomain.CreateDomain("TestintDynamicManifest", AppDomain.CurrentDomain.Evidence, AppDomain.CurrentDomain.SetupInformation);
                     try
@@ -466,12 +406,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
                     Assert.AreEqual(2, entries.Count());
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "======");
                     Assert.AreEqual(2, entries.Count());
-                }
-                finally
-                {
-                    collector.Stop();
-                }
-            }
+                });
         }
 
         private static void UpdateServiceConfigurationFile(string path, string tempFile)
@@ -490,7 +425,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             {
                 if (this.IsEnabled())
                 {
-                    this.WriteEvent(1, id); 
+                    this.WriteEvent(1, id);
                 }
             }
 
@@ -505,7 +440,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             {
                 if (this.IsEnabled())
                 {
-                    this.WriteEvent(2, id); 
+                    this.WriteEvent(2, id);
                 }
             }
 

@@ -27,7 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             {
                 UninstallService();
             }
-            catch 
+            catch
             { }
         }
 
@@ -35,6 +35,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
         public void Initialize()
         {
             this.tableName = string.Empty;
+
+            StopAllSemanticSvcInstances();
         }
 
         [TestCleanup]
@@ -44,6 +46,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             {
                 AzureTableHelper.DeleteTable(System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"], this.tableName);
             }
+
+            StopAllSemanticSvcInstances();
         }
 
         [TestMethod]
@@ -98,22 +102,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             DatabaseHelper.CleanLoggingDB(validConnectionString);
             string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "sqlDB.xml");
 
-            try
-            {
-                var proc = Process.GetProcessesByName("SemanticLogging-svc").FirstOrDefault();
-                if (proc != null)
-                {
-                    proc.Kill();
-                }
-            }
-            catch 
-            { }
-
             // Run the service as a console app.
             // Login to the localdb from the Windows Service (as SYSTEM user) is denied.
             System.Data.DataTable logsTable = null;
             using (var semanticLoggingServiceProcess = this.StartServiceAsConsoleWithConfig(configFile))
             {
+                StringAssert.Contains(semanticLoggingServiceProcess.ProcessName, "SemanticLogging-svc");
+
                 try
                 {
                     var logger = MockEventSourceOutProc.Logger;
@@ -127,6 +122,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
                     if (semanticLoggingServiceProcess != null)
                     {
                         semanticLoggingServiceProcess.Kill();
+                        semanticLoggingServiceProcess.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
                     }
                 }
             }
@@ -207,6 +203,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging using windows service to elastic search 2"));
         }
 
+        private void StopAllSemanticSvcInstances()
+        {
+            try
+            {
+                foreach (var proc in Process.GetProcessesByName("SemanticLogging-svc"))
+                {
+                    if (proc != null)
+                    {
+                        proc.Kill();
+                        proc.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
+                        proc.Dispose();
+                    }
+                }
+            }
+            catch
+            { }
+        }
+
         private void StartServiceWithConfig(string configFileName)
         {
             string path = Path.Combine(Environment.CurrentDirectory, "SemanticLogging-svc.exe.config");
@@ -270,12 +284,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
 
         private static ServiceController GetSemanticLoggingService()
         {
-            return 
+            return
                 ServiceController
                     .GetServices()
-                    .FirstOrDefault(s => 
+                    .FirstOrDefault(s =>
                         s.ServiceName.Equals(
-                            Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Constants.ServiceName, 
+                            Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Constants.ServiceName,
                             StringComparison.OrdinalIgnoreCase));
         }
 
@@ -294,13 +308,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Wi
                 semanticLoggingServiceProcess.Start();
 
                 // Wait for the configuration to be loaded
-                System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(1)).Wait();
+                System.Threading.Tasks.Task.Delay(TimeSpan.FromSeconds(5)).Wait();
             }
             catch
             {
                 if (semanticLoggingServiceProcess != null)
                 {
                     semanticLoggingServiceProcess.Kill();
+                    semanticLoggingServiceProcess.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
                     semanticLoggingServiceProcess.Dispose();
                 }
             }

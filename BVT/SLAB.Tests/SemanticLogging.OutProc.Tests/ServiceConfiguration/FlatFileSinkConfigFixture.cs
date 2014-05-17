@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.ServiceConfiguration
 {
@@ -106,28 +105,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         }
 
         [TestMethod]
-        public void OutProcWhenFormatterWithValuesForProperties()
+        public void WhenFormatterWithValuesForProperties()
         {
             string fileName = "FlatFileFormatterOutProc.log";
             File.Delete(fileName);
 
             IEnumerable<string> entries = null;
-            using (var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\FlatFile\\FlatFileFormatterOutProc.xml"))
-            using (var eventCollectorService = new TraceEventService(svcConfiguration))
-            {
-                eventCollectorService.Start();
-
-                try
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\FlatFile\\FlatFileFormatterOutProc.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
                 {
                     MockEventSourceOutProc.Logger.LogSomeMessage("some message");
                     MockEventSourceOutProc.Logger.LogSomeMessage("some message2");
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 2, "=======");
-                }
-                finally
-                {
-                    eventCollectorService.Stop();
-                }
-            }
+                });
 
             Assert.AreEqual(2, entries.Count());
             StringAssert.Contains(entries.First(), "some message");
