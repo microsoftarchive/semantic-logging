@@ -23,9 +23,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Schema
             Assert.AreEqual("event2Arg0", schema[2].Payload[0]);
             Assert.AreEqual("event2Arg1", schema[2].Payload[1]);
 
+#if !EVENT_SOURCE_PACKAGE
             Assert.AreEqual("event3Arg0", schema[3].Payload[0]);
             Assert.AreEqual("event3Arg1", schema[3].Payload[1]);
             Assert.AreEqual("event3Arg2", schema[3].Payload[2]);
+#endif
         }
 
         [TestMethod]
@@ -37,7 +39,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Schema
 
             Assert.AreEqual("MyEvent1", schema[1].TaskName);
             Assert.AreEqual("MyEvent2", schema[2].TaskName);
+#if !EVENT_SOURCE_PACKAGE
             Assert.IsNull(schema[3].TaskName);
+#endif
         }
 
         [TestMethod]
@@ -78,8 +82,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Schema
             Assert.AreEqual<string>("LogColor", schema[8].TaskName);
             Assert.AreEqual<EventTask>((EventTask)65526, schema[8].Task);
 
+#if !EVENT_SOURCE_PACKAGE
             Assert.IsNull(null, schema[9].TaskName);
             Assert.AreEqual<EventTask>((EventTask)0, schema[9].Task);
+#endif
         }
 
         [TestMethod]
@@ -157,10 +163,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Schema
             var reader = new EventSourceSchemaReader();
             var schema = reader.GetSchema(SimpleEventSource.Log);
 
-            Assert.AreEqual<string>("CustomOpcode1", schema[15].OpcodeName);
+            Assert.AreEqual<string>("Opcode1", schema[15].OpcodeName);
             Assert.AreEqual<EventOpcode>((EventOpcode)100, schema[15].Opcode);
 
-            Assert.AreEqual<string>("CustomOpcode2", schema[16].OpcodeName);
+            Assert.AreEqual<string>("Opcode2", schema[16].OpcodeName);
             Assert.AreEqual<EventOpcode>((EventOpcode)101, schema[16].Opcode);
         }
 
