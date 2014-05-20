@@ -77,11 +77,11 @@ Payload : [color : 0]");
                 listener.EnableEvents(Logger, EventLevel.LogAlways, Keywords.All);
 
                 Logger.DBQueryStart("select * from table");
-                Logger.WithOpcodeAndNoTaskSpecfied(4);
+                Logger.DBQueryStop();
 
                 var entries = Regex.Split(listener.ToString(), formatter.Header + "\r\n").Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
                 StringAssert.Matches(entries[0], new Regex("EventName : .*DBQuery"));
-                StringAssert.Matches(entries[1], new Regex("Task : .*None"));
+                StringAssert.Matches(entries[1], new Regex("Task : .*" + MyCompanyEventSource.Tasks.DBQuery.ToString()));
             }
         }
 

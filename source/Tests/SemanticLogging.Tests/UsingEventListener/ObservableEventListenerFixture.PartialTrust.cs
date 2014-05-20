@@ -49,13 +49,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
+        // Partial trust not supported with the NuGet package
         [TestMethod]
         public void CannotGetThreadIdAndProcessidOnPartialTrust()
         {
             var evidence = new Evidence();
             evidence.AddHostEvidence(new Zone(SecurityZone.Intranet));
             var permissionSet = SecurityManager.GetStandardSandbox(evidence);
-            permissionSet.AddPermission(new ReflectionPermission(ReflectionPermissionFlag.MemberAccess));
 
             var appDomain =
                 AppDomain.CreateDomain(
@@ -94,7 +95,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
             var evidence = new Evidence();
             evidence.AddHostEvidence(new Zone(SecurityZone.Intranet));
             var permissionSet = SecurityManager.GetStandardSandbox(evidence);
-            permissionSet.AddPermission(new ReflectionPermission(ReflectionPermissionFlag.MemberAccess));
 
             var appDomain =
                 AppDomain.CreateDomain(
@@ -121,6 +121,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
                 AppDomain.Unload(appDomain);
             }
         }
+#endif
     }
 
     public class ProcessIdAndThreadIdTester : MarshalByRefObject

@@ -72,7 +72,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests
         {
             using (var listener = new InMemoryEventListener())
             {
-                listener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways);
+                listener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, SemanticLoggingEventSource.Keywords.Formatting);
 
                 SemanticLoggingEventSource.Log.ConsoleSinkWriteFailed("test");
 

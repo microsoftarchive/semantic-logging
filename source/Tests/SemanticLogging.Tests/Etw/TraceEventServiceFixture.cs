@@ -756,14 +756,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 Assert.AreEqual(MyNewCompanyEventSource2.Logger.Name, entry2.Schema.ProviderName);
                 Assert.AreEqual(sourceSettings.EventSourceId, entry2.ProviderId);
                 Assert.AreEqual("Event2 ID=22", entry2.FormattedMessage);
-                Assert.AreEqual(EventOpcode.Start, entry2.Schema.Opcode);
+                Assert.AreEqual(EventOpcode.Stop, entry2.Schema.Opcode);
                 Assert.AreEqual(2, entry2.EventId);
             }
 
             [EventSource(Name = "MyCompany1")]
-            private class MyNewCompanyEventSource : EventSource
+            private sealed class MyNewCompanyEventSource : EventSource
             {
-                [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start)]
+                public static class Tasks
+                {
+                    public const EventTask Custom = (EventTask)1;
+                }
+
+                [Event(1, Task = Tasks.Custom, Opcode = EventOpcode.Start, Message = "Event1 ID={0}")]
                 public void Event1(int id)
                 {
                     if (IsEnabled()) { WriteEvent(1, id); }
@@ -773,15 +778,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             }
 
             [EventSource(Name = "MyCompany1")]
-            private class MyNewCompanyEventSource2 : EventSource
+            private sealed class MyNewCompanyEventSource2 : EventSource
             {
-                [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start)]
+                public static class Tasks
+                {
+                    public const EventTask Custom = (EventTask)1;
+                }
+
+                [Event(1, Task = Tasks.Custom, Opcode = EventOpcode.Start, Message = "Event1 ID={0}")]
                 public void Event1(int id)
                 {
                     if (IsEnabled()) { WriteEvent(1, id); }
                 }
 
-                [Event(2, Message = "Event2 ID={0}", Opcode = EventOpcode.Start)]
+                [Event(2, Task = Tasks.Custom, Opcode = EventOpcode.Stop, Message = "Event2 ID={0}")]
                 public void Event2(int id)
                 {
                     if (IsEnabled()) { WriteEvent(2, id); }
@@ -1071,6 +1081,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
+        // sampling not supported when using the NuGet package
         [TestClass]
         public class when_logging_multiple_events_from_a_process_process_with_sampling : given_traceEventService
         {
@@ -1115,5 +1127,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 Assert.AreEqual(10, this.formatter.WriteEventCalls[2].Payload[0]);
             }
         }
+#endif
     }
 }

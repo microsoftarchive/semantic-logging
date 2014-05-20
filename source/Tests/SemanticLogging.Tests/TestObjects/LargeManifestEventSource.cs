@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects
 {
     [EventSource]
-    internal class LargeManifestEventSource : EventSource
+    internal sealed class LargeManifestEventSource : EventSource
     {
         internal static readonly LargeManifestEventSource Log = new LargeManifestEventSource();
 
