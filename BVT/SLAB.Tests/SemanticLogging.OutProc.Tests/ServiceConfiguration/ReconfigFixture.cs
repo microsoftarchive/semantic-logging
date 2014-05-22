@@ -436,6 +436,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         [EventSource(Name = "MyCompany1")]
         private class MyNewCompanyEventSource2 : EventSource
         {
+            [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start)]
+            public void Event1(int id)
+            {
+                if (this.IsEnabled())
+                {
+                    this.WriteEvent(1, id);
+                }
+            }
             [Event(2, Message = "Event2 ID={0}", Opcode = EventOpcode.Start)]
             public void Event2(int id)
             {
