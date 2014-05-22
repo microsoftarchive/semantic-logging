@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.End2End
 {
     [TestClass]
-    public class WindowsServiceFixture : End2EndFixtureBase
+    public class WindowsServiceIntegrationFixture : End2EndFixtureBase
     {
         private const string FlatFileName = "FlatFileOutProcSvc.log";
 
@@ -24,7 +24,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             CleanFlatFile();
             CleanAzure();
 
-            ValidateAndInitSemanticLoggingService();
+            End2EndFixtureBase.ValidateAndInitSemanticLoggingService();
 
             LogMessages();
         }
@@ -32,9 +32,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
         [ClassCleanup]
         public static void ClassCleanup()
         {
-            StopService();
+            End2EndFixtureBase.StopService();
         }
 
+        // Ignore until permission issue for Windows service is sorted
+        [Ignore]
         [TestMethod]
         public void WhenUsingFlatFile()
         {
@@ -47,6 +49,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             StringAssert.Contains(entries.Last(), "Payload : [message : logging to the windows service 2]");
         }
 
+        // Ignore until permission issue for Windows service is sorted
+        [Ignore]
         [TestMethod]
         public void WhenUsingAzureTable()
         {
@@ -54,7 +58,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
 
             IEnumerable<WindowsAzureTableEventEntry> events = null;
 
-            events = AzureTableHelper.PollForEvents(connectionString, AzureTableName, 2);
+            events = AzureTableHelper.PollForEvents(connectionString, End2EndFixtureBase.AzureTableName, 2);
 
             Assert.AreEqual(2, events.Count());
             var event1 = events.SingleOrDefault(e => e.Payload.Contains(@"""message"": ""logging to the windows service"""));
@@ -63,6 +67,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             Assert.IsNotNull(event2);
         }
 
+        // Ignore until permission issue for Windows service is sorted
+        [Ignore]
         [TestMethod]
         public void WhenUsingElasticsearch()
         {
@@ -83,7 +89,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
         private static void CleanAzure()
         {
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
-            AzureTableHelper.DeleteTable(connectionString, AzureTableName);
+            AzureTableHelper.DeleteTable(connectionString, End2EndFixtureBase.AzureTableName);
         }
 
         private static void CleanElasticsearch()

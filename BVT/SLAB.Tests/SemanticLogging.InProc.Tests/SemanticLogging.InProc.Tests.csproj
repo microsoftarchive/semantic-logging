@@ -144,10 +144,6 @@
       <Project>{2cd4105b-0dd6-4c18-9b37-05d8e8f57303}</Project>
       <Name>SemanticLogging</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Src\TraceEvent1.2.7\TraceEvent.csproj">
-      <Project>{b68f4968-a7cf-41cc-ad6e-373db5e67944}</Project>
-      <Name>TraceEvent</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SemanticLogging.Tests.Shared\SemanticLogging.Tests.Shared.csproj">
       <Project>{001e9c59-1326-48f1-9019-9e6ceeb1e458}</Project>
       <Name>SemanticLogging.Tests.Shared</Name>

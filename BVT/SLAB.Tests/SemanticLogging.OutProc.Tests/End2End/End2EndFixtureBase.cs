@@ -108,7 +108,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
                 svc.Stop();
                 svc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(30));
             }
-            catch (System.ServiceProcess.TimeoutException) { }
+            catch (System.ServiceProcess.TimeoutException)
+            {
+            }
 
             return svc.Status == ServiceControllerStatus.Stopped;
         }

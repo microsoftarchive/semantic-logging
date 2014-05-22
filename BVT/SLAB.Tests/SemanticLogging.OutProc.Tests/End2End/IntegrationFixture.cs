@@ -95,7 +95,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
         public void WhenUsingAzureTable()
         {
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
-            AzureTableHelper.DeleteTable(connectionString, AzureTableName);
+            AzureTableHelper.DeleteTable(connectionString, End2EndFixtureBase.AzureTableName);
             string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "AzureTablesWinService.xml");
 
             IEnumerable<WindowsAzureTableEventEntry> events = null;
