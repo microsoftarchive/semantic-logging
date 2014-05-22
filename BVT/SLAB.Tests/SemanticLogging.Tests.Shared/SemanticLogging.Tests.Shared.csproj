@@ -97,6 +97,7 @@
     <Compile Include="TestSupport\ExceptionAssertHelper.cs" />
     <Compile Include="TestSupport\FlatFileHelper.cs" />
     <Compile Include="TestSupport\LogFileReader.cs" />
+    <Compile Include="TestSupport\ThreadHelper.cs" />
     <Compile Include="TestSupport\TraceSessionHelper.cs" />
     <Compile Include="TestSupport\WindowsAzureTableEventEntry.cs" />
     <Compile Include="TestSupport\XmlFormattedEntry.cs" />

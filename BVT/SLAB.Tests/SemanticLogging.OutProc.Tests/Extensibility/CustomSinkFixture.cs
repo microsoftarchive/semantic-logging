@@ -224,7 +224,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
         }
 
         [TestMethod]
-        public void WhenUsingCustomFormatterProgramatically()
+        public void WhenUsingCustomFormatterProgrammatically()
         {
             string fileName = "FlatFileCustomFormatterProgrammatic.log";
             File.Delete(fileName);
@@ -256,7 +256,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
         }
 
         [TestMethod]
-        public void WhenCustomFormatterThrowsAnExceptionAndUsedProgramatically()
+        public void WhenCustomFormatterThrowsAnExceptionAndUsedProgrammatically()
         {
             string fileName = "FlatFileOutProcCustomFormatterHandleException.log";
             File.Delete(fileName);

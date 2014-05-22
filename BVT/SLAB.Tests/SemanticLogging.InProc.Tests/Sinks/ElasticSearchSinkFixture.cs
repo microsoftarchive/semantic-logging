@@ -817,5 +817,59 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
             Assert.AreEqual(0, result.Hits.Total);
         }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            this.indexPrefix = "whenprocessid";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var message = string.Empty;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                });
+
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
+            Assert.AreEqual(1, result.Hits.Total);
+            var loggedEvent = result.Hits.Hits.ElementAt(0);
+            Assert.AreEqual(processId, Convert.ToInt32(loggedEvent.Source["ProcessId"]));
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            this.indexPrefix = "whenthreadid";
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
+            var logger = MockEventSource.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+            var message = string.Empty;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToElasticsearch("testInstance", elasticsearchUri, this.indexPrefix, this.type, bufferingInterval: TimeSpan.FromSeconds(1));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                });
+
+            var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 1);
+            Assert.AreEqual(1, result.Hits.Total);
+            var loggedEvent = result.Hits.Hits.ElementAt(0);
+            Assert.AreEqual(threadId, Convert.ToInt32(loggedEvent.Source["ThreadId"]));
+        }
     }
 }

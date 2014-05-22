@@ -17,7 +17,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
     public class JsonEventTextFormatterFixture
     {
         [TestMethod]
-        public void WhenUsingJsonFormatterIntended()
+        public void WhenUsingJsonFormatterIndented()
         {
             string fileName = @".\FlatFileJsonFormatterIndentedOutProc.log";
             File.Delete(fileName);
@@ -40,6 +40,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual(EventLevel.Informational, entry.Level);
             Assert.AreEqual(EventKeywords.None, entry.EventKeywords);
             Assert.AreEqual(EventOpcode.Info, entry.Opcode);
+            Assert.AreEqual(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
+            Assert.AreEqual(EventOpcode.Info, entry.Opcode);
             Assert.AreEqual(0, entry.Version);
             Assert.IsNull(entry.Message);
             Assert.AreEqual(1, entry.Payload.Count);
@@ -47,7 +50,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
         }
 
         [TestMethod]
-        public void WhenUsingJsonFormatterNotIntended()
+        public void WhenUsingJsonFormatterNotIndented()
         {
             string fileName = "FlatFileJsonFormatterOutProc.log";
             File.Delete(fileName);
@@ -70,6 +73,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual(EventLevel.Informational, entry.Level);
             Assert.AreEqual(EventKeywords.None, entry.EventKeywords);
             Assert.AreEqual(EventOpcode.Info, entry.Opcode);
+            Assert.AreEqual(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual(0, entry.Version);
             Assert.AreEqual(1, entry.Payload.Count);
             Assert.AreEqual("logging using Json Formatter not indented", (string)entry.Payload["message"]);

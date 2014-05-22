@@ -75,5 +75,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         /// Gets or sets the payload for the event.
         /// </summary>
         public string Payload { get; set; }
+
+        /// <summary>
+        /// Gets or sets the process ID of the event.
+        /// </summary>
+        public int ProcessId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the thread ID of the event.
+        /// </summary>
+        public int ThreadId { get; set; }
     }
 }

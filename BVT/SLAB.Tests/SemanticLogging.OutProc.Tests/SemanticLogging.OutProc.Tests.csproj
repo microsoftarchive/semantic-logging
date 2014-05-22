@@ -70,6 +70,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Management" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Spatial, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\source\packages\System.Spatial.5.6.0\lib\net40\System.Spatial.dll</HintPath>
@@ -95,6 +96,8 @@
       <DependentUpon>MyCustomSinkElement.xsd</DependentUpon>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="End2End\End2EndFixtureBase.cs" />
+    <Compile Include="End2End\WindowsServiceFixture.cs" />
     <Compile Include="Extensibility\CustomSinkFixture.cs" />
     <Compile Include="Formatters\JsonEventTextFormatterFixture.cs" />
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
@@ -122,6 +125,7 @@
     <Compile Include="TestObjects\MockEventSourceOutProcFiltering.cs" />
     <Compile Include="TestObjects\MockEventSourceOutProcKeywords.cs" />
     <Compile Include="TestObjects\MockEventSourceOutProcLevelFiltered.cs" />
+    <Compile Include="TestObjects\MockEventSourceOutProcSvc.cs" />
     <Compile Include="TestObjects\MockFormatter.cs" />
     <Compile Include="TestObjects\TestAttributesEventSource.cs" />
     <Compile Include="TestObjects\TestEventEntry.cs" />
@@ -131,6 +135,9 @@
     <Compile Include="TestScenarios\TestScenario.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="slabsvcTest.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="App.config" />
     <None Include="Configurations\ExternalSchemas\MyCustomSinkElement.xxsd">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

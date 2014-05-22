@@ -23,7 +23,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void WhenUsingSinkProgramatically()
+        public void WhenUsingSinkProgrammatically()
         {
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
             DatabaseHelper.CleanLoggingDB(validConnectionString);
@@ -105,6 +105,62 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
 
             Assert.AreEqual(10, eventsDataTable.Rows.Count);
             StringAssert.Contains(eventsDataTable.Rows[0]["payload"].ToString(), "some message");
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSourceOutProcEnum.Logger;
+            EventTextFormatter formatter = new EventTextFormatter();
+
+            System.Data.DataTable eventsDataTable = null;
+            var subject = new EventEntrySubject();
+            subject.LogToSqlDatabase("testInstance", validConnectionString, "Traces", bufferingCount: 1);
+            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProcEnum", null, EventLevel.LogAlways);
+            SinkSettings sinkSettings = new SinkSettings("sqlDBsink", subject, new List<EventSourceSettings>() { { settings } });
+            List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
+            TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.SaveExpenseStarted(Guid.NewGuid());
+
+                    eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 1);
+                });
+
+            Assert.AreEqual(1, eventsDataTable.Rows.Count);
+            Assert.AreEqual(System.Diagnostics.Process.GetCurrentProcess().Id, Convert.ToInt32(eventsDataTable.Rows[0]["ProcessId"]));
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSourceOutProcEnum.Logger;
+            EventTextFormatter formatter = new EventTextFormatter();
+
+            System.Data.DataTable eventsDataTable = null;
+            var subject = new EventEntrySubject();
+            subject.LogToSqlDatabase("testInstance", validConnectionString, "Traces", bufferingCount: 1);
+            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProcEnum", null, EventLevel.LogAlways);
+            SinkSettings sinkSettings = new SinkSettings("sqlDBsink", subject, new List<EventSourceSettings>() { { settings } });
+            List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
+            TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.SaveExpenseStarted(Guid.NewGuid());
+
+                    eventsDataTable = DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 1);
+                });
+
+            Assert.AreEqual(1, eventsDataTable.Rows.Count);
+            Assert.AreEqual(ThreadHelper.GetCurrentUnManagedThreadId(), Convert.ToInt32(eventsDataTable.Rows[0]["ThreadId"]));
         }
     }
 }

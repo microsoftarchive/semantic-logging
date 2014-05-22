@@ -10,6 +10,7 @@ using System;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sinks
 {
@@ -30,7 +31,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 {
                     listener.LogToRollingFlatFile(fileName, 4, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, new EventTextFormatter(EventTextFormatter.DashSeparator), 2);
                     listener.EnableEvents(logger, EventLevel.LogAlways);
-                    for (int msg = 0; msg < 50; msg++)
+                    for (int msg = 0; msg < 40; msg++)
                     {
                         logger.Informational("The quick brown fox jumps over the lazy dog.  And then the fox did it again and again for time #  " + msg.ToString());
                     }
@@ -103,7 +104,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenLoggingBeforeRollOCcurs()
+        public void WhenLoggingBeforeRollOccurs()
         {
             var fileNameWithoutExtension = "LogInConfiguredFileName";
             var fileName = fileNameWithoutExtension + ".log";
@@ -1237,6 +1238,53 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             string readFile = File.ReadAllText(fileName);
             Assert.IsTrue(readFile.Contains("<Message>Check if it is logged</Message>"));
             Assert.IsTrue(readFile.Contains("<Data Name=\"arg0\">1000</Data><Data Name=\"arg1\">stringstringarg10</Data><Data Name=\"arg2\">2000</Data><Data Name=\"arg3\">stringstringarg20</Data><Data Name=\"arg4\">3000</Data>"));
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var fileNameWithoutExtension = "RollingFlatFileEL_WhenProcessId";
+            var fileName = fileNameWithoutExtension + ".log";
+            FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
+            var logger = MockEventSource.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("Critical");
+                });
+
+            Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("ProcessId : " + processId.ToString()));
+        }
+
+        public void WhenThreadId()
+        {
+            var fileNameWithoutExtension = "RollingFlatFileEL_WhenThreadId";
+            var fileName = fileNameWithoutExtension + ".log";
+            FlatFileHelper.DeleteCreatedLogFiles(fileNameWithoutExtension);
+            var logger = MockEventSource.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToRollingFlatFile(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, new EventTextFormatter(EventTextFormatter.DashSeparator));
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    logger.Critical("Critical");
+                });
+
+            Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
+            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("ThreadId : " + threadId.ToString()));
         }
     }
 }

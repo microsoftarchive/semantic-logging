@@ -682,5 +682,53 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             StringAssert.Contains(events.ElementAt(0).Payload, @"""a"": 2");
             StringAssert.Contains(events.ElementAt(0).Payload, @"""b"": 2");
         }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            this.tableName = "WhenProcessId";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = MockEventSourceInProcEnum.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.Zero);
+                   listener.EnableEvents(logger, EventLevel.LogAlways);
+                   logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
+               });
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            Assert.AreEqual(processId, events.ElementAt(0).ProcessId);
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            this.tableName = "WhenThreadId";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = MockEventSourceInProcEnum.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+
+            TestScenario.With1Listener(
+               logger,
+               listener =>
+               {
+                   listener.LogToWindowsAzureTable("mytestinstance1", connectionString, this.tableName, bufferingInterval: TimeSpan.Zero);
+                   listener.EnableEvents(logger, EventLevel.LogAlways);
+                   logger.SendEnumsEvent17(MockEventSourceInProcEnum.MyColor.Green, MockEventSourceInProcEnum.MyFlags.Flag2);
+               });
+
+            var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+            Assert.AreEqual(1, events.Count());
+            Assert.AreEqual(threadId, events.ElementAt(0).ThreadId);
+        }
     }
 }

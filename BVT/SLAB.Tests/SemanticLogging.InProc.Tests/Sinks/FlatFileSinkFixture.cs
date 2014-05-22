@@ -1342,7 +1342,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WenObjectArgPayload()
+        public void WhenObjectArgPayload()
         {
             string fileName = @".\ObjectArgsEventIsLogged";
             File.Delete(fileName);
@@ -1609,6 +1609,58 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.AreEqual<string>("10", payLoad["arg"]);
             Assert.AreEqual(activityId, Guid.Parse(fileContents[0]["ActivityId"]));
             Assert.AreEqual(relatedActivityId, Guid.Parse(fileContents[0]["RelatedActivityId"]));
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            string fileName = @".\IntArgEventIsLogged.log";
+            File.Delete(fileName);
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
+            var logger = TestEventSourceNoAttributes.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
+                    logger.IntArgEvent2(10);
+                });
+
+            var fileContents = LogFileReader.GetEntries(fileName);
+            Assert.AreEqual<string>("2", fileContents[0]["EventId"]);
+            var payLoad = PayloadParser.GetPayload(fileContents[0]["Payload"]);
+            Assert.AreEqual<string>("10", payLoad["arg"]);
+            Assert.AreEqual(processId, Convert.ToInt32(fileContents[0]["ProcessId"]));
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            string fileName = @".\IntArgEventIsLogged.log";
+            File.Delete(fileName);
+            var formatter = new EventTextFormatter(verbosityThreshold: EventLevel.LogAlways);
+            var logger = TestEventSourceNoAttributes.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToFlatFile(fileName, formatter);
+                    listener.EnableEvents(logger, EventLevel.Informational);
+                    logger.IntArgEvent2(10);
+                });
+
+            var fileContents = LogFileReader.GetEntries(fileName);
+            Assert.AreEqual<string>("2", fileContents[0]["EventId"]);
+            var payLoad = PayloadParser.GetPayload(fileContents[0]["Payload"]);
+            Assert.AreEqual<string>("10", payLoad["arg"]);
+            Assert.AreEqual(threadId, Convert.ToInt32(fileContents[0]["ThreadId"]));
         }
 
         private string ReadFileWithoutLock(string fileName)

@@ -33,5 +33,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         public Guid ActivityId { get; set; }
 
         public Guid RelatedActivityId { get; set; }
+
+        public int ProcessId { get; set; }
+
+        public int ThreadId { get; set; }
     }
 }

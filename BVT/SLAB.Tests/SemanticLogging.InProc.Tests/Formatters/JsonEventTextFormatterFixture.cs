@@ -11,6 +11,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Formatters
 {
@@ -37,7 +38,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
                 }
             }
 
-            Assert.AreEqual(17, rawOutput.Split('\n').Length); //Assert is indented
+            Assert.AreEqual(19, rawOutput.Split('\n').Length); //Assert is indented
             var entries = JsonConvert.DeserializeObject<TestEventEntry[]>("[" + rawOutput + "]");
             var entry = entries.First();
             Assert.AreEqual<Guid>(EventSource.GetGuid(typeof(MockEventSrcForJson)), entry.ProviderId);
@@ -45,6 +46,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<EventLevel>(EventLevel.Informational, entry.Level);
             Assert.AreEqual<string>("None", entry.EventKeywords.ToString());
             Assert.AreEqual<EventOpcode>(EventOpcode.Start, entry.Opcode);
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
             Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
             Assert.AreEqual(null, entry.Message);
@@ -81,6 +84,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<EventLevel>(EventLevel.Informational, entry.Level);
             Assert.AreEqual<string>("None", entry.EventKeywords.ToString());
             Assert.AreEqual<EventOpcode>(EventOpcode.Start, entry.Opcode);
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
             Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
             Assert.AreEqual(null, entry.Message);
@@ -117,6 +122,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<EventLevel>(EventLevel.Informational, entry.Level);
             Assert.AreEqual<EventKeywords>(EventKeywords.None, entry.EventKeywords);
             Assert.AreEqual<EventOpcode>(EventOpcode.Start, entry.Opcode);
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
             Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
             Assert.AreEqual(MockEventSrcForJson.LogMessage, entry.Message);
@@ -177,6 +184,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<EventLevel>(EventLevel.Informational, entry.Level);
             Assert.AreEqual<EventKeywords>(EventKeywords.None, entry.EventKeywords);
             Assert.AreEqual<EventOpcode>(0, entry.Opcode);
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
             Assert.AreEqual(null, entry.Message);
             Assert.AreEqual(3, entry.Payload.Count);
@@ -210,6 +219,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<EventLevel>(EventLevel.Informational, entry.Level);
             Assert.AreEqual<EventKeywords>(EventKeywords.None, entry.EventKeywords);
             Assert.AreEqual<EventOpcode>(0, entry.Opcode);
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual("**test**", entry.Message);
             Assert.AreEqual<byte>(0, entry.Version);
             Assert.AreEqual(1, entry.Payload.Count);

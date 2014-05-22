@@ -29,6 +29,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Te
         public Dictionary<string, object> Payload { get; set; }
 
         public DateTimeOffset Timestamp { get; set; }
+
+        public int ProcessId { get; set; }
+
+        public int ThreadId { get; set; }
     }
 
     public class TestEventEntryCustomTimeStamp
@@ -54,5 +58,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Te
         public Dictionary<string, object> Payload { get; set; }
 
         public string Timestamp { get; set; }
+
+        public int ProcessId { get; set; }
+
+        public int ThreadId { get; set; }
     }
 }

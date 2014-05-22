@@ -1,16 +1,16 @@
-﻿using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics.Tracing;
+using System.Globalization;
+using System.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics.Tracing;
-using System.Globalization;
-using System.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Sinks
 {
@@ -41,7 +41,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void WhenUsingSinkProgramatically()
+        public void WhenUsingSinkProgrammatically()
         {
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
             var logger = MockEventSourceOutProc.Logger;
@@ -96,6 +96,48 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
 
             Assert.AreEqual(10, result.Hits.Total);
             StringAssert.Contains(result.Hits.Hits[0].Source["Payload_message"].ToString(), "some message");
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", "logstash", DateTime.UtcNow);
+            var logger = MockEventSourceOutProc.Logger;
+
+            QueryResult result = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMandatoryProperties.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.LogSomeMessage("some message");
+
+                    result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, "etw", 1, maxPollTime: TimeSpan.FromSeconds(35));
+                });
+
+            Assert.AreEqual(1, result.Hits.Total);
+            Assert.AreEqual(System.Diagnostics.Process.GetCurrentProcess().Id, Convert.ToInt32(result.Hits.Hits[0].Source["ProcessId"]));
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", "logstash", DateTime.UtcNow);
+            var logger = MockEventSourceOutProc.Logger;
+
+            QueryResult result = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\ElasticsearchSink\\ElasticSinkMandatoryProperties.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.LogSomeMessage("some message");
+
+                    result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, "etw", 1, maxPollTime: TimeSpan.FromSeconds(35));
+                });
+
+            Assert.AreEqual(1, result.Hits.Total);
+            Assert.AreEqual(ThreadHelper.GetCurrentUnManagedThreadId(), Convert.ToInt32(result.Hits.Hits[0].Source["ThreadId"]));
         }
     }
 }

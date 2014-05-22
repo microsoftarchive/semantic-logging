@@ -39,7 +39,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
                 }
             }
 
-            Assert.AreEqual(21, rawOutput.Split('\n').Length);
+            Assert.AreEqual(22, rawOutput.Split('\n').Length);
             var entries = XDocument.Parse("<Events>" + rawOutput + "</Events>").Root.Elements();
             XmlFormattedEntry.Fill(entries.Single());
             Assert.AreEqual<Guid>(EventSource.GetGuid(typeof(MockEventSrcForXml)), Guid.Parse(XmlFormattedEntry.Provider.Attribute("Guid").Value));
@@ -49,6 +49,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)MockEventSrcForXml.Keywords.Errors, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
             Assert.AreEqual(2, XmlFormattedEntry.Payload.Elements().Count());
@@ -89,6 +91,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)MockEventSrcForXml.Keywords.Errors, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
             Assert.AreEqual(2, XmlFormattedEntry.Payload.Elements().Count());
@@ -129,6 +133,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
@@ -169,6 +175,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
@@ -205,6 +213,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
@@ -242,6 +252,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
             Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
@@ -286,6 +298,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, formatter.DateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
             Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
@@ -360,6 +374,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             DateTime dt;
             Assert.IsTrue(DateTime.TryParseExact(XmlFormattedEntry.TimeCreated.Attribute("SystemTime").Value, EventEntry.DefaultDateTimeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out dt));
             Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());

@@ -108,5 +108,51 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
             Assert.AreEqual<int>(10, events.Count());
             Assert.AreEqual<int>(2, events.First().EventId);
         }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            this.tableName = "outProcazuretablesusingconfig";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = MockEventSourceOutProc.Logger;
+
+            IEnumerable<WindowsAzureTableEventEntry> events = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\AzureTables\\AzureTables.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.Critical("Critical message");
+
+                    events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+                });
+
+            Assert.AreEqual<int>(1, events.Count());
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, events.First().ProcessId);
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            this.tableName = "outProcazuretablesusingconfig";
+            var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
+            AzureTableHelper.DeleteTable(connectionString, this.tableName);
+            var logger = MockEventSourceOutProc.Logger;
+
+            IEnumerable<WindowsAzureTableEventEntry> events = null;
+            var svcConfiguration = TraceEventServiceConfiguration.Load("Configurations\\AzureTables\\AzureTables.xml");
+            TestScenario.WithConfiguration(
+                svcConfiguration,
+                () =>
+                {
+                    logger.Critical("Critical message");
+
+                    events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
+                });
+
+            Assert.AreEqual<int>(1, events.Count());
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), events.First().ThreadId);
+        }
     }
 }

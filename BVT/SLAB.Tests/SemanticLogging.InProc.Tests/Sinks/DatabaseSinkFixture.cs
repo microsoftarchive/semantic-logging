@@ -1622,5 +1622,59 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             // There should not be remaining events flushed during Dispose
             Assert.AreEqual(25, DatabaseHelper.GetRowCount(validConnectionString));
         }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSource.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+            var message = string.Empty;
+ 
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                });
+
+            var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+            Assert.IsNotNull(dt, "No data logged");
+            Assert.IsTrue(dt.Rows.Count > 0);
+            var dr = dt.Rows[0];
+            Assert.AreEqual(processId, (int)dr["ProcessId"]);
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
+            DatabaseHelper.CleanLoggingDB(validConnectionString);
+            var logger = MockEventSource.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+            var message = string.Empty;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToSqlDatabase("mytestinstance1", validConnectionString);
+                    listener.EnableEvents(logger, EventLevel.LogAlways);
+                    message = string.Concat("Message ", Guid.NewGuid());
+                    logger.Informational(message);
+                });
+
+            var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
+            Assert.IsNotNull(dt, "No data logged");
+            Assert.IsTrue(dt.Rows.Count > 0);
+            var dr = dt.Rows[0];
+            Assert.AreEqual(threadId, (int)dr["ThreadId"]);
+        }
     }
 }

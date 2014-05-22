@@ -18,7 +18,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
     public class XmlEventTextFormatterFixture
     {
         [TestMethod]
-        public void WhenUsingXmlFormatterInIntended()
+        public void WhenUsingXmlFormatterInIndented()
         {
             string fileName = "FlatFileXmlFormatterIndentedOutProc.log";
             File.Delete(fileName);
@@ -42,6 +42,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual<int>(65526, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>(0, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>(0, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
             Assert.AreEqual("message", XmlFormattedEntry.Payload.Elements().First().Attribute("Name").Value);
             Assert.AreEqual("logging using xml Formatter indented", XmlFormattedEntry.Payload.Elements().First().Value);
@@ -106,13 +108,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>(0, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Resume, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));           
             Assert.AreEqual(2, XmlFormattedEntry.Payload.Elements().Count());
             StringAssert.Contains(XmlFormattedEntry.Payload.ToString(), @"<Data Name=""a"">" + ((int)MockEventSourceOutProcEnum.MyColor.Red).ToString() + "</Data>");
             StringAssert.Contains(XmlFormattedEntry.Payload.ToString(), @"<Data Name=""b"">" + ((int)MockEventSourceOutProcEnum.MyFlags.Flag3).ToString() + "</Data>");
         }
 
         [TestMethod]
-        public void WhenNotIntendedInXml()
+        public void WhenNotIndentedInXml()
         {
             string fileName = "FlatFileXmlFormatterOutProc.log";
             File.Delete(fileName);
@@ -137,6 +141,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual<int>(65526, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>(0, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>(0, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
+            Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));           
             Assert.AreEqual(1, XmlFormattedEntry.Payload.Elements().Count());
             Assert.AreEqual("message", XmlFormattedEntry.Payload.Elements().First().Attribute("Name").Value);
             Assert.AreEqual("logging using xml Formatter not indented", XmlFormattedEntry.Payload.Elements().First().Value);

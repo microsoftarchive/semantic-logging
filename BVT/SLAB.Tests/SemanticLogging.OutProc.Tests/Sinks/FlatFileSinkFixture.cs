@@ -19,7 +19,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
     public class FlatFileSinkFixture
     {
         [TestMethod]
-        public void WhenUsingFlatFileSinkProgramatic()
+        public void WhenUsingFlatFileSinkProgrammatic()
         {
             var logger = MockEventSourceOutProc.Logger;
             EventTextFormatter formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -51,7 +51,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
         }
 
         [TestMethod]
-        public void WhenUsingRollingSinkProgramatic()
+        public void WhenUsingRollingSinkProgrammatic()
         {
             var logger = MockEventSourceOutProc.Logger;
             EventTextFormatter formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
@@ -294,6 +294,50 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Si
 
             Assert.AreEqual(1, entries.Count());
             StringAssert.Contains(entries.First(), "EventId : 105");
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var serviceConfigFile = "Configurations\\DataCorrectness\\FlatFile.xml";
+            string fileName = @".\Logs\OutProcFlatFileData.log";
+            FlatFileHelper.DeleteDirectory(@".\Logs");
+
+            IEnumerable<string> entries = null;
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
+                    {
+                        var logger = TestEventSourceNoAttributes.Logger;
+                        logger.NoArgEvent1();
+                        entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
+                    });
+
+            Assert.AreEqual(1, entries.Count());
+            StringAssert.Contains(entries.First(), "ProcessId : " + System.Diagnostics.Process.GetCurrentProcess().Id);
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            var serviceConfigFile = "Configurations\\DataCorrectness\\FlatFile.xml";
+            string fileName = @".\Logs\OutProcFlatFileData.log";
+            FlatFileHelper.DeleteDirectory(@".\Logs");
+
+            IEnumerable<string> entries = null;
+            TestScenario.WithTempUpdatesInConfiguration(
+                serviceConfigFile,
+                xmlContent => xmlContent.Replace("replaceEventSource", "TestEventSourceNoAttributes"),
+                    () =>
+                    {
+                        var logger = TestEventSourceNoAttributes.Logger;
+                        logger.NoArgEvent1();
+                        entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName, 1, EventTextFormatter.DashSeparator);
+                    });
+
+            Assert.AreEqual(1, entries.Count());
+            StringAssert.Contains(entries.First(), "ThreadId : " + ThreadHelper.GetCurrentUnManagedThreadId());
         }
     }
 }

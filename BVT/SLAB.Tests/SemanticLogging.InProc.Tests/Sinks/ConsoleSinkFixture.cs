@@ -9,6 +9,7 @@ using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sinks
 {
@@ -628,6 +629,52 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.IsNotNull(entry);
             StringAssert.Contains(entry, "<Data Name=\"arg0\">1000</Data><Data Name=\"arg1\">stringstringarg10</Data><Data Name=\"arg2\">2000</Data><Data Name=\"arg3\">stringstringarg20</Data><Data Name=\"arg4\">3000</Data>");
             StringAssert.Contains(entry, "<Message>Check if it is logged</Message>");
+        }
+
+        [TestMethod]
+        public void WhenProcessId()
+        {
+            var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
+            var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
+
+            int processId = System.Diagnostics.Process.GetCurrentProcess().Id;
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.Critical("This is to log critical in Console");
+                });
+
+            var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+            Assert.IsNotNull(entry);
+            StringAssert.Contains(entry, "ProcessId : " + processId);
+        }
+
+        [TestMethod]
+        public void WhenThreadId()
+        {
+            var consoleOutputInterceptor = new MockConsoleOutputInterceptor();
+            var formatter = new EventTextFormatter(EventTextFormatter.DashSeparator);
+            var logger = MockConsoleListenerEventSource.Logger;
+
+            int threadId = ThreadHelper.GetCurrentUnManagedThreadId();
+
+            TestScenario.With1Listener(
+                logger,
+                listener =>
+                {
+                    listener.LogToConsole();
+                    listener.EnableEvents(logger, EventLevel.Critical);
+                    logger.Critical("This is to log critical in Console");
+                });
+
+            var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+            Assert.IsNotNull(entry);
+            StringAssert.Contains(entry, "ThreadId : " + threadId);
         }
     }
 }
