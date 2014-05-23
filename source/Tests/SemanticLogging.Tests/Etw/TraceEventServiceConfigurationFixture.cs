@@ -34,7 +34,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
         {
             var sinks = new List<SinkSettings>();
 
-            var sources = new List<EventSourceSettings>() { new EventSourceSettings("test"), new EventSourceSettings("test") };
+            var sources = new List<EventSourceSettings> { new EventSourceSettings("test"), new EventSourceSettings("test") };
             var sink = new SinkSettings("test", new Lazy<IObserver<EventEntry>>(() => new InMemoryEventListener()), sources);
             sinks.Add(sink);
             sinks.Add(sink);
@@ -126,7 +126,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 var exception = AssertEx.Throws<ConfigurationException>(() => TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithDuplicateNames.xml"));
 
                 Assert.AreEqual(3, exception.InnerExceptions.Count);
-                exception.InnerExceptions.All(e => e is XmlSchemaValidationException);
+                Assert.IsTrue(exception.InnerExceptions.All(e => e is XmlSchemaValidationException), "All exceptions should be xml schema validation exceptions");
 
                 Assert.IsTrue(exception.InnerExceptions.Any(e =>
                     e.Message.StartsWith("There is a duplicate key sequence 'customListener'", StringComparison.OrdinalIgnoreCase)));
@@ -148,7 +148,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 var exception = AssertEx.Throws<ConfigurationException>(() => TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithEmptyNonStringValues.xml"));
 
                 Assert.AreEqual(2, exception.InnerExceptions.Count);
-                exception.InnerExceptions.All(e => e is XmlSchemaValidationException || e is InvalidOperationException);
+                Assert.IsTrue(exception.InnerExceptions.All(e => e is XmlSchemaValidationException || e is InvalidOperationException), "Exceptions should be schema validation or invalid operation exceptions");
 
                 Assert.IsTrue(exception.InnerExceptions.Any(e => e.Message.StartsWith("The 'sessionNamePrefix' attribute is invalid", StringComparison.OrdinalIgnoreCase)));
                 Assert.IsTrue(exception.InnerExceptions.Any(e => e.Message.StartsWith("The 'id' attribute is invalid", StringComparison.OrdinalIgnoreCase)));
@@ -164,7 +164,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 var exception = AssertEx.Throws<ConfigurationException>(() => TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithWarnings.xml"));
 
                 Assert.AreEqual(4, exception.InnerExceptions.Count);
-                exception.InnerExceptions.All(e => e is XmlSchemaValidationException);
+                Assert.IsTrue(exception.InnerExceptions.All(e => e is XmlSchemaValidationException), "Exceptions should be schema validation exceptions");
                 Assert.IsTrue(exception.InnerExceptions.Any(e => e.Message.Contains("The required attribute 'attr' is missing.")));
                 Assert.IsTrue(exception.InnerExceptions.Any(e => e.Message.Contains("The 'sessionNamePrefix' attribute is invalid")));
                 Assert.IsTrue(exception.InnerExceptions.Any(e => e.Message.Contains("The 'name' attribute is invalid") &&
@@ -187,15 +187,63 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             {
                 Assert.IsNotNull(this.sut);
                 Assert.AreEqual(2, this.sut.SinkSettings.Count);
+
                 var firstSink = this.sut.SinkSettings.SingleOrDefault(s => s.Name == "sink1");
                 Assert.IsNotNull(firstSink);
                 Assert.AreEqual(1, firstSink.EventSources.Count());
-                Assert.AreEqual("MyCompany", firstSink.EventSources.First().Name);
+                Assert.AreEqual("MyCompany", firstSink.EventSources.ElementAt(0).Name);
+                Assert.IsFalse(firstSink.EventSources.ElementAt(0).Arguments.Any());
+                Assert.IsFalse(firstSink.EventSources.ElementAt(0).ProcessNamesToFilter.Any());
 
                 var secondSink = this.sut.SinkSettings.SingleOrDefault(e => e.Name == "sink2");
                 Assert.IsNotNull(secondSink);
                 Assert.AreEqual(1, secondSink.EventSources.Count());
-                Assert.AreEqual("Test", secondSink.EventSources.First().Name);
+                Assert.AreEqual("Test", secondSink.EventSources.ElementAt(0).Name);
+                Assert.IsFalse(firstSink.EventSources.ElementAt(0).Arguments.Any());
+                Assert.IsFalse(firstSink.EventSources.ElementAt(0).ProcessNamesToFilter.Any());
+            }
+        }
+
+        [TestClass]
+        public class when_loading_instance_from_file_with_many_eventSources_with_filters_and_arguments : given_traceEventServiceConfiguration
+        {
+            protected override void When()
+            {
+                this.sut = TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithManyEventSourcesWithArgumentsAndFilters.xml");
+            }
+
+            [TestMethod]
+            public void then_instance_is_loaded_with_all_configured_eventSources()
+            {
+                Assert.IsNotNull(this.sut);
+                Assert.AreEqual(2, this.sut.SinkSettings.Count);
+
+                var firstSink = this.sut.SinkSettings.SingleOrDefault(s => s.Name == "sink1");
+                Assert.IsNotNull(firstSink);
+                Assert.AreEqual(1, firstSink.EventSources.Count());
+                Assert.AreEqual("MyCompany", firstSink.EventSources.ElementAt(0).Name);
+                Assert.AreEqual(1, firstSink.EventSources.ElementAt(0).Arguments.Count());
+                Assert.AreEqual("ActivitySampling", firstSink.EventSources.ElementAt(0).Arguments.ElementAt(0).Key);
+                Assert.AreEqual("true", firstSink.EventSources.ElementAt(0).Arguments.ElementAt(0).Value);
+                Assert.IsFalse(firstSink.EventSources.ElementAt(0).ProcessNamesToFilter.Any());
+
+                var secondSink = this.sut.SinkSettings.SingleOrDefault(e => e.Name == "sink2");
+                Assert.IsNotNull(secondSink);
+                Assert.AreEqual(2, secondSink.EventSources.Count());
+                Assert.AreEqual("Test", secondSink.EventSources.ElementAt(0).Name);
+
+                Assert.AreEqual(2, secondSink.EventSources.ElementAt(0).Arguments.Count());
+                Assert.AreEqual("ActivitySamplingStartEvent", secondSink.EventSources.ElementAt(0).Arguments.ElementAt(0).Key);
+                Assert.AreEqual("RequestStarted:5", secondSink.EventSources.ElementAt(0).Arguments.ElementAt(0).Value);
+                Assert.AreEqual("SomeOtherArgument", secondSink.EventSources.ElementAt(0).Arguments.ElementAt(1).Key);
+                Assert.AreEqual(string.Empty, secondSink.EventSources.ElementAt(0).Arguments.ElementAt(1).Value);
+                Assert.AreEqual(2, secondSink.EventSources.ElementAt(0).ProcessNamesToFilter.Count());
+                Assert.AreEqual("iis.exe", secondSink.EventSources.ElementAt(0).ProcessNamesToFilter.ElementAt(0));
+                Assert.AreEqual("iisexpress.exe", secondSink.EventSources.ElementAt(0).ProcessNamesToFilter.ElementAt(1));
+
+                Assert.IsFalse(secondSink.EventSources.ElementAt(1).Arguments.Any());
+                Assert.AreEqual(1, secondSink.EventSources.ElementAt(1).ProcessNamesToFilter.Count());
+                Assert.AreEqual("iis.exe", secondSink.EventSources.ElementAt(1).ProcessNamesToFilter.ElementAt(0));
             }
         }
 
@@ -261,7 +309,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             [ExpectedException(typeof(ConfigurationException))]
             public void then_exception_is_thrown()
             {
-                var sut = TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithBadTypes.xml");
+                TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithBadTypes.xml");
             }
         }
 
@@ -301,7 +349,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 var exception = AssertEx.Throws<ConfigurationException>(() => TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithExtensionsSchemaValidation.xml"));
 
                 Assert.AreEqual(1, exception.InnerExceptions.Count);
-                exception.InnerExceptions.All(e => e is XmlSchemaValidationException);
+                Assert.IsTrue(exception.InnerExceptions.All(e => e is XmlSchemaValidationException), "Exceptions should be schema validation exceptions");
                 Assert.AreEqual("The required attribute 'attr' is missing.", exception.InnerException.Message);
             }
         }
@@ -314,7 +362,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             {
                 var exception = AssertEx.Throws<ConfigurationException>(() =>
                 {
-                    var config = TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithErrorOnSinkCreation.xml");
+                    TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithErrorOnSinkCreation.xml");
                 });
 
                 StringAssert.Contains(exception.ToString(), "The given path's format is not supported.");
@@ -345,7 +393,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             {
                 var exception = AssertEx.Throws<ConfigurationException>(() =>
                 {
-                    var config = TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithExtensionsIncompleteParams.xml");
+                    TraceEventServiceConfiguration.Load("Etw\\Configuration\\WithExtensionsIncompleteParams.xml");
                 });
 
                 StringAssert.Contains(exception.ToString(), "The parameters specified in this element does not map to an existing type member. All paramters are required in the same order of the defined type member");

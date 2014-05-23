@@ -27,14 +27,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility
             return new TraceEventSession(sessionName, null) { StopOnDispose = true };
         }
 
-        internal static void EnableProvider(TraceEventSession session, Guid providerId, EventLevel level, EventKeywords matchAnyKeyword, bool sendManifest = true)
+        internal static void EnableProvider(
+            TraceEventSession session,
+            Guid providerId,
+            EventLevel level,
+            EventKeywords matchAnyKeyword,
+            IEnumerable<KeyValuePair<string, string>> arguments,
+            IEnumerable<string> processNamesToFilter,
+            bool sendManifest = true)
         {
             // Make explicit the invocation for requesting the manifest from the EventSource (Provider).
-            var values = sendManifest ? new Dictionary<string, string>() { { "Command", "SendManifest" } } : null;
+            var argumentsDictionary = arguments.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            if (sendManifest)
+            {
+                argumentsDictionary["Command"] = "SendManifest";
+            }
+
             var options =
                 new TraceEventProviderOptions
                 {
-                    Arguments = values
+                    Arguments = argumentsDictionary,
+                    ProcessNameFilter = processNamesToFilter.ToArray()
                 };
 
             session.EnableProvider(providerId, (TraceEventLevel)level, (ulong)matchAnyKeyword, options);

@@ -4,7 +4,8 @@
            xmlns:etw="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
            targetNamespace="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
            elementFormDefault="qualified"
-           attributeFormDefault="unqualified">
+           attributeFormDefault="unqualified"
+           version="1.2">
 
   <xs:element name="configuration" type="ConfigurationElement"/>
   
@@ -73,12 +74,45 @@
   </xs:complexType>
 
   <xs:complexType name="EventSourceElement">
+    <xs:sequence>
+      <xs:element name="arguments" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="add" type="EventSourceArgumentElement" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="arguments">
+          <xs:selector xpath="etw:*"/>
+          <xs:field xpath="@key"/>
+        </xs:unique>
+      </xs:element>
+      <xs:element name="filter" minOccurs="0" maxOccurs="1">
+        <xs:complexType>
+          <xs:sequence>
+          <xs:element name="process" type="EventSourceFilterProcessElement" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="filter">
+          <xs:selector xpath="etw:*"/>
+          <xs:field xpath="@name"/>
+        </xs:unique>
+      </xs:element>
+    </xs:sequence>
     <xs:attribute name="name" type="NoEmptyString" use="optional"/>
     <xs:attribute name="id" type="Guid" use="optional"/>
     <xs:attribute name="level" type="EventLevel"/>
     <xs:attribute name="matchAnyKeyword" type="xs:long"/>
   </xs:complexType>
-  
+
+  <xs:complexType name="EventSourceArgumentElement">
+    <xs:attribute name="key" type="NoEmptyString" use="required"/>
+    <xs:attribute name="value" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="EventSourceFilterProcessElement">
+    <xs:attribute name="name" type="NoEmptyString" use="required"/>
+  </xs:complexType>
+
   <xs:complexType name="FlatFileSinkElement">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBaseWithFormatters">

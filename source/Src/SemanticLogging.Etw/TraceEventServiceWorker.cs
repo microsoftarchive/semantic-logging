@@ -43,31 +43,45 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
         public void UpdateSession(IEnumerable<EventSourceSettings> updatedEventSources)
         {
             Guard.ArgumentNotNull(updatedEventSources, "updatedEventSources");
+            var updatedSources = updatedEventSources as EventSourceSettings[] ?? updatedEventSources.ToArray();
 
-            var eventSourceComparer = new EventSourceSettingsEqualityComparer(nameOnly: true);
+            var eventSourceNameComparer = new EventSourceSettingsEqualityComparer(nameOnly: true);
+            var eventSourceFullComparer = new EventSourceSettingsEqualityComparer(nameOnly: false);
 
             // updated sources
-            foreach (var currentSource in this.eventSources.Intersect(updatedEventSources, eventSourceComparer).ToArray())
+            foreach (var currentSource in this.eventSources.Intersect(updatedSources, eventSourceNameComparer).ToArray())
             {
-                var updatedSource = updatedEventSources.Single(s => s.Name == currentSource.Name);
-                if (updatedSource.Level != currentSource.Level ||
-                    updatedSource.MatchAnyKeyword != currentSource.MatchAnyKeyword)
+                var updatedSource = updatedSources.Single(s => s.Name == currentSource.Name);
+                if (!eventSourceFullComparer.Equals(currentSource, updatedSource))
                 {
-                    TraceEventUtil.EnableProvider(this.session, updatedSource.EventSourceId, updatedSource.Level, updatedSource.MatchAnyKeyword, sendManifest: false);
-                    currentSource.Level = updatedSource.Level;
-                    currentSource.MatchAnyKeyword = updatedSource.MatchAnyKeyword;
+                    currentSource.CopyValuesFrom(updatedSource);
+                    TraceEventUtil.EnableProvider(
+                        this.session,
+                        currentSource.EventSourceId,
+                        currentSource.Level,
+                        currentSource.MatchAnyKeyword,
+                        currentSource.Arguments,
+                        currentSource.ProcessNamesToFilter,
+                        sendManifest: false);
                 }
             }
 
             // new sources
-            foreach (var newSource in updatedEventSources.Except(this.eventSources, eventSourceComparer).ToArray())
+            foreach (var newSource in updatedSources.Except(this.eventSources, eventSourceNameComparer).ToArray())
             {
-                TraceEventUtil.EnableProvider(this.session, newSource.EventSourceId, newSource.Level, newSource.MatchAnyKeyword, sendManifest: true);
+                TraceEventUtil.EnableProvider(
+                    this.session,
+                    newSource.EventSourceId,
+                    newSource.Level,
+                    newSource.MatchAnyKeyword,
+                    newSource.Arguments,
+                    newSource.ProcessNamesToFilter,
+                    sendManifest: true);
                 this.eventSources.Add(newSource);
             }
 
             // removed sources
-            foreach (var removedSource in this.eventSources.Except(updatedEventSources, eventSourceComparer).ToArray())
+            foreach (var removedSource in this.eventSources.Except(updatedSources, eventSourceNameComparer).ToArray())
             {
                 this.session.DisableProvider(removedSource.EventSourceId);
                 this.eventSources.Remove(removedSource);
@@ -122,7 +136,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
             foreach (var eventSource in this.eventSources)
             {
                 // Bind the provider (EventSource/EventListener) with the session
-                TraceEventUtil.EnableProvider(this.session, eventSource.EventSourceId, eventSource.Level, eventSource.MatchAnyKeyword);
+                TraceEventUtil.EnableProvider(
+                    this.session,
+                    eventSource.EventSourceId,
+                    eventSource.Level,
+                    eventSource.MatchAnyKeyword,
+                    eventSource.Arguments,
+                    eventSource.ProcessNamesToFilter);
             }
 
             // source.Process() is blocking so we need to launch it on a separate thread.
@@ -191,7 +211,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
 
         private ReadOnlyCollection<object> CreatePayload(TraceEvent traceEvent)
         {
-            List<object> payloadValues = new List<object>();
+            var payloadValues = new List<object>();
 
             for (int i = 0; i < traceEvent.PayloadNames.Length; i++)
             {
@@ -211,6 +231,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
                 if (!this.disposing)
                 {
                     // The process stopped because of a non-transient exception so log it. 
+                    // ReSharper disable once PossibleNullReferenceException - documented not to be null if task.IsFaulted is true
                     this.logger.TraceEventServiceProcessTaskFault(this.sessionName, exception.Flatten().ToString());
 
                     // The worker will be left in a stopped state and resources will be released on Dispose().

@@ -28,7 +28,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         /// </summary>
         /// <param name="sinkSettings">The sink settings.</param>
         /// <param name="settings">The settings.</param>
-        /// <exception cref="ArgumentNotNull">The EventSources.</exception>
+        /// <exception cref="ConfigurationException">The EventSources.</exception>
         public TraceEventServiceConfiguration(IEnumerable<SinkSettings> sinkSettings = null, TraceEventServiceSettings settings = null)
         {
             this.sinkSettings = new ObservableCollection<SinkSettings>(sinkSettings ?? Enumerable.Empty<SinkSettings>());
@@ -78,16 +78,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
             var configReader = new ConfigurationReader(fileName);
             ConfigurationElement configElement = configReader.Read();
 
-            var serviceSettings = new TraceEventServiceSettings()
-            {
-                SessionNamePrefix = configElement.TraceEventService.SessionNamePrefix
-            };
+            var serviceSettings =
+                new TraceEventServiceSettings
+                {
+                    SessionNamePrefix = configElement.TraceEventService.SessionNamePrefix
+                };
 
             var sinkSettings = new List<SinkSettings>();
 
             foreach (var element in configElement.SinkConfigurationElements)
             {
-                var eventSources = element.EventSources.Select(e => new EventSourceSettings(e.Name, e.EventId, e.Level, e.MatchAnyKeyword));
+                var eventSources =
+                    element.EventSources.Select(
+                        e =>
+                            new EventSourceSettings(
+                                e.Name,
+                                e.EventId,
+                                e.Level,
+                                e.MatchAnyKeyword,
+                                e.Arguments.Select(a => new KeyValuePair<string, string>(a.Key, a.Value)),
+                                e.ProcessNameFilters.Select(p => p.Name)));
                 var sink = createSinks ?
                     new SinkSettings(element.Name, element.SinkPromise.Value, eventSources) :
                     new SinkSettings(element.Name, element.SinkPromise, eventSources);
@@ -127,12 +137,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         {
             this.monitoredFile = file ?? this.monitoredFile;
 
-            this.watcher = new FileSystemWatcher()
-            {
-                Path = Path.GetDirectoryName(this.monitoredFile),
-                Filter = Path.GetFileName(this.monitoredFile),
-                NotifyFilter = NotifyFilters.LastWrite
-            };
+            this.watcher = 
+                new FileSystemWatcher
+                {
+                    Path = Path.GetDirectoryName(this.monitoredFile),
+                    Filter = Path.GetFileName(this.monitoredFile),
+                    NotifyFilter = NotifyFilters.LastWrite
+                };
 
             this.watcher.Changed += this.OnFileChanged;
             this.watcher.Error += this.OnFileError;
