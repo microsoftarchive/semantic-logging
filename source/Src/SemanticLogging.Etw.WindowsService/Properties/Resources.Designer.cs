@@ -62,6 +62,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service.Prop
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [ -a=type | -account=type]	Specifies the account type. Accepted values are &apos;User&apos;, &apos;LocalSystem&apos;, and &apos;LocalService&apos;. Default is &apos;LocalService&apos;..
+        /// </summary>
+        internal static string AccountArgDescription {
+            get {
+                return ResourceManager.GetString("AccountArgDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The service is already installed or has been marked for deletion..
         /// </summary>
         internal static string AlreadyInstalledService {
@@ -229,6 +238,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service.Prop
         internal static string ServiceDisplayName {
             get {
                 return ResourceManager.GetString("ServiceDisplayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The account identifier is invalid &apos;{0}&apos;..
+        /// </summary>
+        internal static string ServiceInvalidAccount {
+            get {
+                return ResourceManager.GetString("ServiceInvalidAccount", resourceCulture);
             }
         }
         

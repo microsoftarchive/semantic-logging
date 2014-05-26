@@ -7,17 +7,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 {
     internal class Parameter
     {
-        public Parameter(string name, string description, Action<ParameterSet> action)
+        public Parameter(string name, string description, Action<ParameterSet, IEnumerable<Tuple<string, string>>> action)
         {
-            this.Names = new HashSet<string>(name.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries));
-            this.Action = action;
+            this.Names = new HashSet<string>(name.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries));
             this.Description = description;
+            this.Action = action;
         }
 
-        public ICollection<string> Names { get; set; }
+        public Parameter(string name, string description, string key)
+        {
+            this.Names = new HashSet<string>(name.Split(new[] { "|" }, StringSplitOptions.RemoveEmptyEntries));
+            this.Description = description;
+            this.Key = key;
+        }
 
-        public Action<ParameterSet> Action { get; set; }
+        public ICollection<string> Names { get; private set; }
 
-        public string Description { get; set; }
+        public Action<ParameterSet, IEnumerable<Tuple<string, string>>> Action { get; private set; }
+
+        public string Description { get; private set; }
+
+        public string Key { get; private set; }
     }
 }
