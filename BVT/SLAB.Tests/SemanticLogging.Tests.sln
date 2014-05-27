@@ -1,5 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30324.0
+MinimumVisualStudioVersion = 10.0.40219.1
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.InProc.Tests", "SemanticLogging.InProc.Tests\SemanticLogging.InProc.Tests.csproj", "{FFAF719C-D4E7-4AFF-A896-3CA5605B2C88}"
 EndProject
@@ -20,6 +23,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Tests.Shared", "SemanticLogging.Tests.Shared\SemanticLogging.Tests.Shared.csproj", "{001E9C59-1326-48F1-9019-9E6CEEB1E458}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Elasticsearch", "..\..\source\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj", "{5F7F3BFE-6117-43C3-AABB-7195516D9F1C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7FEF73F8-E020-4F0D-B3E9-969AA584307B}"
+	ProjectSection(SolutionItems) = preProject
+		Settings.StyleCop = Settings.StyleCop
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
