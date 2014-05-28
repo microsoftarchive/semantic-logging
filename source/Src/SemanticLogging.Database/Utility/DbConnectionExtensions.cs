@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
 {
     internal static class DbConnectionExtensions
     {

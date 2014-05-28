@@ -44,7 +44,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 maxBufferSize,
                 onCompletedTimeout ?? Timeout.InfiniteTimeSpan);
 
-            var subscription = eventStream.SubscribeWithConversion(sink);
+            var subscription = eventStream.Subscribe(sink);
             return new SinkSubscription<ElasticsearchSink>(subscription, sink);
         }
 

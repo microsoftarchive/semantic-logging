@@ -54,12 +54,11 @@
     </Compile>
     <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Sinks\EventRecord.cs" />
     <Compile Include="Sinks\SqlDatabaseSink.cs" />
     <Compile Include="Utility\EventRecordDataReader.cs" />
     <Compile Include="SqlDatabaseLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utility\EventRecordExtensions.cs" />
+    <Compile Include="Utility\EventEntryExtensions.cs" />
     <Compile Include="Utility\DbConnectionExtensions.cs" />
   </ItemGroup>
   <ItemGroup>

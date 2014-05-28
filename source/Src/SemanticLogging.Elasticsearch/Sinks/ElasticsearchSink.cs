@@ -21,11 +21,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Sink that asynchronously writes entries to a Elasticsearch server.
     /// </summary>
-    public class ElasticsearchSink : IObserver<JsonEventEntry>, IDisposable
+    public class ElasticsearchSink : IObserver<EventEntry>, IDisposable
     {
         private const string BulkServiceOperationPath = "/_bulk";
 
-        private readonly BufferedEventPublisher<JsonEventEntry> bufferedPublisher;
+        private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         private readonly string index;
@@ -75,7 +75,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.index = index;
             this.type = type;
             var sinkId = string.Format(CultureInfo.InvariantCulture, "ElasticsearchSink ({0})", instanceName);
-            bufferedPublisher = BufferedEventPublisher<JsonEventEntry>.CreateAndStart(sinkId, PublishEventsAsync, bufferInterval,
+            bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(sinkId, PublishEventsAsync, bufferInterval,
                 bufferingCount, maxBufferSize, cancellationTokenSource.Token);
         }
 
@@ -101,14 +101,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to Windows Azure.</param>
-        public void OnNext(JsonEventEntry value)
+        public void OnNext(EventEntry value)
         {
             if (value == null)
             {
                 return;
             }
-
-            value.InstanceName = value.InstanceName ?? instanceName;
 
             bufferedPublisher.TryPost(value);
         }
@@ -155,7 +153,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             return bufferedPublisher.FlushAsync();
         }
 
-        internal async Task<int> PublishEventsAsync(IEnumerable<JsonEventEntry> collection)
+        internal async Task<int> PublishEventsAsync(IList<EventEntry> collection)
         {
             HttpClient client = null;
 
@@ -164,7 +162,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 client = new HttpClient();
 
                 string logMessages;
-                using (var serializer = new ElasticsearchEventEntrySerializer(this.index, this.type, this.flattenPayload))
+                using (var serializer = new ElasticsearchEventEntrySerializer(this.index, this.type, this.instanceName, this.flattenPayload))
                 {
                     logMessages = serializer.Serialize(collection);
                 }
@@ -179,7 +177,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     // Check the response for 400 bad request
                     if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
-                        // Possible multiple enumeration, but this should be an extremely rare occurrance
                         var messagesDiscarded = collection.Count();
 
                         var errorContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
