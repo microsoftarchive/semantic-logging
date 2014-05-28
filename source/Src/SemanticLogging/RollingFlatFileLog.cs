@@ -2,8 +2,6 @@
 
 using System;
 using System.Diagnostics.Tracing;
-using System.IO;
-using System.Reflection;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
@@ -35,9 +33,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 fileName = FileUtil.CreateRandomFileName();
             }
 
-            var sink = new RollingFlatFileSink(fileName, rollSizeKB, timestampPattern, rollFileExistsBehavior, rollInterval, maxArchivedFiles, isAsync);
+            var sink = new RollingFlatFileSink(fileName, rollSizeKB, timestampPattern, rollFileExistsBehavior, rollInterval, maxArchivedFiles, formatter ?? new EventTextFormatter(), isAsync);
 
-            var subscription = eventStream.SubscribeWithFormatter(formatter ?? new EventTextFormatter(), sink);
+            var subscription = eventStream.Subscribe(sink);
 
             return new SinkSubscription<RollingFlatFileSink>(subscription, sink);
         }

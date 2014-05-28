@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {
@@ -40,21 +41,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [ExpectedException(typeof(ArgumentNullException))]
         public void ThrowOnNullFileName()
         {
-            new RollingFlatFileSink(null, 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false);
+            new RollingFlatFileSink(null, 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void ThrowOnEmptyFileName()
         {
-            new RollingFlatFileSink(string.Empty, 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false);
+            new RollingFlatFileSink(string.Empty, 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false);
         }
 
         [TestMethod]
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public void ThrowOnDirectoryNotFound()
         {
-            new RollingFlatFileSink(@"Z:\Foo\foo.log", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false);
+            new RollingFlatFileSink(@"Z:\Foo\foo.log", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false);
         }
 
         [TestMethod]
@@ -62,44 +63,50 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
             }
         }
 
         [TestMethod]
         public void ThrowIfTimestampPatternIsNullOrEmpty()
         {
-            AssertEx.Throws<ArgumentNullException>(() => new RollingFlatFileSink("rolling.log", 1024, null, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+            AssertEx.Throws<ArgumentNullException>(() => new RollingFlatFileSink("rolling.log", 1024, null, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
 
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 1024, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 1024, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+        }
+
+        [TestMethod]
+        public void ThrowIfFormatterIsNull()
+        {
+            AssertEx.Throws<ArgumentNullException>(() => new RollingFlatFileSink("rolling.log", 1024, "pattern", RollFileExistsBehavior.Increment, RollInterval.Day, 0, null, false));
         }
 
         [TestMethod]
         public void ThrowOnPathNavigationFileName()
         {
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(".", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"..\..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"C:\Test\..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(".", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"..\..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(@"C:\Test\..\", 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
         }
 
         [TestMethod]
         public void ThrowsArgumentOutOfRangeIfTimeStampUsesInvalidChars()
         {
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 0, "MM/dd/yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
-            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 0, "MM:dd:yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 0, "MM/dd/yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink("rolling.log", 0, "MM:dd:yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
         }
 
         [TestMethod]
         public void SinkForNewFileWillUseCreationDateToCalculateRollDate()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = this.dateTimeProvider;
 
@@ -117,7 +124,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, new DateTime(2000, 01, 01));
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 this.dateTimeProvider.CurrentDateTimeField = new DateTime(2008, 01, 01);
                 sink.RollingHelper.DateTimeProvider = this.dateTimeProvider;
@@ -133,13 +140,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void WriterKeepsTally()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = this.dateTimeProvider;
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.AreEqual(5L, sink.Tally);
             }
@@ -149,17 +156,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RolledFileWillHaveCurrentDateForTimestamp()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
 
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
 
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.AreEqual(5L, sink.Tally);
             }
@@ -176,7 +183,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         ////    using (FileStream fileStream = File.Open(fileName, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
         ////    {
         ////        using (var sink
-        ////            = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+        ////            = new RollingFlatFileSink(fileName, 10, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
         ////        {
         ////            sink.RollingHelper.DateTimeProvider = dateTimeProvider;
         ////            sink.OnNext("1234567890");
@@ -195,20 +202,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RolledFileWithOverwriteWillOverwriteArchiveFileIfDateTemplateMatches()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -224,20 +231,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RolledFileWithOverwriteWillCreateArchiveFileIfDateTemplateDoesNotMatch()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2008, 01, 01));
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -264,6 +271,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                     RollFileExistsBehavior.Overwrite,
                     RollInterval.Day,
                     1,
+                    new SimpleMessageFormatter(),
                     false))
             {
                 var testTime = new DateTime(2007, 01, 01);
@@ -271,21 +279,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = testTime;
 
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 sink.RollingHelper.PerformRoll(testTime);
 
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 dateTimeProvider.CurrentDateTimeField = testTime.AddYears(1);
                 sink.RollingHelper.PerformRoll(testTime.AddYears(1));
 
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
 
                 dateTimeProvider.CurrentDateTimeField = testTime.AddYears(2);
                 sink.RollingHelper.PerformRoll(testTime.AddYears(2));
 
-                sink.OnNext("edcbe");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "edcbe"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -304,15 +312,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             using (FileStream stream = File.Open(targetArchiveFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
             {
                 using (var sink
-                    = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                    = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
                 {
                     sink.RollingHelper.DateTimeProvider = dateTimeProvider;
-                    sink.OnNext("1234567890");
+                    sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                     Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                     sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                    sink.OnNext("12345");
+                    sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
                 }
             }
 
@@ -336,20 +344,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RolledFileWithIncrementWillCreateArchiveFileIfDateTemplateDoesNotMatch()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2008, 01, 01));
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -369,20 +377,20 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RolledFileWithIncrementWillCreateArchiveFileWithMaxSequenceIfDateTemplateDoesMatch()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 01));
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
 
                 Assert.IsTrue(sink.RollingHelper.UpdateRollingInformationIfNecessary());
 
                 sink.RollingHelper.PerformRoll(new DateTime(2007, 01, 02));
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -407,6 +415,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                     RollFileExistsBehavior.Increment,
                     RollInterval.Day,
                     1,
+                    new SimpleMessageFormatter(),
                     false))
             {
                 var testTime = new DateTime(2007, 01, 01);
@@ -414,16 +423,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = testTime;
 
-                sink.OnNext("1234567890");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "1234567890"));
 
                 dateTimeProvider.CurrentDateTimeField = testTime.AddHours(12);
 
                 sink.RollingHelper.PerformRoll(testTime.AddHours(12));
-                sink.OnNext("12345");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "12345"));
                 dateTimeProvider.CurrentDateTimeField = testTime.AddHours(24);
 
                 sink.RollingHelper.PerformRoll(testTime.AddHours(24));
-                sink.OnNext("abcde");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "abcde"));
             }
 
             Assert.IsTrue(File.Exists(fileName));
@@ -440,7 +449,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void WillRollForDateIfEnabled()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
 
@@ -452,7 +461,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             }
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.None, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.UpdateRollingInformationIfNecessary();
 
@@ -470,21 +479,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void WillRollForSize()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Year, 0, false))
+                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Year, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.UpdateRollingInformationIfNecessary();
 
-                sink.OnNext(new string('c', 1200));
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: new string('c', 1200)));
 
                 Assert.IsNotNull(sink.RollingHelper.CheckIsRollNecessary());
             }
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Year, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Year, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.UpdateRollingInformationIfNecessary();
 
-                sink.OnNext(new string('c', 1200));
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: new string('c', 1200)));
 
                 Assert.IsNull(sink.RollingHelper.CheckIsRollNecessary());
             }
@@ -514,7 +523,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void WillNotRollWhenTracingIfNotOverThresholds()
         {
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
             }
@@ -529,12 +538,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, currentDateTime);
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.None, 0, false))
+                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.None, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = currentDateTime;
 
-                sink.OnNext("logged message");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "logged message"));
             }
 
             Assert.AreEqual(existingPayload, File.ReadAllText(fileNameWithoutExtension + ".2007" + Extension));
@@ -550,12 +559,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, currentDateTime);
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Increment, RollInterval.None, 0, false))
+                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Increment, RollInterval.None, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = currentDateTime;
 
-                sink.OnNext("logged message");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "logged message"));
             }
 
             Assert.AreEqual(existingPayload, File.ReadAllText(fileNameWithoutExtension + ".1" + Extension));
@@ -571,12 +580,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, currentDateTime);
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Increment, RollInterval.None, 0, isAsync: true))
+                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Increment, RollInterval.None, 0, new SimpleMessageFormatter(), isAsync: true))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = currentDateTime;
 
-                sink.OnNext("logged message");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "logged message"));
                 sink.FlushAsync().Wait();
             }
 
@@ -593,12 +602,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, currentDateTime);
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Overwrite, RollInterval.None, 0, false))
+                = new RollingFlatFileSink(fileName, 1, string.Empty, RollFileExistsBehavior.Overwrite, RollInterval.None, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = currentDateTime;
 
-                sink.OnNext("logged message");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "logged message"));
             }
 
             Assert.IsFalse(File.ReadAllText(fileName).Contains(existingPayload));
@@ -614,12 +623,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             File.SetCreationTime(fileName, currentDateTime);
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, false))
+                = new RollingFlatFileSink(fileName, 1, "yyyy", RollFileExistsBehavior.Overwrite, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
                 dateTimeProvider.CurrentDateTimeField = currentDateTime.AddDays(2);
 
-                sink.OnNext("logged message");
+                sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "logged message"));
             }
 
             Assert.AreEqual(existingPayload, File.ReadAllText(fileNameWithoutExtension + ".2007" + Extension));
@@ -632,7 +641,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             DateTime rollDate = DateTime.Now.AddDays(1).Date;
 
             using (var sink
-                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Midnight, 0, false))
+                = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Midnight, 0, new SimpleMessageFormatter(), false))
             {
                 sink.RollingHelper.DateTimeProvider = dateTimeProvider;
 
@@ -651,9 +660,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             const int NumberOfEntries = 300;
 
-            using (var sink = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, false))
+            using (var sink = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false))
             {
-                Parallel.For(0, NumberOfEntries, i => sink.OnNext("Info-" + i + ":"));
+                Parallel.For(0, NumberOfEntries, i => sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "Info-" + i + ":")));
             }
 
             Assert.AreEqual<int>(NumberOfEntries, File.ReadAllText(fileName).Split(new string[] { ":" }, StringSplitOptions.RemoveEmptyEntries).Length);
@@ -665,9 +674,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             const int NumberOfEntries = 300;
 
-            using (var sink = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, isAsync: true))
+            using (var sink = new RollingFlatFileSink(fileName, 0, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), isAsync: true))
             {
-                Parallel.For(0, NumberOfEntries, i => sink.OnNext("|" + i));
+                Parallel.For(0, NumberOfEntries, i => sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|" + i)));
                 sink.FlushAsync().Wait();
             }
 
@@ -683,7 +692,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void RollingFlatFileCreatesSubDirectories()
         {
             string file = @"dir1\dir2\rolling\patterns\practices\log.xt";
-            using (var sink = new RollingFlatFileSink(file, 1024, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, -1, false))
+            using (var sink = new RollingFlatFileSink(file, 1024, "yyyy", RollFileExistsBehavior.Increment, RollInterval.Day, -1, new SimpleMessageFormatter(), false))
             {
                 Assert.IsTrue(new DirectoryInfo(Path.GetDirectoryName(file)).Exists);
             }
