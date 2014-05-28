@@ -16,7 +16,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Sink that asynchronously writes entries to SQL Server database.
     /// </summary>
-    public class SqlDatabaseSink : IObserver<EventRecord>, IDisposable
+    public class SqlDatabaseSink : IObserver<EventEntry>, IDisposable
     {
         private readonly RetryPolicy retryPolicy = new RetryPolicy<SqlDatabaseTransientErrorDetectionStrategy>(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5));
         private readonly string instanceName;
@@ -105,7 +105,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to the database.</param>
-        public void OnNext(EventRecord value)
+        public void OnNext(EventEntry value)
+        {
+            this.OnNext(value.TryConvertToEventRecord());
+        }
+
+        internal void OnNext(EventRecord value)
         {
             if (value != null)
             {

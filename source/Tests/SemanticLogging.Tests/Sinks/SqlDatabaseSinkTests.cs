@@ -51,7 +51,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
 
-                sink.OnNext(new EventRecord());
+                sink.OnNext(EventEntryTestHelper.Create());
                 try
                 {
                     Assert.IsTrue(sink.FlushAsync().Wait(TimeSpan.FromSeconds(5)));
@@ -76,7 +76,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
 
-                sink.OnNext(new EventRecord());
+                sink.OnNext(EventEntryTestHelper.Create());
                 Assert.IsTrue(Task.Run(() => sink.OnCompleted()).Wait(TimeSpan.FromSeconds(5)));
 
                 Assert.IsTrue(collectErrorsListener.WrittenEntries.Any(x => x.EventId == 101));
@@ -142,22 +142,24 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             for (int i = 0; i < NumberOfEntries; i++)
             {
-                var entry = new EventRecord
-                {
-                    ProviderId = Guid.NewGuid(),
-                    ProviderName = "TestName",
-                    EventId = 50,
-                    Level = (int)EventLevel.Verbose,
-                    Opcode = 5,
-                    Task = 6,
-                    Timestamp = DateTimeOffset.UtcNow,
-                    Version = 2,
-                    InstanceName = "Custom instance name",
-                    FormattedMessage = "Test" + i,
-                    Payload = "{arg0:Test}",
-                    ActivityId = Guid.NewGuid(),
-                    RelatedActivityId = Guid.NewGuid(),
-                };
+                var entry = new EventRecord(
+                    EventEntryTestHelper.Create(
+                        providerId: Guid.NewGuid(),
+                        providerName: "TestName",
+                        eventId: 50,
+                        level: EventLevel.Verbose,
+                        opcode: (EventOpcode)5,
+                        task: (EventTask)6,
+                        timestamp: DateTimeOffset.UtcNow,
+                        version: 2,
+                        formattedMessage: "Test" + i,
+                        payloadNames: new string[] { "arg0" },
+                        payload: new object[] { "Test" },
+                        activityId: Guid.NewGuid(),
+                        relatedActivityId: Guid.NewGuid()))
+                    {
+                        InstanceName = "Custom instance name",
+                    };
 
                 this.sink.OnNext(entry);
             }
@@ -179,9 +181,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void then_should_write_properties()
         {
-            var entry = CreateValidEntry();
-            entry.ProcessId = 300;
-            entry.ThreadId = 500;
+            var entry = CreateValidEntry(
+                processId: 300,
+                threadId: 500);
             this.sink.OnNext(entry);
 
             this.sink.FlushAsync().Wait();
@@ -214,9 +216,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void then_should_write_properties_with_activity_id()
         {
-            var entry = CreateValidEntry();
-            entry.ActivityId = Guid.Parse("{D6A8536E-398F-4AD5-BB0A-3BFFD05EF5CB}");
-            entry.RelatedActivityId = Guid.Parse("{28ED52F1-1AB2-4B8C-9F30-4382BE2928AA}");
+            var entry = CreateValidEntry(
+                activityId: Guid.Parse("{D6A8536E-398F-4AD5-BB0A-3BFFD05EF5CB}"),
+                relatedActivityId: Guid.Parse("{28ED52F1-1AB2-4B8C-9F30-4382BE2928AA}"));
             this.sink.OnNext(entry);
 
             this.sink.FlushAsync().Wait();
@@ -262,8 +264,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void then_defaults_EventSourceName_property()
         {
-            var entry = CreateValidEntry();
-            entry.ProviderName = null;
+            var entry = CreateValidEntry(providerName: null);
 
             sink.OnNext(entry);
             sink.FlushAsync().Wait(TimeSpan.FromSeconds(5));
@@ -277,8 +278,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void then_should_truncate_longer_properties()
         {
-            var entry = CreateValidEntry();
-            entry.ProviderName = new string('a', 5000);
+            var entry = CreateValidEntry(
+                providerName: new string('a', 5000));
             entry.InstanceName = new string('b', 5000);
 
             sink.OnNext(entry);
@@ -312,23 +313,29 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             }
         }
 
-        private static EventRecord CreateValidEntry()
+        private static EventRecord CreateValidEntry(string providerName = "TestName", int processId = 0, int threadId = 0, Guid activityId = default(Guid), Guid relatedActivityId = default (Guid))
         {
-            var entry = new EventRecord
-            {
-                ProviderId = Guid.NewGuid(),
-                ProviderName = "TestName",
-                EventId = 50,
-                Level = (int)EventLevel.Verbose,
-                Opcode = 5,
-                Task = 6,
-                Timestamp = DateTimeOffset.UtcNow,
-                Version = 2,
-                InstanceName = "Custom instance name",
-                FormattedMessage = "Formatted message",
-                Payload = "{arg0:Test}",
-            };
-            return entry;
+            var record = new EventRecord(
+                EventEntryTestHelper.Create(
+                    providerId: Guid.NewGuid(),
+                    providerName: providerName,
+                    eventId: 50,
+                    level: EventLevel.Verbose,
+                    opcode: (EventOpcode)5,
+                    task: (EventTask)6,
+                    timestamp: DateTimeOffset.UtcNow,
+                    version: 2,
+                    formattedMessage: "Formatted message",
+                    payloadNames: new string[] { "arg0" },
+                    payload: new object[] { "Test" },
+                    processId: processId,
+                    threadId: threadId,
+                    activityId: activityId,
+                    relatedActivityId: relatedActivityId))
+                {
+                    InstanceName = "Custom instance name"
+                };
+            return record;
         }
     }
 
@@ -363,20 +370,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             for (int i = 0; i < BufferingCount + 2; i++)
             {
-                var entry = new EventRecord
-                                {
-                                    ProviderId = Guid.NewGuid(),
-                                    ProviderName = "TestName",
-                                    EventId = 50,
-                                    Level = (int)EventLevel.Verbose,
-                                    Opcode = 5,
-                                    Task = 6,
-                                    Timestamp = DateTimeOffset.UtcNow,
-                                    Version = 2,
-                                    InstanceName = "Custom instance name",
-                                    FormattedMessage = "Test" + i,
-                                    Payload = "{arg0:Test}"
-                                };
+                var entry = new EventRecord(
+                    EventEntryTestHelper.Create(
+                        providerId: Guid.NewGuid(),
+                        providerName: "TestName",
+                        eventId: 50,
+                        level: EventLevel.Verbose,
+                        opcode: (EventOpcode)5,
+                        task: (EventTask)6,
+                        timestamp: DateTimeOffset.UtcNow,
+                        version: 2,
+                        formattedMessage: "Test" + i,
+                        payloadNames: new string[] { "arg0" },
+                        payload: new object[] { "Test" }))
+                    {
+                        InstanceName = "Custom instance name",
+                    };
 
                 this.sink.OnNext(entry);
                 Thread.Sleep(10);

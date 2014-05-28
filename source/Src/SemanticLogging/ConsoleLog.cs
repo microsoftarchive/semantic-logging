@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Diagnostics.Tracing;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
-using System;
-using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 {
@@ -27,7 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             formatter = formatter ?? new EventTextFormatter();
             colorMapper = colorMapper ?? new DefaultConsoleColorMapper();
 
-            var subscription = eventStream.SubscribeWithFormatterAndColor(formatter ?? new EventTextFormatter(), colorMapper, sink);
+            var subscription = eventStream.SubscribeWithFormatterAndColor(formatter, colorMapper, sink);
 
             return new SinkSubscription<ConsoleSink>(subscription, sink);
         }

@@ -64,26 +64,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         /// <returns>A converted entry, or <see langword="null"/> if the payload is invalid.</returns>
         public static EventRecord TryConvertToEventRecord(this EventEntry entry)
         {
-            var entity = new EventRecord()
-            {
-                ProviderId = entry.ProviderId,
-                ProviderName = entry.Schema.ProviderName,
-                EventId = entry.EventId,
-                EventKeywords = (long)entry.Schema.Keywords,
-                Level = (int)entry.Schema.Level,
-                Opcode = (int)entry.Schema.Opcode,
-                Task = (int)entry.Schema.Task,
-                Timestamp = entry.Timestamp,
-                Version = entry.Schema.Version,
-                FormattedMessage = entry.FormattedMessage,
-                Payload = EventEntryUtil.JsonSerializePayload(entry),
-                ActivityId = entry.ActivityId,
-                RelatedActivityId = entry.RelatedActivityId,
-                ProcessId = entry.ProcessId,
-                ThreadId = entry.ThreadId,
-            };
-
-            return entity;
+            return new EventRecord(entry);
         }
 
         internal static SqlDataRecord ToSqlDataRecord(this EventRecord record)
