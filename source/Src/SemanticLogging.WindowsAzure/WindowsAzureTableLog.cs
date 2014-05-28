@@ -48,7 +48,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 SortKeysAscending = sortKeysAscending
             };
 
-            var subscription = eventStream.SubscribeWithConversion(sink);
+            var subscription = eventStream.Subscribe(sink);
             return new SinkSubscription<WindowsAzureTableSink>(subscription, sink);
         }
 
