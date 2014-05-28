@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
@@ -8,17 +10,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// A sink that writes to the Console.
     /// </summary>
     /// <remarks>This class is thread-safe.</remarks>
-    // TODO: validate: should it be Observer<Tuple<string, ConsoleColor?>> or should we create a custom class?
-    public class ConsoleSink : IObserver<Tuple<string, ConsoleColor?>>
+    public class ConsoleSink : IObserver<EventEntry>
     {
+        private readonly IEventTextFormatter formatter;
+        private readonly IConsoleColorMapper colorMapper;
+
         // lock on static because Console.Out is shared across all threads and sink instances
         private static readonly object LockObject = new object();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleSink" /> class.
         /// </summary>
-        public ConsoleSink()
+        public ConsoleSink(IEventTextFormatter formatter, IConsoleColorMapper colorMapper)
         {
+            this.formatter = formatter;
+            this.colorMapper = colorMapper;
         }
 
         /// <summary>
@@ -40,11 +46,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry and its color to write to the console.</param>
-        public void OnNext(Tuple<string, ConsoleColor?> value)
+        public void OnNext(EventEntry value)
         {
-            if (value != null)
+            var convertedValue = value.TryFormatAsStringAndColor(this.formatter, this.colorMapper);
+            if (convertedValue != null)
             {
-                OnNext(value.Item1, value.Item2);
+                OnNext(convertedValue.Item1, convertedValue.Item2);
             }
         }
 

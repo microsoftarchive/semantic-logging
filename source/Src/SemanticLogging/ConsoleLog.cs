@@ -22,12 +22,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <returns>A subscription to the sink that can be disposed to unsubscribe the sink, or to get access to the sink instance.</returns>
         public static SinkSubscription<ConsoleSink> LogToConsole(this IObservable<EventEntry> eventStream, IEventTextFormatter formatter = null, IConsoleColorMapper colorMapper = null)
         {
-            var sink = new ConsoleSink();
-
             formatter = formatter ?? new EventTextFormatter();
             colorMapper = colorMapper ?? new DefaultConsoleColorMapper();
 
-            var subscription = eventStream.SubscribeWithFormatterAndColor(formatter, colorMapper, sink);
+            var sink = new ConsoleSink(formatter, colorMapper);
+
+            var subscription = eventStream.Subscribe(sink);
 
             return new SinkSubscription<ConsoleSink>(subscription, sink);
         }
