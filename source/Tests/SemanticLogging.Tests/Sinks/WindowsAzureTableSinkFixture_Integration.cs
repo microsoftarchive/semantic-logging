@@ -90,22 +90,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             sink.SortKeysAscending = true;
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 1,
                     payloadNames: new string[] { "arg1" },
-                    payload: new object[] { "value arg1" }));
+                    payload: new object[] { "value arg1" })));
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 2,
                     payloadNames: new string[] { "arg2" },
-                    payload: new object[] { "value arg2" }));
+                    payload: new object[] { "value arg2" })));
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 3,
                     payloadNames: new string[] { "arg3" },
-                    payload: new object[] { "value arg3" }));
+                    payload: new object[] { "value arg3" })));
         }
 
         [TestMethod]
@@ -132,13 +132,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
         protected override void Act()
         {
             base.Act();
-            this.entry = CloudEventEntryTestHelper.Create(
+            this.entry = new CloudEventEntry(EventEntryTestHelper.Create(
                 eventId: 12,
                 providerId: Guid.NewGuid(),
                 providerName: "Provider Name",
                 timestamp: new DateTimeOffset(2013, 4, 10, 16, 0, 0, TimeSpan.Zero),
                 keywords: (EventKeywords)16L,
-                instanceName: "Instance Name",
                 level: EventLevel.Informational,
                 formattedMessage: "My message",
                 opcode: (EventOpcode)4,
@@ -149,7 +148,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
                 processId: 200,
                 threadId: 300,
                 activityId: Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}"),
-                relatedActivityId: Guid.Parse("{23408E19-3133-47E1-9307-C99A4F9AC8CC}"));
+                relatedActivityId: Guid.Parse("{23408E19-3133-47E1-9307-C99A4F9AC8CC}")))
+            {
+                InstanceName = "Instance Name"
+            };
             sink.OnNext(this.entry);
         }
 
@@ -192,20 +194,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
         {
             base.Act();
             this.entry =
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 12,
                     providerId: Guid.NewGuid(),
                     providerName: "Provider Name",
                     timestamp: new DateTimeOffset(2013, 4, 10, 16, 0, 0, TimeSpan.Zero),
                     keywords: (EventKeywords)16,
-                    instanceName: "Instance Name",
                     level: EventLevel.Informational,
                     formattedMessage: "My message",
                     opcode: (EventOpcode)4,
                     task: (EventTask)24,
                     version: 2,
                     payloadNames: new string[] { "arg1" },
-                    payload: new object[] { "value arg1" });
+                    payload: new object[] { "value arg1" }))
+                {
+                    InstanceName = "Instance Name",
+                };
             sink.OnNext(this.entry);
         }
 
@@ -245,13 +249,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
         protected override void Act()
         {
             base.Act();
-            this.entry = CloudEventEntryTestHelper.Create(
+            this.entry = new CloudEventEntry(EventEntryTestHelper.Create(
                 eventId: 12,
                 providerId: Guid.NewGuid(),
                 providerName: "Provider Name",
                 timestamp: new DateTimeOffset(2013, 4, 10, 16, 0, 0, TimeSpan.Zero),
                 keywords: (EventKeywords)16,
-                instanceName: "Instance Name",
                 level: EventLevel.Informational,
                 formattedMessage: "My message",
                 opcode: (EventOpcode)4,
@@ -259,8 +262,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
                 version: 2,
                 payloadNames: new string[] { "arg1" },
                 payload: new object[] { "value arg1" },
-                activityId: Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}")
-                );
+                activityId: Guid.Parse("{562D0422-F427-4849-A6CD-7990A46F1223}")))
+            {
+                InstanceName = "Instance Name",
+            };
             sink.OnNext(this.entry);
         }
 
@@ -299,8 +304,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
         protected override void Act()
         {
             base.Act();
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 1, payloadNames: new[] { "arg1" },
-                payload: new object[] { "value arg1" }));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 1, payloadNames: new[] { "arg1" },
+                payload: new object[] { "value arg1" })));
             Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromSeconds(45)));
         }
 
@@ -310,8 +315,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             var table = client.GetTableReference(tableName);
 
             table.Delete();
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 4, payloadNames: new[] { "arg4" },
-                payload: new object[] { "value arg4" }));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 4, payloadNames: new[] { "arg4" },
+                payload: new object[] { "value arg4" })));
 
             // wait for long, as deleting a table and then recreating it can take very long
             Assert.IsTrue(this.sink.FlushAsync().Wait(TimeSpan.FromMinutes(3)));
@@ -332,26 +337,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             base.Act();
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 1,
                     payloadNames: new string[] { "arg1" },
-                    payload: new object[] { "value arg1" }));
+                    payload: new object[] { "value arg1" })));
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 2,
                     payloadNames: new string[] { "arg2" },
-                    payload: new object[] { "value arg2" }));
+                    payload: new object[] { "value arg2" })));
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 3,
                     payloadNames: new string[] { "arg3" },
-                    payload: new object[] { "value arg3" }));
+                    payload: new object[] { "value arg3" })));
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
-                    eventId: 4));
+                new CloudEventEntry(EventEntryTestHelper.Create(
+                    eventId: 4)));
         }
 
         [TestMethod]
@@ -422,11 +427,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < 5; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         timestamp: this.eventDate,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -462,11 +467,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < NumberOfEntries; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         timestamp: this.eventDate,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -499,10 +504,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < NumberOfEntries; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -536,10 +541,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < NumberOfEntries; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -575,10 +580,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < NumberOfEntries; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -613,10 +618,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < NumberOfEntries; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 10,
                         payloadNames: new string[] { "arg" },
-                        payload: new object[] { i }));
+                        payload: new object[] { i })));
             }
         }
 
@@ -645,13 +650,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             base.Act();
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 10,
                     opcode: EventOpcode.Reply,
                     level: EventLevel.Informational,
                     version: 2,
                     payloadNames: new string[] { "arg1", "arg2", "arg3" },
-                    payload: new object[] { 1, "2", true }));
+                    payload: new object[] { 1, "2", true })));
         }
 
         [TestMethod]
@@ -678,10 +683,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             base.Act();
 
             sink.OnNext(
-                CloudEventEntryTestHelper.Create(
+                new CloudEventEntry(EventEntryTestHelper.Create(
                     eventId: 10,
                     payloadNames: new[] { "arg1", "arg2", "arg3" },
-                    payload: new object[] { MyLongEnum.Value1, MyIntEnum.Value2, MyShortEnum.Value3 }));
+                    payload: new object[] { MyLongEnum.Value1, MyIntEnum.Value2, MyShortEnum.Value3 })));
         }
 
         [TestMethod]
@@ -725,8 +730,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
                 Assert.Inconclusive("This test cannot be run with the storage emulator");
             }
 
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10));
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 20, instanceName: "Custom@#Name"));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10)));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 20)) { InstanceName = "Custom@#Name" });
         }
 
         [TestMethod]
@@ -751,15 +756,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
         {
             base.Act();
 
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10,
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10,
                 payloadNames: Enumerable.Range(0, 500).Select(x => "arg" + x),
-                payload: Enumerable.Range(0, 500).Select(x => (object)x)));
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 20, payloadNames: new string[] { "Large" },
-                payload: new object[] { new string('a', 500000) }));
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 30, formattedMessage: new string('b', 500000)));
-            sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 40,
+                payload: Enumerable.Range(0, 500).Select(x => (object)x))));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 20, payloadNames: new string[] { "Large" },
+                payload: new object[] { new string('a', 500000) })));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 30, formattedMessage: new string('b', 500000))));
+            sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 40,
                 payloadNames: Enumerable.Range(0, 50).Select(x => "arg" + x),
-                payload: Enumerable.Range(0, 50).Select(x => (object)new string('c', 1000))));
+                payload: Enumerable.Range(0, 50).Select(x => (object)new string('c', 1000)))));
         }
 
         [TestMethod]
@@ -804,11 +809,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             for (int i = 0; i < 100; i++)
             {
                 sink.OnNext(
-                    CloudEventEntryTestHelper.Create(
+                    new CloudEventEntry(EventEntryTestHelper.Create(
                         eventId: 30,
                         formattedMessage: new string('b', 30000),
                         payloadNames: new string[] { "Medium" },
-                        payload: new object[] { new string('a', 20000) }));
+                        payload: new object[] { new string('a', 20000) })));
             }
         }
 
@@ -828,51 +833,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
             Assert.AreEqual(new string('b', 30000), list[0].Message);
             Assert.AreEqual(new string('a', 20000), list[0].DeserializedPayload["Medium"]);
             Assert.AreEqual(new string('a', 20000), list[0].RawPayloadProperties["Payload_Medium"].StringValue);
-        }
-    }
-}
-
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
-{
-    internal static class CloudEventEntryTestHelper
-    {
-        public static CloudEventEntry Create(
-            int eventId = 0,
-            Guid providerId = default(Guid),
-            string providerName = null,
-            EventLevel level = default(EventLevel),
-            EventTask task = default(EventTask),
-            string taskName = null,
-            EventOpcode opcode = default(EventOpcode),
-            string opcodeName = null,
-            EventKeywords keywords = default(EventKeywords),
-            string keywordsDescription = null,
-            int version = 0,
-            IEnumerable<string> payloadNames = null,
-            string formattedMessage = null,
-            IEnumerable<object> payload = null,
-            DateTimeOffset timestamp = default(DateTimeOffset),
-            Guid activityId = default(Guid),
-            Guid relatedActivityId = default(Guid),
-            int processId = 0,
-            int threadId = 0,
-            string instanceName = null)
-        {
-            return new CloudEventEntry(
-                new EventEntry(
-                    providerId,
-                    eventId,
-                    formattedMessage,
-                    new ReadOnlyCollection<object>((payload ?? Enumerable.Empty<object>()).ToList()),
-                    timestamp != default(DateTimeOffset) ? timestamp : DateTimeOffset.UtcNow,
-                    processId,
-                    threadId,
-                    activityId,
-                    relatedActivityId,
-                    new EventSchema(eventId, providerId, providerName, level, task, taskName, opcode, opcodeName, keywords, keywordsDescription, version, (payloadNames ?? Enumerable.Empty<string>()))))
-            {
-                InstanceName = instanceName
-            };
         }
     }
 }

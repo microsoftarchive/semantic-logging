@@ -1,13 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Properties;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
-using System.Threading;
-using System.Transactions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport
 {

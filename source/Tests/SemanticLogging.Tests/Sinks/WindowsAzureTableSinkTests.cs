@@ -70,7 +70,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
 
-                sink.OnNext(CloudEventEntryTestHelper.Create());
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create()));
                 try
                 {
                     Assert.IsTrue(sink.FlushAsync().Wait(TimeSpan.FromSeconds(15)));
@@ -97,7 +97,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
 
-                sink.OnNext(CloudEventEntryTestHelper.Create());
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create()));
                 Assert.IsTrue(Task.Run(() => sink.OnCompleted()).Wait(TimeSpan.FromSeconds(15)));
 
                 Assert.IsTrue(collectErrorsListener.WrittenEntries.Any(x => x.EventId == 500));
@@ -111,7 +111,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_writing_entity_adds_payload_to_dictionary()
         {
-            var entity = CloudEventEntryTestHelper.Create(payloadNames: new string[] { "message1", "message2" }, payload: new object[] { "value1", "value2" });
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(payloadNames: new string[] { "message1", "message2" }, payload: new object[] { "value1", "value2" }));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -126,9 +126,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var guid = Guid.NewGuid();
             var binary = new byte[] { 1, 2, 3, 4 };
 
-            var entity = CloudEventEntryTestHelper.Create(
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(
                 payloadNames: new string[] { "string1", "int1", "long1", "double1", "bool1", "bool2", "guid1", "binary1" },
-                payload: new object[] { "This is a string", 123456, 123456L, 123456D, true, false, guid, binary });
+                payload: new object[] { "This is a string", 123456, 123456L, 123456D, true, false, guid, binary }));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -146,9 +146,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_generating_key_then_prefixes_with_instance_name()
         {
-            var entity = CloudEventEntryTestHelper.Create(
-                timestamp: DateTimeOffset.UtcNow,
-                instanceName: "MyInstanceName");
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(
+                timestamp: DateTimeOffset.UtcNow))
+            {
+                InstanceName = "MyInstanceName"
+            };
 
             entity.CreateKey(false, 0);
 
@@ -158,7 +160,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_having_big_message_value_then_truncates()
         {
-            var entity = CloudEventEntryTestHelper.Create(formattedMessage: new string('a', 500000));
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(formattedMessage: new string('a', 500000)));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -169,9 +171,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_having_big_payload_value_then_stores_warning_and_does_not_contain_payload()
         {
-            var entity = CloudEventEntryTestHelper.Create(
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(
                 payloadNames: new string[] { "arg1" },
-                payload: new object[] { new string('a', 500000) });
+                payload: new object[] { new string('a', 500000) }));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -183,7 +185,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_having_big_payload_then_truncates()
         {
-            var entity = CloudEventEntryTestHelper.Create(payloadNames: new string[] { "arg1" }, payload: new object[] { new string('a', 500000) });
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(payloadNames: new string[] { "arg1" }, payload: new object[] { new string('a', 500000) }));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -195,7 +197,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_having_big_overall_payloads_then_stores_warning_and_does_not_contain_payload()
         {
-            var entity = CloudEventEntryTestHelper.Create(payloadNames: Enumerable.Range(0, 50).Select(i => "arg" + i), payload: Enumerable.Range(0, 50).Select(i => new string('a', 2000)));
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(payloadNames: Enumerable.Range(0, 50).Select(i => "arg" + i), payload: Enumerable.Range(0, 50).Select(i => new string('a', 2000))));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -210,9 +212,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             int numberOfAllowedItems = 200;
 
-            var entity = CloudEventEntryTestHelper.Create(
+            var entity = new CloudEventEntry(EventEntryTestHelper.Create(
                 payloadNames: Enumerable.Range(0, 300).Select(i => "arg" + i),
-                payload: Enumerable.Range(0, 300).Select(i => (object)i));
+                payload: Enumerable.Range(0, 300).Select(i => (object)i)));
             entity.CreateKey(true, 0);
 
             var dict = entity.CreateTableEntity().WriteEntity(null);
@@ -270,7 +272,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             for (int i = 0; i < NumberOfEntries; i++)
             {
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i }));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i })));
             }
 
             sink.WaitHandle.Set();
@@ -289,7 +291,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             for (int i = 0; i < NumberOfEntries; i++)
             {
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i }));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i })));
             }
 
             sink.WaitHandle.Set();
@@ -308,7 +310,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             for (int i = 0; i < 600; i++)
             {
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i }));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i })));
             }
 
             sink.WaitHandle.Set();
@@ -317,7 +319,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             for (int i = 0; i < NumberOfNewEntries; i++)
             {
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i }));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i })));
             }
 
             Assert.IsTrue(sink.FlushAsync().Wait(TimeSpan.FromSeconds(10)));
@@ -333,7 +335,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
             for (int i = 0; i < NumberOfEntries; i++)
             {
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i }));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10, payloadNames: new string[] { "arg" }, payload: new object[] { i })));
             }
 
             sink.WaitHandle.Set();
@@ -356,7 +358,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             {
                 sink.WaitHandle.Reset();
 
-                sink.OnNext(CloudEventEntryTestHelper.Create(eventId: 10));
+                sink.OnNext(new CloudEventEntry(EventEntryTestHelper.Create(eventId: 10)));
 
                 var stopWatch = Stopwatch.StartNew();
                 sink.OnCompleted();
