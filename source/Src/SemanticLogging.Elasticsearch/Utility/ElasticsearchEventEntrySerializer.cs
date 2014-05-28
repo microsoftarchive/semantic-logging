@@ -63,35 +63,35 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             // Write the batch "index" operation header
             this.writer.WriteStartObject();
             // ES index names must be lower case and cannot contain whitespace or any of the following characters \/*?"<>|,
-            WriteValue("_index", this.GetIndexName(entry.EventDate));
+            WriteValue("_index", this.GetIndexName(entry.EventEntry.Timestamp.UtcDateTime));
             WriteValue("_type", this.entryType);
             this.writer.WriteEndObject();
             this.writer.WriteEndObject();
             this.writer.WriteRaw("\n");  //ES requires this \n separator
 
             this.writer.WriteStartObject();
-            WriteValue("EventId", entry.EventId);
-            WriteValue("EventDate", entry.EventDate);
-            WriteValue("Keywords", entry.Keywords);
-            WriteValue("ProviderId", entry.ProviderId);
-            WriteValue("ProviderName", entry.ProviderName);
+            WriteValue("EventId", entry.EventEntry.EventId);
+            WriteValue("EventDate", entry.EventEntry.Timestamp.UtcDateTime);
+            WriteValue("Keywords", (long)entry.EventEntry.Schema.Keywords);
+            WriteValue("ProviderId", entry.EventEntry.Schema.ProviderId);
+            WriteValue("ProviderName", entry.EventEntry.Schema.ProviderName);
             WriteValue("InstanceName", entry.InstanceName);
-            WriteValue("Level", entry.Level);
-            WriteValue("Message", entry.Message);
-            WriteValue("Opcode", entry.Opcode);
-            WriteValue("Task", entry.Task);
-            WriteValue("Version", entry.Version);
-            WriteValue("ProcessId", entry.ProcessId);
-            WriteValue("ThreadId", entry.ThreadId);
+            WriteValue("Level", (int)entry.EventEntry.Schema.Level);
+            WriteValue("Message", entry.EventEntry.FormattedMessage);
+            WriteValue("Opcode", (int)entry.EventEntry.Schema.Opcode);
+            WriteValue("Task", (int)entry.EventEntry.Schema.Task);
+            WriteValue("Version", entry.EventEntry.Schema.Version);
+            WriteValue("ProcessId", entry.EventEntry.ProcessId);
+            WriteValue("ThreadId", entry.EventEntry.ThreadId);
 
-            if (entry.ActivityId != Guid.Empty)
+            if (entry.EventEntry.ActivityId != Guid.Empty)
             {
-                WriteValue("ActivityId", entry.ActivityId);
+                WriteValue("ActivityId", entry.EventEntry.ActivityId);
             }
 
-            if (entry.RelatedActivityId != Guid.Empty)
+            if (entry.EventEntry.RelatedActivityId != Guid.Empty)
             {
-                WriteValue("RelatedActivityId", entry.RelatedActivityId);
+                WriteValue("RelatedActivityId", entry.EventEntry.RelatedActivityId);
             }
 
             //If we are not going to flatten the payload then write opening

@@ -69,12 +69,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_then_object_can_serialize()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance"
-            };
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values))
+                {
+                    InstanceName = "instance"
+                };
 
             var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
@@ -86,14 +88,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_then_object_can_serialize_process_and_thread_id()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance",
-                ProcessId = 300,
-                ThreadId = 500
-            };
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values,
+                    processId: 300,
+                    threadId: 500))
+                {
+                    InstanceName = "instance",
+                };
 
             var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
 
@@ -111,13 +115,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_with_activtyid_then_activityid_serialized()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values,
+                    activityId: Guid.NewGuid(),
+                    relatedActivityId: Guid.NewGuid()))
             {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
                 InstanceName = "instance",
-                ActivityId = Guid.NewGuid(),
-                RelatedActivityId = Guid.NewGuid()
             };
 
             var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
@@ -125,8 +131,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
 
-            Assert.AreEqual(logObject.ActivityId.ToString(), jsonObject["ActivityId"]);
-            Assert.AreEqual(logObject.RelatedActivityId.ToString(), jsonObject["RelatedActivityId"]);
+            Assert.AreEqual(logObject.EventEntry.ActivityId.ToString(), jsonObject["ActivityId"]);
+            Assert.AreEqual(logObject.EventEntry.RelatedActivityId.ToString(), jsonObject["RelatedActivityId"]);
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
         }
@@ -135,10 +141,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_without_activtyid_then_activityid_not_serialized()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values))
             {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
                 InstanceName = "instance"
             };
 
@@ -157,10 +165,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_without_flattened_payload_then_payload_nested()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values))
             {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
                 InstanceName = "instance"
             };
 
@@ -189,10 +199,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         private static JsonEventEntry CreateJsonEventEntry()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values))
             {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
                 InstanceName = "instance"
             };
             return logObject;
@@ -262,7 +274,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
                 var sink = new ElasticsearchSink("instance", endpoint, "slabtest", "etw", true, TimeSpan.FromSeconds(1), 100, 800, TimeSpan.FromMinutes(1));
 
-                sink.OnNext(new JsonEventEntry());
+                sink.OnNext(new JsonEventEntry(EventEntryTestHelper.Create()));
 
                 var flushCompleteInTime = sink.FlushAsync().Wait(TimeSpan.FromSeconds(45));
 
@@ -311,10 +323,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var entry = this.sink.Entries.Single();
             var jsonEntry = entry.TryConvertToJsonEventEntry();
 
-            Assert.AreEqual(entry.EventId, jsonEntry.EventId);
+            Assert.AreEqual(entry.EventId, jsonEntry.EventEntry.EventId);
 
-            Assert.AreEqual(entry.ProcessId, jsonEntry.ProcessId);
-            Assert.AreEqual(entry.ThreadId, jsonEntry.ThreadId);
+            Assert.AreEqual(entry.ProcessId, jsonEntry.EventEntry.ProcessId);
+            Assert.AreEqual(entry.ThreadId, jsonEntry.EventEntry.ThreadId);
 
             Assert.AreEqual(entry.ActivityId, entry.ActivityId);
             Assert.AreEqual(entry.RelatedActivityId, entry.RelatedActivityId);

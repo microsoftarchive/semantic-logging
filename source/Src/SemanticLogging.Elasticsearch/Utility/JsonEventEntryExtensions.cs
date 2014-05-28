@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
@@ -38,44 +36,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         {
             Guard.ArgumentNotNull(entry, "entry");
 
-            var entity = new JsonEventEntry
-            {
-                EventId = entry.EventId,
-                Keywords = (long)entry.Schema.Keywords,
-                ProviderId = entry.ProviderId,
-                ProviderName = entry.Schema.ProviderName,
-                Level = (int)entry.Schema.Level,
-                Message = entry.FormattedMessage,
-                Opcode = (int)entry.Schema.Opcode,
-                Task = (int)entry.Schema.Task,
-                Version = entry.Schema.Version,
-                EventDate = entry.Timestamp.UtcDateTime,
-                ProcessId = entry.ProcessId,
-                ThreadId = entry.ThreadId,
-                ActivityId = entry.ActivityId,
-                RelatedActivityId = entry.RelatedActivityId
-            };
-
-            InitializePayload(entity, entry.Payload, entry.Schema);
-
-            return entity;
-        }
-
-        private static void InitializePayload(JsonEventEntry entity, IList<object> payload, EventSchema schema)
-        {
-            try
-            {
-                entity.Payload = new Dictionary<string, object>(payload.Count);
-
-                for (int i = 0; i < payload.Count; i++)
-                {
-                    entity.Payload.Add(schema.Payload[i], payload[i]);
-                }
-            }
-            catch (Exception e)
-            {
-                SemanticLoggingEventSource.Log.ElasticsearchSinkEntityPayloadCreationFailed(e.ToString());
-            }
+            return new JsonEventEntry(entry);
         }
     }
 }

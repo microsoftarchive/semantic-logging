@@ -74,10 +74,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         protected JsonEventEntry CreateEventEntry(string msgPropertyValue)
         {
             var payload = new Dictionary<string, object> { { "msg", msgPropertyValue }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
+            var logObject = new JsonEventEntry(
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values))
             {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
                 InstanceName = "instance"
             };
             return logObject;

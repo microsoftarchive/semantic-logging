@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
@@ -10,54 +11,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// </summary>
     public sealed class JsonEventEntry
     {
+        private readonly EventEntry eventEntry;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JsonEventEntry"/> class.
         /// </summary>
-        public JsonEventEntry()
+        public JsonEventEntry(EventEntry eventEntry)
         {
-            Payload = new Dictionary<string, object>();
-            EventDate = DateTime.UtcNow;
+            this.eventEntry = eventEntry;
+            Payload = InitializePayload(eventEntry.Payload, eventEntry.Schema);
         }
 
         /// <summary>
-        /// Gets or sets the event identifier.
+        /// Gets or sets the event entry.
         /// </summary>
         /// <value>
-        /// The event id.
+        /// The event entry.
         /// </value>
-        public int EventId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the event date.
-        /// </summary>
-        /// <value>
-        /// The event date.
-        /// </value>
-        public DateTime EventDate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the keywords for the event.
-        /// </summary>
-        /// <value>
-        /// The keywords.
-        /// </value>
-        public long Keywords { get; set; }
-
-        /// <summary>
-        /// Gets or sets the unique identifier for the provider, which is typically the class derived from <see cref="System.Diagnostics.Tracing.EventSource"/>.
-        /// </summary>
-        /// <value>
-        /// The provider ID.
-        /// </value>
-        public Guid ProviderId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the friendly name of the class that is derived from the event source.
-        /// </summary>
-        /// <value>
-        /// The name of the event source.
-        /// </value>
-        public string ProviderName { get; set; }
+        public EventEntry EventEntry
+        {
+            get { return this.eventEntry; }
+        }
 
         /// <summary>
         /// Gets or sets the instance name where the entries are generated from.
@@ -68,82 +42,30 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         public string InstanceName { get; set; }
 
         /// <summary>
-        /// Gets or sets the level of the event.
-        /// </summary>
-        /// <value>
-        /// The level.
-        /// </value>
-        public int Level { get; set; }
-
-        /// <summary>
-        /// Gets or sets the message for the event.
-        /// </summary>
-        /// <value>
-        /// The message.
-        /// </value>
-        public string Message { get; set; }
-
-        /// <summary>
-        /// Gets or sets the operation code for the event.
-        /// </summary>
-        /// <value>
-        /// The operation code.
-        /// </value>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming",
-            "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "Opcode",
-            Justification = "Uses casing from EventWrittenEventArgs.Opcode")]
-        public int Opcode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the task for the event.
-        /// </summary>
-        /// <value>
-        /// The task code.
-        /// </value>
-        public int Task { get; set; }
-
-        /// <summary>
-        /// Gets or sets the version of the event.
-        /// </summary>
-        /// <value>
-        /// The version.
-        /// </value>
-        public int Version { get; set; }
-
-        /// <summary>
         /// Gets or sets the payload for the event.
         /// </summary>
         /// <value>
         /// The payload.
         /// </value>
-        public Dictionary<string, object> Payload { get; set; }
+        public IReadOnlyDictionary<string, object> Payload { get; private set; }
 
-        /// <summary>
-        /// Gets or sets the process id.
-        /// </summary>
-        /// <value>The process id.</value>
-        public int ProcessId { get; set; }
+        private static IReadOnlyDictionary<string, object> InitializePayload(IList<object> payload, EventSchema schema)
+        {
+            var payloadDictionary = new Dictionary<string, object>(payload.Count);
 
-        /// <summary>
-        /// Gets or sets the thread id.
-        /// </summary>
-        /// <value>The thread id.</value>
-        public int ThreadId { get; set; }
+            try
+            {
+                for (int i = 0; i < payload.Count; i++)
+                {
+                    payloadDictionary.Add(schema.Payload[i], payload[i]);
+                }
+            }
+            catch (Exception e)
+            {
+                SemanticLoggingEventSource.Log.ElasticsearchSinkEntityPayloadCreationFailed(e.ToString());
+            }
 
-        /// <summary>
-        /// Gets or sets the activity id for the event.
-        /// </summary>
-        /// <value>
-        /// The activity id.
-        /// </value>
-        public Guid ActivityId { get; set; }
-
-        /// <summary>
-        /// Gets or sets the related activity id for the event.
-        /// </summary>
-        /// <value>
-        /// The related activity id.
-        /// </value>
-        public Guid RelatedActivityId { get; set; }
+            return payloadDictionary;
+        }
     }
 }
