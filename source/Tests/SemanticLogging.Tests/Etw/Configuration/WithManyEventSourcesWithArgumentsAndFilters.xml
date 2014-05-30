@@ -19,7 +19,8 @@
           </arguments>
           <filter>
             <process name="iis.exe"/>
-            <process name="iisexpress.exe"/>
+            <!-- restore when TraceEvent supports multiple process names -->
+            <!--<process name="iisexpress.exe"/>-->
           </filter>
         </eventSource>
         <eventSource name="Test2" level="Warning">
