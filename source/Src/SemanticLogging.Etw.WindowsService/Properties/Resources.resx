@@ -129,6 +129,9 @@
   <data name="EventSessionMessage" xml:space="preserve">
     <value>Event Trace Session prefix: {0}</value>
   </data>
+  <data name="EventSourceArgumentsMessage" xml:space="preserve">
+    <value>Arguments: {0}</value>
+  </data>
   <data name="EventSourceDescriptionMessage" xml:space="preserve">
     <value>{0}, Level: {1}, MatchAnyKeyword: {2}</value>
   </data>
@@ -137,6 +140,9 @@
   </data>
   <data name="EventSourceNameMessage" xml:space="preserve">
     <value>Name: {0}</value>
+  </data>
+  <data name="EventSourceProcessNamesMessage" xml:space="preserve">
+    <value>Processes: {0}</value>
   </data>
   <data name="HelpArgDescription" xml:space="preserve">
     <value>[ -h | -help | -? ]		Display list of arguments</value>

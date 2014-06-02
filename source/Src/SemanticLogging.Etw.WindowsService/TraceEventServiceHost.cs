@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
+using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
         // Capture non-transient errors from internal SLAB EventSource
         private EventListener slabNonTransientErrors;
-        
+
         private TraceEventService service;
         private bool consoleMode;
 
@@ -56,7 +57,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
                 var configuration = TraceEventServiceConfiguration.Load(configFile, monitorChanges: true);
                 configuration.Settings.PropertyChanged += this.OnTraceEventServiceSettingsChanged;
                 this.service = new TraceEventService(configuration);
-                
+
                 if (this.consoleMode)
                 {
                     this.service.StatusChanged += this.OnServiceStatusChanged;
@@ -155,7 +156,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
         private void ShowConfiguration(TraceEventServiceConfiguration configuration, string file)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             sb.AppendFormat(Resources.LoadedConfigurationMessage, file);
             sb.AppendLine();
@@ -179,6 +180,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
                         sb.AppendLine();
                         sb.AppendFormat(Resources.EventSourceDescriptionMessage, eventSource.Name, eventSource.Level, eventSource.MatchAnyKeyword);
                         sb.AppendLine();
+
+                        if (eventSource.Arguments.Any())
+                        {
+                            sb.AppendFormat(
+                                Resources.EventSourceArgumentsMessage,
+                                string.Join(
+                                    ", ",
+                                    eventSource.Arguments.Select(kvp => string.Format("\"{0}\" = \"{1}\"", kvp.Key, kvp.Value))));
+                            sb.AppendLine();
+                        }
+
+                        if (eventSource.ProcessNamesToFilter.Any())
+                        {
+                            sb.AppendFormat(Resources.EventSourceProcessNamesMessage, string.Join(", ", eventSource.ProcessNamesToFilter));
+                            sb.AppendLine();
+                        }
                     }
                 }
             }
@@ -267,7 +284,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
             }
 
             EventLevel level;
-            if (!Enum.TryParse<EventLevel>(ConfigurationManager.AppSettings[NonTransientErrorsEventLevelKey], out level))
+            if (!Enum.TryParse(ConfigurationManager.AppSettings[NonTransientErrorsEventLevelKey], out level))
             {
                 level = EventLevel.LogAlways;
             }
