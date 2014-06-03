@@ -83,7 +83,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
         }
 
         [TestMethod]
-        public void CanGetThreadIdAndProcessidOnPartialTrustIfFullyTrusted()
+        public void CannotGetThreadIdAndProcessidOnPartialTrustIfFullyTrusted()
         {
             var slabAssemblyName = typeof(EventEntry).Assembly.GetName();
             if (slabAssemblyName.GetPublicKeyToken().Length == 0)
@@ -113,8 +113,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
 
                 var result = tester.GetProcessIdAndThreadIdThoughEvent();
 
-                Assert.AreEqual(Process.GetCurrentProcess().Id, result.Item1);
-                Assert.AreNotEqual(0, result.Item2);
+                Assert.AreEqual(0, result.Item1);
+                Assert.AreEqual(0, result.Item2);
             }
             finally
             {
