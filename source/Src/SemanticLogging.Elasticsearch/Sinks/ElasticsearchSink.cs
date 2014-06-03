@@ -42,8 +42,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// </summary>
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
-        /// <param name="index">Index name prefix formatted as index-{0:yyyy.MM.DD}</param>
-        /// <param name="type">Elasticsearch entry type, the default is etw</param>
+        /// <param name="index">Index name prefix formatted as index-{0:yyyy.MM.DD}.</param>
+        /// <param name="type">Elasticsearch entry type.</param>
         /// <param name="flattenPayload">Flatten the payload collection when serializing event entries</param>
         /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Elasticsearch.</param>
         /// <param name="bufferingCount">The buffering event entry count to wait before sending events to Elasticsearch </param>

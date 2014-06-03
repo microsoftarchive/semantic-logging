@@ -16,10 +16,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
     [TestClass]
     public class given_empty_index : ArrangeActAssert
     {
+        protected readonly string TestIndex = "slabtest";
         // These tests will delete data in the provided elasticsearch endpoint
         protected string elasticsearchUrl;
-
-        protected readonly string TestIndex = "slabtest";
 
         protected override void Arrange()
         {

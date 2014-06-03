@@ -27,7 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Reviewed.")]
         internal const string DefaultDateTimeFormat = "O";
 
-        private static readonly int currentProcessId = ProcessPropertyAccess.GetCurrentProcessId();
+        private static readonly int CurrentProcessId = ProcessPropertyAccess.GetCurrentProcessId();
 
         private readonly Guid providerId;
         private readonly int eventId;
@@ -78,7 +78,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <param name="formattedMessage">The message.</param>
         /// <param name="payload">The payload.</param>
         /// <param name="timestamp">The timestamp.</param>
-        /// <param name="processId">The proces id.</param>
+        /// <param name="processId">The process id.</param>
         /// <param name="threadId">The thread id.</param>
         /// <param name="activityId">The activity id.</param>
         /// <param name="relatedActivityId">The related activity id.</param>
@@ -224,7 +224,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 formattedMessage,
                 args.Payload,
                 timestamp,
-                currentProcessId,
+                CurrentProcessId,
                 ProcessPropertyAccess.GetCurrentThreadId(),
                 ActivityIdPropertyAccess.GetActivityId(args),
                 ActivityIdPropertyAccess.GetRelatedActivityId(args),
