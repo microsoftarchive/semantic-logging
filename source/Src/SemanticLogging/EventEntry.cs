@@ -294,26 +294,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 
             static ProcessPropertyAccess()
             {
-                if (typeof(ProcessPropertyAccess).Assembly.IsFullyTrusted)
+                if (AppDomain.CurrentDomain.IsHomogenous && AppDomain.CurrentDomain.IsFullyTrusted)
                 {
                     ProcessIdAccessor = GetCurrentProcessIdSafe;
                     CurrentThreadIdAccessor = GetCurrentThreadIdSafe;
                 }
                 else
                 {
-                    ProcessIdAccessor = () => 0;
-                    CurrentThreadIdAccessor = () => 0;
+                    ProcessIdAccessor = null;
+                    CurrentThreadIdAccessor = null;
                 }
             }
 
             public static int GetCurrentProcessId()
             {
-                return ProcessIdAccessor();
+                return ProcessIdAccessor != null ? ProcessIdAccessor() : 0;
             }
 
             public static int GetCurrentThreadId()
             {
-                return CurrentThreadIdAccessor();
+                return CurrentThreadIdAccessor != null ? CurrentThreadIdAccessor() : 0;
             }
 
             [SecuritySafeCritical]
