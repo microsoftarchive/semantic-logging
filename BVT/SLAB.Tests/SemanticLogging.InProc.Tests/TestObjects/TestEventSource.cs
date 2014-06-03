@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class TestEventSource : EventSource
+    public sealed class TestEventSource : EventSource
     {
         public const int InformationalEventId = 4;
         public const int AuditSuccessEventId = 20;
@@ -150,7 +150,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(CriticalWithTaskNameEventId, Level = EventLevel.Critical, Keywords = Keywords.Page, Task = Tasks.Page)]
+        [Event(CriticalWithTaskNameEventId, Level = EventLevel.Critical, Keywords = Keywords.Page, Task = Tasks.DBQuery)]
         public void CriticalWithTaskName(string message)
         {
             if (this.IsEnabled())

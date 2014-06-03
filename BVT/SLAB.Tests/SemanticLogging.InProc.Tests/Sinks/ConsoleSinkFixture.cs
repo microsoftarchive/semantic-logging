@@ -298,6 +298,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.IsNotNull(entry);
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [TestMethod]
         public void WhenLowEventIds()
         {
@@ -320,6 +321,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 Assert.AreEqual("Event IDs must be positive integers.", ex.Message);
             }
         }
+#endif
 
         [TestMethod]
         public void WhenLoggingErrorOCcurs()
@@ -384,7 +386,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
             Assert.IsNotNull(entry);
             Assert.IsTrue(entry.Contains("ProviderId : "));
-            Assert.IsTrue(entry.Contains("\r\nEventId : 1020\r\nKeywords : 4\r\nLevel : Informational\r\nMessage : \r\nOpcode : Info\r\nTask : 1\r\nVersion : 0\r\nPayload : [message : Info with keyword Diagnostic] \r\nEventName : PageInfo\r\nTimestamp : "));
+            Assert.IsTrue(entry.Contains("\r\nEventId : 1020\r\nKeywords : 4\r\nLevel : Informational\r\nMessage : \r\nOpcode : Info\r\nTask : 2\r\nVersion : 0\r\nPayload : [message : Info with keyword Diagnostic] \r\nEventName : DbQueryInfo\r\nTimestamp : "));
         }
 
         [TestMethod]
@@ -404,8 +406,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 });
 
             var entry = Regex.Split(consoleOutputInterceptor.Ouput, formatter.Header).Where(c => !string.IsNullOrWhiteSpace(c)).SingleOrDefault();
+#if EVENT_SOURCE_PACKAGE
+            Assert.IsNotNull(entry);
+#else
             Assert.IsNull(entry);
-        }
+#endif
+            }
 
         [TestMethod]
         public void WhenCriticalVerbosityForFormatter()

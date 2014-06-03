@@ -1041,8 +1041,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                 });
 
             Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
-            Assert.IsTrue(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : Critical]"));
-            Assert.IsFalse(File.ReadAllText(fileNameWithoutExtension + ".log").Contains("Payload : [message : VerboseWithKeywordPage]"));
+            string fileText = File.ReadAllText(fileNameWithoutExtension + ".log");
+            Assert.IsTrue(fileText.Contains("Payload : [message : Critical]"));
+            bool doesContainText = fileText.Contains("Payload : [message : VerboseWithKeywordPage]");
+#if !EVENT_SOURCE_PACKAGE
+            Assert.IsFalse(doesContainText);
+#else
+            Assert.IsTrue(doesContainText);
+#endif
         }
 
         [TestMethod]
@@ -1123,7 +1129,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     Assert.IsTrue(File.Exists(fileNameWithoutExtension + ".log"));
                 });
 
-            StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Task : 1\r\nVersion : 0\r\nPayload : [message : CriticalWithTaskName] \r\nEventName : PageInfo");
+            StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Task : 1\r\nVersion : 0\r\nPayload : [message : CriticalWithTaskName] \r\nEventName : PageSuspend");
             StringAssert.Contains(File.ReadAllText(fileNameWithoutExtension + ".log"), "Task : 64512\r\nVersion : 0\r\nPayload : [message : InfoWithKeywordDiagnostic] \r\nEventName : InfoWithKeywordDiagnosticInfo");
         }
 

@@ -544,7 +544,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
         }
 
         [TestMethod]
-        public void WhenSourceEnabledWitKeywordsAll()
+        public void WhenSourceEnabledWithKeywordsAll()
         {
             this.indexPrefix = "whensourceenabledwitkeywordsall";
             var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", this.indexPrefix, DateTime.UtcNow);
@@ -585,7 +585,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             // Wait for events to be inserted
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
             var result = ElasticsearchHelper.GetEvents(this.elasticsearchUri, index, this.type);
-            Assert.AreEqual(0, result.Hits.Total);
+            int resultCount = 0;
+#if EVENT_SOURCE_PACKAGE
+            resultCount = 1;
+#endif
+            Assert.AreEqual(resultCount, result.Hits.Total);
         }
 
         [TestMethod]
@@ -639,7 +643,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var result = ElasticsearchHelper.PollUntilEvents(this.elasticsearchUri, index, this.type, 2);
             Assert.AreEqual(2, result.Hits.Total);
             Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Task"].ToString() == "64513"));
-            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Task"].ToString() == "1"));
+            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => h.Source["Task"].ToString() == "2"));
         }
 
         [TestMethod]

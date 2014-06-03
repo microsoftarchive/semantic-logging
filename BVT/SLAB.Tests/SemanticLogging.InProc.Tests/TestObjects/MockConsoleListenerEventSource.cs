@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockConsoleListenerEventSource : EventSource
+    public sealed class MockConsoleListenerEventSource : EventSource
     {
         public const int InfoWithKeywordDiagnosticEventId = 1020;
         public const int CriticalWithTaskNameEventId = 1500;
@@ -21,6 +21,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         public class Tasks
         {
             public const EventTask Page = (EventTask)1;
+            public const EventTask DbQuery = (EventTask)2;
         }
 
         [Event(401, Level = EventLevel.Informational, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 1)]
@@ -51,7 +52,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         [Event(600, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 6)]
         public void Warning(string message) { this.WriteEvent(600, message); }
 
-        [Event(InfoWithKeywordDiagnosticEventId, Level = EventLevel.Informational, Keywords = Keywords.Diagnostic, Task = Tasks.Page)]
+        [Event(InfoWithKeywordDiagnosticEventId, Level = EventLevel.Informational, Keywords = Keywords.Diagnostic, Task = Tasks.DbQuery)]
         public void InfoWithKeywordDiagnostic(string message)
         {
             if (this.IsEnabled(EventLevel.Informational, Keywords.Diagnostic))
@@ -85,19 +86,27 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
         }
     }
 
-    public class MockHighEventIdEventSource : EventSource
+    public sealed class MockHighEventIdEventSource : EventSource
     {
+#if !EVENT_SOURCE_PACKAGE
+        private const int MaxEventId = 65535;
+#else
+        private const int MaxEventId = 65533;
+#endif
+
         public static readonly MockHighEventIdEventSource HigheventIdLogger = new MockHighEventIdEventSource();
 
-        [Event(65535, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 6)]
-        public void Warning() { this.WriteEvent(65535); }
+        [Event(MaxEventId, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 6)]
+        public void Warning() { this.WriteEvent(MaxEventId); }
     }
 
-    public class MockNegativeEventIdEventSource : EventSource
+#if !EVENT_SOURCE_PACKAGE
+    public sealed class MockNegativeEventIdEventSource : EventSource
     {
         public static readonly MockNegativeEventIdEventSource LoweventIdLogger = new MockNegativeEventIdEventSource();
 
         [Event(-100, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 6)]
         public void Warning() { this.WriteEvent(-100); }
     }
+#endif
 }

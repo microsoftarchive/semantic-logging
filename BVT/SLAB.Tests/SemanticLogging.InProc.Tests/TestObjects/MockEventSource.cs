@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockEventSource : EventSource
+    public sealed class MockEventSource : EventSource
     {
         public const int ErrorWithKeywordDiagnosticEventId = 1020;
         public const int CriticalWithKeywordPageEventId = 1021;
@@ -36,10 +36,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(2, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 0)]
+        [Event(2, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = Tasks.DBQuery, Version = 0)]
         public void Critical(string message) { this.WriteEvent(2, message); }
 
-        [Event(3, Level = EventLevel.Error, Keywords = EventKeywords.None, Message = "Test Error", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 3)]
+        [Event(3, Level = EventLevel.Error, Keywords = EventKeywords.None, Message = "Test Error", Opcode = EventOpcode.Stop, Task = Tasks.DBQuery, Version = 3)]
         public void Error(string message)
         {
             if (this.IsEnabled(EventLevel.Error, EventKeywords.None))
@@ -48,16 +48,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(4, Level = EventLevel.Verbose, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 1)]
+        [Event(4, Level = EventLevel.Verbose, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = Tasks.Page, Version = 1)]
         public void Verbose(string message) { this.WriteEvent(4, message); }
 
-        [Event(5, Level = EventLevel.LogAlways, Keywords = EventKeywords.None, Message = "Test LogAlways", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 5)]
+        [Event(5, Level = EventLevel.LogAlways, Keywords = EventKeywords.None, Message = "Test LogAlways", Opcode = EventOpcode.Reply, Task = Tasks.DBQuery, Version = 5)]
         public void LogAlways(string message) { this.WriteEvent(5, message); }
 
-        [Event(6, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 6)]
+        [Event(6, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test Warning", Opcode = EventOpcode.Send, Task = Tasks.DBQuery, Version = 6)]
         public void Warning(string message) { this.WriteEvent(6, message); }
 
-        [Event(7, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test OpCode", Opcode = EventOpcode.Resume, Task = EventTask.None, Version = 6)]
+        [Event(7, Level = EventLevel.Warning, Keywords = EventKeywords.None, Message = "Test OpCode", Opcode = EventOpcode.Resume, Task = Tasks.DBQuery, Version = 6)]
         public void WriteWithOpCode(string message) { this.WriteEvent(7, message); }
 
         [Event(8, Level = EventLevel.Informational)]
@@ -105,7 +105,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(CriticalWithTaskNameEventId, Level = EventLevel.Critical, Keywords = Keywords.Page, Task = Tasks.Page)]
+        [Event(CriticalWithTaskNameEventId, Level = EventLevel.Critical, Keywords = Keywords.Page, Task = Tasks.Page, Opcode = EventOpcode.Suspend)]
         public void CriticalWithTaskName(string message)
         {
             if (this.IsEnabled())
@@ -123,21 +123,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(15, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 0)]
+        [Event(15, Level = EventLevel.Critical, Keywords = EventKeywords.None, Message = "Functional Test", Opcode = EventOpcode.Resume, Task = Tasks.Page, Version = 0)]
         public void CriticalWithRelatedActivityId(string message, Guid relatedActivityId)
         {
             this.WriteEventWithRelatedActivityId(15, relatedActivityId, message);
         }
     }
 
-    public class MockEventSource2 : EventSource
+    public sealed class MockEventSource2 : EventSource
     {
         public static readonly MockEventSource2 Logger = new MockEventSource2();
 
         [Event(1, Level = EventLevel.Error, Keywords = EventKeywords.None, Message = "Test Error", Opcode = EventOpcode.Info, Task = EventTask.None, Version = 3)]
         public void Error(string message) { this.WriteEvent(1, message); }
     }
-    public class MockEventSource3 : EventSource
+    public sealed class MockEventSource3 : EventSource
     {
         public static readonly MockEventSource3 Logger = new MockEventSource3();
 

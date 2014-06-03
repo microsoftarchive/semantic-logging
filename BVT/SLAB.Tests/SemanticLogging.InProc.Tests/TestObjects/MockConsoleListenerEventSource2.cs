@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockConsoleListenerEventSource2 : EventSource
+    public sealed class MockConsoleListenerEventSource2 : EventSource
     {
         public static readonly MockConsoleListenerEventSource2 Logger = new MockConsoleListenerEventSource2();
 

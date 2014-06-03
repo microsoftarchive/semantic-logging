@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
-    public class TestEventSource : EventSource
+    public sealed class TestEventSource : EventSource
     {
         public const int InformationalEventId = 4;
         public const int AuditSuccessEventId = 20;

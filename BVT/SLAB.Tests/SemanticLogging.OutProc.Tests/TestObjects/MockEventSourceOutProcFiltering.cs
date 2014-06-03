@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
     [EventSource(Name = "MockEventSourceOutProcFiltering")]
-    public class MockEventSourceOutProcFiltering : EventSource
+    public sealed class MockEventSourceOutProcFiltering : EventSource
     {
         public static readonly MockEventSourceOutProcFiltering Logger = new MockEventSourceOutProcFiltering();
 

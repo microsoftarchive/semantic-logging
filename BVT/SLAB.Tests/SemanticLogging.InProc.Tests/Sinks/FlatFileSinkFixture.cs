@@ -474,7 +474,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.IsTrue(File.Exists(fileName));
             string strLog = ReadFileWithoutLock(fileName);
             StringAssert.Contains(strLog, "----------------------------------------\r\nProviderId : ");
-            StringAssert.Contains(strLog, "\r\nEventId : 4\r\nKeywords : None\r\nLevel : Verbose\r\nMessage : Functional Test\r\nOpcode : Info\r\nTask : 65530\r\nVersion : 1\r\nPayload : [message : Message 1] \r\nEventName : VerboseInfo\r\nTimestamp :");
+            // Task used to be "Task : 65530"
+            StringAssert.Contains(strLog, "\r\nEventId : 4\r\nKeywords : None\r\nLevel : Verbose\r\nMessage : Functional Test\r\nOpcode : Info\r\nTask : 1\r\nVersion : 1\r\nPayload : [message : Message 1] \r\nEventName : PageInfo\r\nTimestamp :");
         }
 
         [TestMethod]
@@ -937,9 +938,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = File.ReadAllText(fileName);
-            Assert.IsTrue(fileText.Contains("\r\nEventId : 3\r\nKeywords : None\r\nLevel : Error\r\nMessage : Test Error\r\nOpcode : Info\r\nTask : 65531\r\nVersion : 3\r\nPayload : [message : Error message] \r\nEventName : ErrorInfo\r\nTimestamp :"));
-            Assert.IsTrue(fileText.Contains("\r\nEventId : 2\r\nKeywords : None\r\nLevel : Critical\r\nMessage : Functional Test\r\nOpcode : Info\r\nTask : 65532\r\nVersion : 0\r\nPayload : [message : Critical message] \r\nEventName : CriticalInfo\r\nTimestamp :"));
-            Assert.IsTrue(fileText.Contains("----------------------------------------\r\nEventId : 6, Level : Warning, Message : Test Warning, Payload : [message : Warning message] , EventName : WarningInfo, Timestamp :"));
+            // Task used to be "Task : 65531"
+            Assert.IsTrue(fileText.Contains("\r\nEventId : 3\r\nKeywords : None\r\nLevel : Error\r\nMessage : Test Error\r\nOpcode : Stop\r\nTask : 2\r\nVersion : 3\r\nPayload : [message : Error message] \r\nEventName : DBQueryStop\r\nTimestamp :"));
+            // Task used to be "Task : 65532"
+            Assert.IsTrue(fileText.Contains("\r\nEventId : 2\r\nKeywords : None\r\nLevel : Critical\r\nMessage : Functional Test\r\nOpcode : Info\r\nTask : 2\r\nVersion : 0\r\nPayload : [message : Critical message] \r\nEventName : DBQueryInfo\r\nTimestamp :"));
+            Assert.IsTrue(fileText.Contains("----------------------------------------\r\nEventId : 6, Level : Warning, Message : Test Warning, Payload : [message : Warning message] , EventName : DBQuerySend, Timestamp :"));
         }
 
         [TestMethod]
@@ -962,7 +965,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             Assert.IsTrue(File.Exists(fileName));
             string fileText = ReadFileWithoutLock(fileName);
-            Assert.IsTrue(fileText.Contains("Task : 1\r\nVersion : 0\r\nPayload : [message : CriticalWithTaskName] \r\nEventName : PageInfo"));
+            Assert.IsTrue(fileText.Contains("Task : 1\r\nVersion : 0\r\nPayload : [message : CriticalWithTaskName] \r\nEventName : PageSuspend"));
             Assert.IsTrue(fileText.Contains("Task : 64512\r\nVersion : 0\r\nPayload : [message : InfoWithKeywordDiagnostic] \r\nEventName : InfoWithKeywordDiagnosticInfo"));
         }
 

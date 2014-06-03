@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
     [EventSource(Name = "TestProvideraaa", Guid = "B4F8149D-6DD2-4EE2-A46A-45584A942D1C")]
-    public class TestAttributesEventSource : EventSource
+    public sealed class TestAttributesEventSource : EventSource
     {
         public static readonly TestAttributesEventSource Logger = new TestAttributesEventSource();
 
