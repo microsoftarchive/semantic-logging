@@ -9,7 +9,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
     /// An <see cref="EventSource"/> class to notify non-transient faults and internal trace information.
     /// </summary>
     [EventSource(Name = "Microsoft-SemanticLogging", LocalizationResources = "Microsoft.Practices.EnterpriseLibrary.SemanticLogging.SemanticLoggingEventSourceResources")]
-    public class SemanticLoggingEventSource : EventSource
+    public sealed class SemanticLoggingEventSource : EventSource
     {
         private static readonly Lazy<SemanticLoggingEventSource> Instance = new Lazy<SemanticLoggingEventSource>(() => new SemanticLoggingEventSource());
 
@@ -381,7 +381,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         {
             if (this.IsEnabled())
             {
-                this.WriteEvent(1100, eventLevel, message);
+                this.WriteEvent(1101, eventLevel, message);
             }
         }
 

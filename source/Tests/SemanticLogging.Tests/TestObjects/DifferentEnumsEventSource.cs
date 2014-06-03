@@ -6,7 +6,7 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects
 {
     [EventSource]
-    public class DifferentEnumsEventSource : EventSource
+    public sealed class DifferentEnumsEventSource : EventSource
     {
         public static readonly DifferentEnumsEventSource Log = new DifferentEnumsEventSource();
 

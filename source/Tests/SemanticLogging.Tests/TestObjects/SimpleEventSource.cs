@@ -5,15 +5,21 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects
 {
     [EventSource(Name = "SimpleEventSource-CustomName")]
-    public class SimpleEventSource : EventSource
+    public sealed class SimpleEventSource : EventSource
     {
-        public class Opcodes
+        public static class Opcodes
         {
-            public const EventOpcode CustomOpcode1 = (EventOpcode)100;
-            public const EventOpcode CustomOpcode2 = (EventOpcode)101;
+            public const EventOpcode Opcode1 = (EventOpcode)100;
+            public const EventOpcode Opcode2 = (EventOpcode)101;
         }
 
-        public class Keywords
+        public static class Tasks
+        {
+            public const EventTask Custom = (EventTask)1;
+            public const EventTask Opcode = (EventTask)2;
+        }
+
+        public static class Keywords
         {
             public const EventKeywords LongKeyword = (EventKeywords)(1L << 33);
         }
@@ -31,47 +37,49 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
             WriteEvent(2, event2Arg0, event2Arg1);
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [Event(3, Opcode = EventOpcode.Start)]
         public void NoTaskSpecfied(int event3Arg0, int event3Arg1, int event3Arg2) { }
+#endif
 
-        [Event(4, Opcode = EventOpcode.Info)]
+        [Event(4, Task = Tasks.Opcode, Opcode = EventOpcode.Info)]
         public void OpcodeInfo() { }
 
-        [Event(5, Opcode = EventOpcode.Start)]
+        [Event(5, Task = Tasks.Opcode, Opcode = EventOpcode.Start)]
         public void OpcodeStart() { }
 
-        [Event(6, Opcode = EventOpcode.Stop)]
+        [Event(6, Task = Tasks.Opcode, Opcode = EventOpcode.Stop)]
         public void OpcodeStop() { }
 
-        [Event(7, Opcode = EventOpcode.DataCollectionStart)]
+        [Event(7, Task = Tasks.Opcode, Opcode = EventOpcode.DataCollectionStart)]
         public void OpcodeDataCollectionStart() { }
 
-        [Event(8, Opcode = EventOpcode.DataCollectionStop)]
+        [Event(8, Task = Tasks.Opcode, Opcode = EventOpcode.DataCollectionStop)]
         public void OpcodeDataCollectionStop() { }
 
-        [Event(9, Opcode = EventOpcode.Extension)]
+        [Event(9, Task = Tasks.Opcode, Opcode = EventOpcode.Extension)]
         public void OpcodeExtension() { }
 
-        [Event(10, Opcode = EventOpcode.Reply)]
+        [Event(10, Task = Tasks.Opcode, Opcode = EventOpcode.Reply)]
         public void OpcodeReply() { }
 
-        [Event(11, Opcode = EventOpcode.Resume)]
+        [Event(11, Task = Tasks.Opcode, Opcode = EventOpcode.Resume)]
         public void OpcodeResume() { }
 
-        [Event(12, Opcode = EventOpcode.Suspend)]
+        [Event(12, Task = Tasks.Opcode, Opcode = EventOpcode.Suspend)]
         public void OpcodeSuspend() { }
 
-        [Event(13, Opcode = EventOpcode.Send)]
+        [Event(13, Task = Tasks.Opcode, Opcode = EventOpcode.Send)]
         public void OpcodeSend() { }
 
-        [Event(14, Opcode = EventOpcode.Receive)]
+        [Event(14, Task = Tasks.Opcode, Opcode = EventOpcode.Receive)]
         public void OpcodeReceive() { }
 
-        [Event(15, Opcode = Opcodes.CustomOpcode1)]
-        public void CustomOpcode1Event() { }
+        [Event(15, Task = Tasks.Custom, Opcode = Opcodes.Opcode1)]
+        public void CustomOpcode1() { }
 
-        [Event(16, Opcode = Opcodes.CustomOpcode2)]
-        public void CustomOpcode2Event() { }
+        [Event(16, Task = Tasks.Custom, Opcode = Opcodes.Opcode2)]
+        public void CustomOpcode2() { }
 
         [Event(21, Level = EventLevel.LogAlways)]
         public void LevelLogAlways() { }

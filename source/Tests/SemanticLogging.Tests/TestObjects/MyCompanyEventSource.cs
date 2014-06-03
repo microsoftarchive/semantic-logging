@@ -8,7 +8,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
     public enum MyColor { Red, Yellow, Blue }
 
     [EventSource(Name = "MyCompany")]
-    public class MyCompanyEventSource : EventSource
+    public sealed class MyCompanyEventSource : EventSource
     {
         public class Keywords
         {
@@ -49,13 +49,16 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
         [Event(8)]
         public void LogColor(MyColor color) { WriteEvent(8, (int)color); }
 
+#if !EVENT_SOURCE_PACKAGE
+        // This will be invalid in new versions of EventSource - if you have an opcode you must have a task
         [Event(9, Opcode = EventOpcode.Start)]
         public void WithOpcodeAndNoTaskSpecfied(int arg1) { WriteEvent(9, arg1); }
+#endif
 
         [Event(10, Keywords = Keywords.DataBase | Keywords.Perf)]
         public void MultipleKeywords(int arg1) { WriteEvent(10, arg1); }
 
-        [Event(11, Opcode = EventOpcode.Send)]
+        [Event(11, Task = Tasks.Page, Opcode = EventOpcode.Send)]
         public void WithRelatedActivityId(Guid relatedActivityId) { WriteEventWithRelatedActivityId(11, relatedActivityId); }
 
         public static readonly MyCompanyEventSource Log = new MyCompanyEventSource();

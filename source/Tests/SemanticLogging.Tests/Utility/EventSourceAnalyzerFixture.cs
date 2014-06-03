@@ -18,12 +18,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             EventSourceAnalyzer.InspectAll(BadFormatEventSource.Log);
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [TestMethod] //Note: type in error message comes from ETW internal API
         [ExpectedException(typeof(ArgumentException))]
         public void when_inspecting_event_with_eventId_mismatch()
         {
             EventSourceAnalyzer.InspectAll(EventIdMismatchEventSource.Log);
         }
+#endif
 
         [TestMethod]
         [ExpectedException(typeof(EventSourceAnalyzerException))]
@@ -32,12 +34,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             EventSourceAnalyzer.InspectAll(MissingWriteEventCallEventSource.Log);
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void when_inspecting_event_with_duplicate_events()
         {
             EventSourceAnalyzer.InspectAll(DuplicateEventsEventSource.Log);
         }
+#endif
 
         [TestMethod]
         [ExpectedException(typeof(EventSourceAnalyzerException))]
@@ -81,20 +85,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             EventSourceAnalyzer.InspectAll(IncorrectKeywordsFilterEventSource.Log);
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void when_not_defined_opcode()
         {
             EventSourceAnalyzer.InspectAll(NonDefinedOpcodeEventSource.Log);
         }
-       
+#endif
+
         [TestMethod]
         [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_null_argument_in_writeEvent()
         {
             EventSourceAnalyzer.InspectAll(NullTypeArgumentEventSource.Log);
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_less_writeEvent_arguments()
@@ -115,7 +121,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         {
             EventSourceAnalyzer.InspectAll(DifferentTypeArgumentsWriteEventEventSource.Log);
         }
-         
+
         [TestMethod]
         [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_enum_types_that_generates_invalid_manifest()
@@ -130,12 +136,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             EventSourceAnalyzer.InspectAll(TestEventSource.Log);
             EventSourceAnalyzer.InspectAll(MyCompanyEventSource.Log);
             EventSourceAnalyzer.InspectAll(SemanticLoggingEventSource.Log);
-        }        
+        }
 
         #region Test EventSource classes
 
         [EventSource]
-        private class BadFormatEventSource : EventSource
+        private sealed class BadFormatEventSource : EventSource
         {
             internal static readonly BadFormatEventSource Log = new BadFormatEventSource();
 
@@ -146,7 +152,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class NoSingletonEventSource : EventSource
+        private sealed class NoSingletonEventSource : EventSource
         {
             [Event(1)]
             public void SimpleEvent()
@@ -155,8 +161,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [EventSource]
-        private class EventIdMismatchEventSource : EventSource
+        private sealed class EventIdMismatchEventSource : EventSource
         {
             internal static readonly EventIdMismatchEventSource Log = new EventIdMismatchEventSource();
 
@@ -166,9 +173,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
                 if (IsEnabled()) { WriteEvent(2); }
             }
         }
+#endif
 
         [EventSource]
-        private class NoEventsEventSource : EventSource
+        private sealed class NoEventsEventSource : EventSource
         {
             internal static readonly NoEventsEventSource Log = new NoEventsEventSource();
 
@@ -178,8 +186,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [EventSource]
-        private class DuplicateEventsEventSource : EventSource
+        private sealed class DuplicateEventsEventSource : EventSource
         {
             internal static readonly DuplicateEventsEventSource Log = new DuplicateEventsEventSource();
 
@@ -195,9 +204,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
                 if (IsEnabled()) { WriteEvent(1); }
             }
         }
+#endif
 
         [EventSource]
-        private class NotDecoratedPublicMethodsEventSource : EventSource
+        private sealed class NotDecoratedPublicMethodsEventSource : EventSource
         {
             internal static readonly NotDecoratedPublicMethodsEventSource Log = new NotDecoratedPublicMethodsEventSource();
 
@@ -218,7 +228,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class MissingWriteEventCallEventSource : EventSource
+        private sealed class MissingWriteEventCallEventSource : EventSource
         {
             internal static readonly MissingWriteEventCallEventSource Log = new MissingWriteEventCallEventSource();
 
@@ -229,7 +239,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class IncorrectLevelFilterEventSource : EventSource
+        private sealed class IncorrectLevelFilterEventSource : EventSource
         {
             internal static readonly IncorrectLevelFilterEventSource Log = new IncorrectLevelFilterEventSource();
 
@@ -244,7 +254,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class IncorrectKeywordsFilterEventSource : EventSource
+        private sealed class IncorrectKeywordsFilterEventSource : EventSource
         {
             public class Keywords
             {
@@ -264,7 +274,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class SameTypeArgumentsOrderMismatchEventSource : EventSource
+        private sealed class SameTypeArgumentsOrderMismatchEventSource : EventSource
         {
             internal static readonly SameTypeArgumentsOrderMismatchEventSource Log = new SameTypeArgumentsOrderMismatchEventSource();
 
@@ -276,7 +286,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class BooleanTypeArgumentsOrderMismatchEventSource : EventSource
+        private sealed class BooleanTypeArgumentsOrderMismatchEventSource : EventSource
         {
             internal static readonly BooleanTypeArgumentsOrderMismatchEventSource Log = new BooleanTypeArgumentsOrderMismatchEventSource();
 
@@ -288,7 +298,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class DifferentTypeArgumentsOrderMismatchEventSource : EventSource
+        private sealed class DifferentTypeArgumentsOrderMismatchEventSource : EventSource
         {
             internal static readonly DifferentTypeArgumentsOrderMismatchEventSource Log = new DifferentTypeArgumentsOrderMismatchEventSource();
 
@@ -299,8 +309,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
         [EventSource]
-        private class NonDefinedOpcodeEventSource : EventSource
+        private sealed class NonDefinedOpcodeEventSource : EventSource
         {
             internal static readonly NonDefinedOpcodeEventSource Log = new NonDefinedOpcodeEventSource();
 
@@ -310,9 +321,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
                 WriteEvent(1);
             }
         }
+#endif
 
         [EventSource]
-        private class NullTypeArgumentEventSource : EventSource
+        private sealed class NullTypeArgumentEventSource : EventSource
         {
             internal static readonly NullTypeArgumentEventSource Log = new NullTypeArgumentEventSource();
 
@@ -325,7 +337,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class LessWriteEventArgumentsEventSource : EventSource
+        private sealed class LessWriteEventArgumentsEventSource : EventSource
         {
             internal static readonly LessWriteEventArgumentsEventSource Log = new LessWriteEventArgumentsEventSource();
 
@@ -337,7 +349,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class MoreWriteEventArgumentsEventSource : EventSource
+        private sealed class MoreWriteEventArgumentsEventSource : EventSource
         {
             internal static readonly MoreWriteEventArgumentsEventSource Log = new MoreWriteEventArgumentsEventSource();
 
@@ -350,7 +362,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [EventSource]
-        private class DifferentTypeArgumentsWriteEventEventSource : EventSource
+        private sealed class DifferentTypeArgumentsWriteEventEventSource : EventSource
         {
             internal static readonly DifferentTypeArgumentsWriteEventEventSource Log = new DifferentTypeArgumentsWriteEventEventSource();
 
