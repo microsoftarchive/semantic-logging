@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
-           xmlns:etw="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw" 
+           xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
+           xmlns:etw="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
            targetNamespace="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified"
            version="1.2">
 
   <xs:element name="configuration" type="ConfigurationElement"/>
-  
+
   <xs:complexType name="ConfigurationElement">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="1" name="traceEventService" type="TraceEventServiceElement" />
@@ -32,11 +32,11 @@
       </xs:element>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:complexType name="TraceEventServiceElement">
     <xs:attribute name="sessionNamePrefix" type="NoEmpty200CharsString" use="optional" />
   </xs:complexType>
-  
+
   <xs:complexType name="SinkBaseWithFormatters" abstract="true">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBase">
@@ -89,8 +89,8 @@
       <xs:element name="filter" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-          <xs:element name="process" type="EventSourceFilterProcessElement" minOccurs="0" maxOccurs="unbounded"/>
-        </xs:sequence>
+            <xs:element name="process" type="EventSourceFilterProcessElement" minOccurs="0" maxOccurs="1"/>
+          </xs:sequence>
         </xs:complexType>
         <xs:unique name="filter">
           <xs:selector xpath="etw:*"/>
@@ -120,7 +120,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
- 
+
   <xs:complexType name="RollingFlatFileSinkElement">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBaseWithFormatters">
@@ -177,7 +177,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:complexType name="ConsoleSinkElement">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBaseWithFormatters">
@@ -185,7 +185,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:complexType name="CustomSinkElement">
     <xs:complexContent mixed="false">
       <xs:extension base="SinkBaseWithFormatters">
@@ -220,29 +220,29 @@
     </xs:sequence>
     <xs:attribute name="type" type="NoEmptyString" use="required" />
   </xs:complexType>
-  
+
   <xs:complexType name="ArrayOfParameterElement">
     <xs:sequence>
       <xs:element minOccurs="1" maxOccurs="unbounded" name="parameter" nillable="true" type="ParameterElement" />
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:complexType name="ParameterElement">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="1" name="parameters" type="ArrayOfParameterElement" />
     </xs:sequence>
     <xs:attribute name="name" type="NoEmptyString" />
     <xs:attribute name="type" type="NoEmptyString" use="required"/>
-    <xs:attribute name="value" type="xs:string" use="optional" />    
+    <xs:attribute name="value" type="xs:string" use="optional" />
   </xs:complexType>
-  
+
   <xs:simpleType name="EventTextFormatting">
     <xs:restriction base="xs:string">
       <xs:enumeration value="None" />
       <xs:enumeration value="Indented" />
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="EventLevel">
     <xs:restriction base="xs:string">
       <xs:enumeration value="LogAlways" />
@@ -273,7 +273,7 @@
       <xs:enumeration value="Midnight" />
     </xs:restriction>
   </xs:simpleType>
- 
+
   <xs:simpleType name="Guid">
     <xs:restriction base="xs:string">
       <xs:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" />
@@ -294,8 +294,8 @@
       <xs:pattern value=".*[^\s].*" />
     </xs:restriction>
   </xs:simpleType>
-  
- <xs:simpleType name="PositiveInteger">
+
+  <xs:simpleType name="PositiveInteger">
     <xs:restriction base="xs:int">
       <xs:pattern value="^[0-9]+$" />
     </xs:restriction>

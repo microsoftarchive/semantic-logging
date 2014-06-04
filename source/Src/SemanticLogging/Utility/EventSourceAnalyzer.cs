@@ -306,7 +306,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             {
                 MethodInfo eventMethod = this.analyzer.GetMethodFromSchema(this.EventData.EventSource, this.eventSchema);
                 ParameterInfo[] eventParameters = eventMethod.GetParameters();
-                int payloadParameterOffset = HasRelatedActivityId(eventParameters) ? 1 : 0;
+                int payloadParameterOffset = this.HasRelatedActivityId(eventParameters) ? 1 : 0;
 
                 if (eventParameters.Length != this.EventData.Payload.Count + payloadParameterOffset)
                 {

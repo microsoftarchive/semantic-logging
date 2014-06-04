@@ -49,13 +49,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
+        // Partial trust not supported with the NuGet package
         [TestMethod]
         public void CannotGetThreadIdAndProcessidOnPartialTrust()
         {
             var evidence = new Evidence();
             evidence.AddHostEvidence(new Zone(SecurityZone.Intranet));
             var permissionSet = SecurityManager.GetStandardSandbox(evidence);
-            permissionSet.AddPermission(new ReflectionPermission(ReflectionPermissionFlag.MemberAccess));
 
             var appDomain =
                 AppDomain.CreateDomain(
@@ -83,7 +84,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
         }
 
         [TestMethod]
-        public void CanGetThreadIdAndProcessidOnPartialTrustIfFullyTrusted()
+        public void CannotGetThreadIdAndProcessidOnPartialTrustIfFullyTrusted()
         {
             var slabAssemblyName = typeof(EventEntry).Assembly.GetName();
             if (slabAssemblyName.GetPublicKeyToken().Length == 0)
@@ -94,7 +95,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
             var evidence = new Evidence();
             evidence.AddHostEvidence(new Zone(SecurityZone.Intranet));
             var permissionSet = SecurityManager.GetStandardSandbox(evidence);
-            permissionSet.AddPermission(new ReflectionPermission(ReflectionPermissionFlag.MemberAccess));
 
             var appDomain =
                 AppDomain.CreateDomain(
@@ -113,14 +113,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.UsingEvent
 
                 var result = tester.GetProcessIdAndThreadIdThoughEvent();
 
-                Assert.AreEqual(Process.GetCurrentProcess().Id, result.Item1);
-                Assert.AreNotEqual(0, result.Item2);
+                Assert.AreEqual(0, result.Item1);
+                Assert.AreEqual(0, result.Item2);
             }
             finally
             {
                 AppDomain.Unload(appDomain);
             }
         }
+#endif
     }
 
     public class ProcessIdAndThreadIdTester : MarshalByRefObject

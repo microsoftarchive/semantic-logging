@@ -1081,6 +1081,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
             }
         }
 
+#if !EVENT_SOURCE_PACKAGE
+        // sampling not supported when using the NuGet package
         [TestClass]
         public class when_logging_multiple_events_from_a_process_process_with_sampling : given_traceEventService
         {
@@ -1125,5 +1127,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 Assert.AreEqual(10, this.formatter.WriteEventCalls[2].Payload[0]);
             }
         }
+#endif
     }
 }
