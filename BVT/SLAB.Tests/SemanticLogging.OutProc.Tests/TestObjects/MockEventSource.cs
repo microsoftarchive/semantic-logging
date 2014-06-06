@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
     [EventSource(Name = "TestEventSource")]
-    public class MockEventSource : EventSource
+    public sealed class MockEventSource : EventSource
     {
         public const int ErrorWithKeywordDiagnosticEventId = 1020;
         public const int CriticalWithKeywordPageEventId = 1021;

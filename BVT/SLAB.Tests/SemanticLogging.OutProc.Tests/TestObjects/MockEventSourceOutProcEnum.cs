@@ -5,9 +5,14 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
-    public class MockEventSourceOutProcEnum : EventSource
+    public sealed class MockEventSourceOutProcEnum : EventSource
     {
         public static readonly MockEventSourceOutProcEnum Logger = new MockEventSourceOutProcEnum();
+
+        public static class Tasks
+        {
+            public const EventTask Opcode = (EventTask)1;
+        }
 
         [Event(2)]
         public void SendEnumsEvent15(MyColor a, MyFlags b)
@@ -15,7 +20,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Te
             this.WriteEvent(2, (int)a, (int)b);
         }
 
-        [Event(3, Task = EventTask.None, Opcode = EventOpcode.Resume)]
+        [Event(3, Task = Tasks.Opcode, Opcode = EventOpcode.Resume)]
         public void SendEnumsEvent16(MyColor a, MyFlags b)
         {
             this.WriteEvent(3, a, b);

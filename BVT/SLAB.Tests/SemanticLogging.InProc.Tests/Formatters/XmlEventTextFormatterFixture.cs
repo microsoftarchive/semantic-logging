@@ -46,7 +46,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.UsingKeywordsEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.DBQuery, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)MockEventSrcForXml.Keywords.Errors, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
@@ -88,7 +88,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.UsingKeywordsEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.DBQuery, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)MockEventSrcForXml.Keywords.Errors, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
@@ -130,7 +130,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.Page, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
@@ -172,7 +172,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.Page, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
@@ -210,9 +210,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageFormatEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.DBQuery, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
-            Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>((int)EventOpcode.Stop, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
             Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
@@ -248,9 +248,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageFormatEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.DBQuery, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
-            Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
+            Assert.AreEqual<int>((int)EventOpcode.Stop, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));
             Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), Int32.Parse(XmlFormattedEntry.ThreadId.Value));
@@ -294,7 +294,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.Page, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
@@ -370,7 +370,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(MockEventSrcForXml.LogUsingMessageEventID, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSrcForXml.Tasks.Page, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>((long)EventKeywords.None, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Start, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));

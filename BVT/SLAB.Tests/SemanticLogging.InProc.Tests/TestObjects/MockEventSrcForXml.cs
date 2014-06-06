@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockEventSrcForXml : EventSource
+    public sealed class MockEventSrcForXml : EventSource
     {
         public const int UsingKeywordsEventID = 1;
         public const int LogUsingMessageEventID = 2;
@@ -16,7 +16,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
 
         public static readonly MockEventSrcForXml Logger = new MockEventSrcForXml();
 
-        [Event(UsingKeywordsEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Keywords = Keywords.Errors)]
+        public class Keywords
+        {
+            public const EventKeywords Errors = (EventKeywords)0x0001;
+            public const EventKeywords Trace = (EventKeywords)0x0002;
+        }
+
+        public class Tasks
+        {
+            public const EventTask Page = (EventTask)1;
+            public const EventTask DBQuery = (EventTask)2;
+        }
+
+        [Event(UsingKeywordsEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Task = Tasks.DBQuery, Keywords = Keywords.Errors)]
         public void UsingKeywords(string message, long longArg)
         {
             if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
@@ -25,7 +37,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(LogUsingMessageEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Message = LogMessage)]
+        [Event(LogUsingMessageEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Task = Tasks.Page, Message = LogMessage)]
         public void LogUsingMessage(string message)
         {
             if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
@@ -34,7 +46,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(LogUsingMessageFormatEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Message = "{0}")]
+        [Event(LogUsingMessageFormatEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Stop, Task = Tasks.DBQuery, Message = "{0}")]
         public void LogUsingMessageFormat(string message)
         {
             if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
@@ -43,19 +55,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(LogUsingMessageWithRelatedActivityIdEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Start, Message = LogMessage)]
+        [Event(LogUsingMessageWithRelatedActivityIdEventID, Level = EventLevel.Informational, Opcode = EventOpcode.Stop, Task = Tasks.Page, Message = LogMessage)]
         internal void LogUsingMessageWithRelatedActivityId(string message, Guid relatedActivityId)
         {
             if (this.IsEnabled(EventLevel.Informational, Keywords.Errors))
             {
                 this.WriteEventWithRelatedActivityId(LogUsingMessageWithRelatedActivityIdEventID, relatedActivityId, message);
             }
-        }
-
-        public class Keywords
-        {
-            public const EventKeywords Errors = (EventKeywords)0x0001;
-            public const EventKeywords Trace = (EventKeywords)0x0002;
         }
     }
 }

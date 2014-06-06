@@ -48,7 +48,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
             Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
-            Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
+            Assert.AreEqual<EventTask>(MockEventSrcForJson.Tasks.DBQuery, entry.Task);
             Assert.AreEqual(null, entry.Message);
             Assert.AreEqual(2, entry.Payload.Count);
             StringAssert.Contains(entry.Payload.First().ToString(), MockEventSrcForJson.LogMessage);
@@ -86,7 +86,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
             Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
-            Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
+            Assert.AreEqual<EventTask>(MockEventSrcForJson.Tasks.DBQuery, entry.Task);
             Assert.AreEqual(null, entry.Message);
             Assert.AreEqual(2, entry.Payload.Count);
             StringAssert.Contains(entry.Payload.First().ToString(), MockEventSrcForJson.LogMessage);
@@ -124,7 +124,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.For
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, entry.ProcessId);
             Assert.AreEqual<int>(ThreadHelper.GetCurrentUnManagedThreadId(), entry.ThreadId);
             Assert.AreEqual<byte>(0, entry.Version);
-            Assert.AreEqual<EventTask>(EventTask.None, entry.Task);
+            Assert.AreEqual<EventTask>(MockEventSrcForJson.Tasks.Page, entry.Task);
             Assert.AreEqual(MockEventSrcForJson.LogMessage, entry.Message);
             Assert.AreEqual(1, entry.Payload.Count);
             StringAssert.Contains(entry.Payload.First().ToString(), MockEventSrcForJson.LogMessage);

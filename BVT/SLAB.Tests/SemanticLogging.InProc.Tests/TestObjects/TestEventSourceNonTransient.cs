@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class TestEventSourceNonTransient : EventSource
+    public sealed class TestEventSourceNonTransient : EventSource
     {
         public const int InformationalEventId = 4;
         public const int AuditSuccessEventId = 20;

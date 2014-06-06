@@ -342,7 +342,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             Assert.IsNotNull(dt, "No data logged");
             Assert.IsTrue(dt.Rows.Count > 0);
             var dr = dt.Rows[0];
-            Assert.AreEqual(0, (int)dr["Task"]);
+
+            int taskValue = 0xfffe - (int)dr["EventId"];
+            Assert.AreEqual(taskValue, (int)dr["Task"]);
         }
 
         [TestMethod]
@@ -749,8 +751,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                     logger.ErrorWithKeywordDiagnostic(string.Concat("ErrorWithKeywordDiagnostic ", strGuid));
                     logger.CriticalWithKeywordPage(string.Concat("CriticalWithKeywordPage ", strGuid));
                 });
-
-            Assert.AreEqual(0, DatabaseHelper.GetRowCount(validConnectionString));
+            int rowCount = 0;
+#if EVENT_SOURCE_PACKAGE
+            rowCount = 2;
+#endif
+            Assert.AreEqual(rowCount, DatabaseHelper.GetRowCount(validConnectionString));
         }
 
         [TestMethod]

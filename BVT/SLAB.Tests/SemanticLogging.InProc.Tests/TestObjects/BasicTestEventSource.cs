@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class BasicTestEventSource : EventSource
+    public sealed class BasicTestEventSource : EventSource
     {
         public static readonly BasicTestEventSource Logger = new BasicTestEventSource();
 

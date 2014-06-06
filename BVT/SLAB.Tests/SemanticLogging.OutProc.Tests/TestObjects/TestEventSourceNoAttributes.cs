@@ -5,7 +5,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects
 {
-    public class TestEventSourceNoAttributes : EventSource
+    public sealed class TestEventSourceNoAttributes : EventSource
     {
         public static readonly TestEventSourceNoAttributes Logger = new TestEventSourceNoAttributes();
 

@@ -4,7 +4,7 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class TestAttributesEventSource : EventSource
+    public sealed class TestAttributesEventSource : EventSource
     {
         public static readonly TestAttributesEventSource Logger = new TestAttributesEventSource();
 
@@ -16,7 +16,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
                 this.WriteEvent(103, arg1, arg2, arg3);
             }
         }
-        [Event(104, Opcode = EventOpcode.Start)]
+        [Event(104)]
         public void NoTaskSpecfied(int arg1, int arg2, int arg3)
         {
             if (this.IsEnabled())

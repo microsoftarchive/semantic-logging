@@ -5,8 +5,14 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockEventSourceNoTask : EventSource
+    public sealed class MockEventSourceNoTask : EventSource
     {
+#if !EVENT_SOURCE_PACKAGE
+        private const int MaxEventId = 65535;
+#else
+        private const int MaxEventId = 65533;
+#endif
+
         [Event(1, Level = EventLevel.Informational, Message = "message param")]
         public void Informational(string message)
         {
@@ -16,7 +22,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(2, Opcode = EventOpcode.Start)]
+        [Event(2)]
         public void NoTaskSpecfied1(int event3Arg0, int event3Arg1, int event3Arg2)
         {
             if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
@@ -25,7 +31,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(3, Opcode = EventOpcode.Start)]
+        [Event(3)]
         public void NoTaskSpecfied2(int event3Arg0, int event3Arg1, int event3Arg2)
         {
         }
@@ -42,7 +48,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(6, Opcode = EventOpcode.Start)]
+        [Event(6)]
         public void DifferentTypes(string strArg, int longArg)
         {
             if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
@@ -51,7 +57,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(7, Opcode = EventOpcode.Start)]
+        [Event(7)]
         public void DifferentTypesInverted(string strArg, long longArg, int intArg)
         {
             if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
@@ -60,7 +66,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(8, Opcode = EventOpcode.Start)]
+        [Event(8)]
         public void AllSupportedTypes(short srtArg, int intArg, long lngArg, float fltArg, TestEnum enumArg, Guid guidArg)
         {
             if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
@@ -69,12 +75,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(65535, Opcode = EventOpcode.Start)]
+        [Event(MaxEventId)]
         public void MaxValues(string strArg, long longArg, int intArg)
         {
             if (this.IsEnabled(EventLevel.Informational, EventKeywords.None))
             {
-                this.WriteEvent(65535, intArg, strArg, longArg); 
+                this.WriteEvent(MaxEventId, intArg, strArg, longArg); 
             }
         }
 

@@ -599,7 +599,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
                });
 
             var eventsCount = AzureTableHelper.GetEventsCount(connectionString, this.tableName);
-            Assert.AreEqual(0, eventsCount);
+            int eventCount = 0;
+#if EVENT_SOURCE_PACKAGE
+            eventCount = 1;
+#endif
+            Assert.AreEqual(eventCount, eventsCount);
         }
 
         [TestMethod]
@@ -655,7 +659,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 2);
             Assert.AreEqual(2, events.Count());
             Assert.AreEqual("64513", events.First().Task.ToString());
-            Assert.AreEqual("1", events.ElementAt(1).Task.ToString());
+            Assert.AreEqual("2", events.ElementAt(1).Task.ToString());
         }
 
         [TestMethod]
@@ -677,7 +681,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Sin
 
             var events = AzureTableHelper.PollForEvents(connectionString, this.tableName, 1);
             Assert.AreEqual(1, events.Count());
-            Assert.AreEqual((int)EventTask.None, events.ElementAt(0).Task);
+            Assert.AreEqual((int)MockEventSourceInProcEnum.Tasks.DBQuery, events.ElementAt(0).Task);
             Assert.AreEqual((int)EventOpcode.Resume, events.ElementAt(0).Opcode);
             StringAssert.Contains(events.ElementAt(0).Payload, @"""a"": 2");
             StringAssert.Contains(events.ElementAt(0).Payload, @"""b"": 2");

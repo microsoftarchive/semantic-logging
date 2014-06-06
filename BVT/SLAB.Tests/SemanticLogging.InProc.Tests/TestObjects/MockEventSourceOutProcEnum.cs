@@ -5,9 +5,15 @@ using System.Diagnostics.Tracing;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.TestObjects
 {
-    public class MockEventSourceInProcEnum : EventSource
+    public sealed class MockEventSourceInProcEnum : EventSource
     {
         public static readonly MockEventSourceInProcEnum Logger = new MockEventSourceInProcEnum();
+
+        public class Tasks
+        {
+            public const EventTask Page = (EventTask)1;
+            public const EventTask DBQuery = (EventTask)2;
+        }
 
         [Event(1)]
         public void InformationalWithEnum(Message message)
@@ -24,7 +30,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             this.WriteEvent(2, (int)a, (int)b);
         }
 
-        [Event(3, Task = EventTask.None, Opcode = EventOpcode.Resume)]
+        [Event(3, Opcode = EventOpcode.Resume, Task = Tasks.Page)]
         public void SendEnumsEvent16(MyColor a, MyFlags b)
         {
             this.WriteEvent(3, a, b);
@@ -39,7 +45,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests.Tes
             }
         }
 
-        [Event(5, Task = EventTask.None, Opcode = EventOpcode.Resume)]
+        [Event(5, Opcode = EventOpcode.Resume, Task = Tasks.DBQuery)]
         public void SendEnumsEvent17(MyColor a, MyFlags b)
         {
             this.WriteEvent(5, (int)a, (int)b);

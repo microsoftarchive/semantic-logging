@@ -419,9 +419,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         }
 
         [EventSource(Name = "MyCompany1")]
-        private class MyNewCompanyEventSource : EventSource
+        private sealed class MyNewCompanyEventSource : EventSource
         {
-            [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start)]
+            public static class Tasks
+            {
+                public const EventTask Opcode = (EventTask)1;
+            }
+
+            [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start, Task = Tasks.Opcode)]
             public void Event1(int id)
             {
                 if (this.IsEnabled())
@@ -434,17 +439,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
         }
 
         [EventSource(Name = "MyCompany1")]
-        private class MyNewCompanyEventSource2 : EventSource
+        private sealed class MyNewCompanyEventSource2 : EventSource
         {
-            [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start)]
-            public void Event1(int id)
+            public static class Tasks
             {
-                if (this.IsEnabled())
-                {
-                    this.WriteEvent(1, id);
-                }
+                public const EventTask Opcode = (EventTask)1;
             }
-            [Event(2, Message = "Event2 ID={0}", Opcode = EventOpcode.Start)]
+
+            [Event(2, Message = "Event2 ID={0}", Opcode = EventOpcode.Start, Task = Tasks.Opcode)]
             public void Event2(int id)
             {
                 if (this.IsEnabled())

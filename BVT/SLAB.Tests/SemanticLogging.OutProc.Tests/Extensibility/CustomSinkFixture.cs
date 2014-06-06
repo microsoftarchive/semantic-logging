@@ -1,5 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.IO;
+using System.Linq;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
@@ -8,10 +13,6 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestSc
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Extensibility
 {
@@ -58,7 +59,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             File.Delete(fileName2);
             var validConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["valid"].ConnectionString;
             DatabaseHelper.CleanLoggingDB(validConnectionString);
-            var logger = MockEventSourceOutProc.Logger;
 
             string message = string.Concat("Message ", Guid.NewGuid());
             string message2 = string.Concat("Message2 ", Guid.NewGuid());
@@ -69,9 +69,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
                 svcConfiguration,
                 () =>
                 {
+                    var logger = MockEventSourceOutProc.Logger;
                     logger.LogSomeMessage(message);
                     logger.LogSomeMessage(message2);
-
+                    
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName1, 2, "--==--");
                     entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "==-==");
                     DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 4);
@@ -83,9 +84,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             StringAssert.Contains(entries.Last().ToString(), message2);
 
             Assert.IsTrue(File.Exists(fileName2));
-            Assert.AreEqual<int>(2, entries.Count());
-            StringAssert.Contains(entries.First().ToString(), message);
-            StringAssert.Contains(entries.Last().ToString(), message2);
+            Assert.AreEqual<int>(2, entries2.Count());
+            StringAssert.Contains(entries2.First().ToString(), message);
+            StringAssert.Contains(entries2.Last().ToString(), message2);
 
             var dt = DatabaseHelper.GetLoggedTable(validConnectionString);
             Assert.AreEqual(4, dt.Rows.Count);
@@ -154,7 +155,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
             IEnumerable<string> entries = null;
             var subject = new EventEntrySubject();
             subject.LogToMockFlatFile(fileName, "==-==");
-            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, System.Diagnostics.Tracing.EventLevel.LogAlways);
+            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, EventLevel.LogAlways);
             SinkSettings sinkSettings = new SinkSettings("MockFlatFileSink", subject, new List<EventSourceSettings>() { { settings } });
             List<SinkSettings> sinks = new List<SinkSettings>() { { sinkSettings } };
             TraceEventServiceConfiguration svcConfiguration = new TraceEventServiceConfiguration(sinks);
@@ -224,18 +225,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
         }
 
         [TestMethod]
-        public void WhenUsingCustomFormatterProgrammatically()
+        public void WhenUsingCustomFormatterProgramatically()
         {
             string fileName = "FlatFileCustomFormatterProgrammatic.log";
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
             CustomFormatterWithWait formatter = new CustomFormatterWithWait();
-            formatter.Detailed = System.Diagnostics.Tracing.EventLevel.LogAlways;
+            formatter.Detailed = EventLevel.LogAlways;
             formatter.Header = "---------------";
             formatter.DateTimeFormat = "d";
 
             IEnumerable<string> entries = null;
-            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, System.Diagnostics.Tracing.EventLevel.Critical);
+            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, EventLevel.Critical);
             var subject = new EventEntrySubject();
             subject.LogToFlatFile(fileName, formatter);
             SinkSettings sinkSettings = new SinkSettings("flatFileSink", subject, new List<EventSourceSettings>() { { settings } });
@@ -256,14 +257,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
         }
 
         [TestMethod]
-        public void WhenCustomFormatterThrowsAnExceptionAndUsedProgrammatically()
+        public void WhenCustomFormatterThrowsAnExceptionAndUsedProgramatically()
         {
             string fileName = "FlatFileOutProcCustomFormatterHandleException.log";
             File.Delete(fileName);
             var logger = MockEventSourceOutProc.Logger;
             MockFormatter formatter = new MockFormatter(true); //this formatter throws
 
-            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, System.Diagnostics.Tracing.EventLevel.Informational);
+            EventSourceSettings settings = new EventSourceSettings("MockEventSourceOutProc", null, EventLevel.Informational);
             var subject = new EventEntrySubject();
             subject.LogToFlatFile(fileName, formatter);
             SinkSettings sinkSettings = new SinkSettings("flatFileSink", subject, new List<EventSourceSettings>() { { settings } });
@@ -277,7 +278,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
                     {
                         try
                         {
-                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.LogAlways, Keywords.All);
+                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.LogAlways, Keywords.All);
 
                             logger.LogSomeMessage("some message using formatter that throws");
                             collectErrorsListener.WaitEvents.Wait(5000);
@@ -309,7 +310,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
                     {
                         try
                         {
-                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, System.Diagnostics.Tracing.EventLevel.Error, Keywords.All);
+                            collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
                             logger.LogSomeMessage("some message using formatter that throws");
                             collectErrorsListener.WaitEvents.Wait(5000);
 
