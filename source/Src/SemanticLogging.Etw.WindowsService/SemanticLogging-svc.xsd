@@ -89,7 +89,7 @@
       <xs:element name="filter" minOccurs="0" maxOccurs="1">
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="process" type="EventSourceFilterProcessElement" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="process" type="EventSourceFilterProcessElement" minOccurs="0" maxOccurs="unbounded"/>
           </xs:sequence>
         </xs:complexType>
         <xs:unique name="filter">
