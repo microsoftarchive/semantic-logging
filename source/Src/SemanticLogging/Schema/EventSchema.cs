@@ -10,7 +10,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
     /// <summary>
     /// Represents an <see cref="EventSource"/> schema.
     /// </summary>
-    public class EventSchema
+    public sealed class EventSchema
     {
         private readonly int id;
         private readonly Guid providerId;

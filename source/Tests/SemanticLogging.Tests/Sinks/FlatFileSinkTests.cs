@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -46,7 +47,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [ExpectedException(typeof(DirectoryNotFoundException))]
         public void ThrowOnDirectoryNotFound()
         {
-            new FlatFileSink(@"Z:\Foo\foo.log", false);
+            new FlatFileSink(@"Z:\Foo\foo.log", new SimpleMessageFormatter(), false);
         }
 
         [TestMethod]
@@ -54,37 +55,37 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), false));
+                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), false));
+                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
             }
         }
 
         [TestMethod]
         public void ThrowOnInvalidOSFileNames()
         {
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("PRN.log", false));
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("AUX.log", false));
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("CON.log", false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("PRN.log", new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("AUX.log", new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("CON.log", new SimpleMessageFormatter(), false));
         }
 
         [TestMethod]
         public void ThrowOnPathNavigationFileName()
         {
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(".", false));
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"..\", false));
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"..\..\..", false));
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"C:\Test\..\", false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(".", new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"..\", new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"..\..\..", new SimpleMessageFormatter(), false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink(@"C:\Test\..\", new SimpleMessageFormatter(), false));
         }
 
         [TestMethod]
         public void CreatesFlatFile()
         {
-            sink = new FlatFileSink(this.fileName, false);
-            sink.OnNext("|1");
+            sink = new FlatFileSink(this.fileName, new SimpleMessageFormatter(), false);
+            sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|1"));
 
             Assert.IsTrue(File.Exists(this.fileName));
 
@@ -96,10 +97,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void AppendsEntriesToFlatFile()
         {
-            sink = new FlatFileSink(this.fileName, false);
-            sink.OnNext("|1");
-            sink.OnNext("|2");
-            sink.OnNext("|3");
+            sink = new FlatFileSink(this.fileName, new SimpleMessageFormatter(), false);
+            sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|1"));
+            sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|2"));
+            sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|3"));
 
             var entries = ReadFileWithoutLock(this.fileName).Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual<int>(3, entries.Length);
@@ -111,10 +112,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void ConcurrentAppendsEntriesToFlatFile()
         {
-            sink = new FlatFileSink(this.fileName, false);
+            sink = new FlatFileSink(this.fileName, new SimpleMessageFormatter(), false);
             const int NumberOfEntries = 100;
 
-            Parallel.For(0, NumberOfEntries, i => sink.OnNext("|" + i));
+            Parallel.For(0, NumberOfEntries, i => sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|" + i)));
 
             var entries = ReadFileWithoutLock(this.fileName).Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual<int>(NumberOfEntries, entries.Length);
@@ -128,10 +129,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [Ignore]    // TODO fix race condition
         public void ConcurrentAppendsEntriesToFlatFileWhenUsingAsync()
         {
-            sink = new FlatFileSink(this.fileName, isAsync: true);
+            sink = new FlatFileSink(this.fileName, new SimpleMessageFormatter(), isAsync: true);
             const int NumberOfEntries = 100;
 
-            Parallel.For(0, NumberOfEntries, i => sink.OnNext("|" + i));
+            Parallel.For(0, NumberOfEntries, i => sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|" + i)));
             sink.FlushAsync().Wait();
             var entries = ReadFileWithoutLock(this.fileName).Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual<int>(NumberOfEntries, entries.Length);
@@ -145,7 +146,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void CreatesDirectoryForLogRecursively()
         {
             string file = @"dir1\dir2\test\patterns\practices\log.xt";
-            using (var flatFileSink = new FlatFileSink(file, false))
+            using (var flatFileSink = new FlatFileSink(file, new SimpleMessageFormatter(), false))
             {
                 Assert.IsTrue(new DirectoryInfo(Path.GetDirectoryName(file)).Exists);
             }
@@ -159,10 +160,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var tempFileName = this.fileName;
             this.fileName = Path.Combine(Path.Combine(Environment.CurrentDirectory, "fromtestvariable"), tempFileName);
 
-            this.sink = new FlatFileSink(Path.Combine(Environment.CurrentDirectory, @"%TESTVAR%\") + tempFileName, false);
-            this.sink.OnNext("|1");
-            this.sink.OnNext("|2");
-            this.sink.OnNext("|3");
+            this.sink = new FlatFileSink(Path.Combine(Environment.CurrentDirectory, @"%TESTVAR%\") + tempFileName, new SimpleMessageFormatter(), false);
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|1"));
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|2"));
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|3"));
 
             var entries = ReadFileWithoutLock(this.fileName).Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual<int>(3, entries.Length);
@@ -177,10 +178,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             var tempFileName = this.fileName;
             this.fileName = Path.Combine(Environment.CurrentDirectory, tempFileName);
 
-            this.sink = new FlatFileSink(Path.Combine(Environment.CurrentDirectory, @"%MISSINGTESTVAR%\") + tempFileName, false);
-            this.sink.OnNext("|1");
-            this.sink.OnNext("|2");
-            this.sink.OnNext("|3");
+            this.sink = new FlatFileSink(Path.Combine(Environment.CurrentDirectory, @"%MISSINGTESTVAR%\") + tempFileName, new SimpleMessageFormatter(), false);
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|1"));
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|2"));
+            this.sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|3"));
 
             var entries = ReadFileWithoutLock(this.fileName).Split(new[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
             Assert.AreEqual<int>(3, entries.Length);
@@ -192,7 +193,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void CreatingSinkWithVariableThatResultsInInvalidPathThrows()
         {
-            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("%INVALIDPATH%", false));
+            AssertEx.Throws<ArgumentException>(() => new FlatFileSink("%INVALIDPATH%", new SimpleMessageFormatter(), false));
         }
 
         private static string ReadFileWithoutLock(string fileName)
@@ -222,9 +223,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
                 try
                 {
-                    using (var sink = new FlatFileSink(this.fileName, isAsync: true))
+                    using (var sink = new FlatFileSink(this.fileName, new SimpleMessageFormatter(), isAsync: true))
                     {
-                        Parallel.For(0, NumberOfEntries, i => sink.OnNext("|" + i));
+                        Parallel.For(0, NumberOfEntries, i => sink.OnNext(EventEntryTestHelper.Create(formattedMessage: "|" + i)));
                         sink.FlushAsync().Wait();
                     }
 
@@ -235,7 +236,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 finally
                 {
                     if (File.Exists(this.fileName))
-                    { 
+                    {
                         File.Delete(this.fileName);
                     }
                 }

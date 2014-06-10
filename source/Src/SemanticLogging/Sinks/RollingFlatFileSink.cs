@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
@@ -13,9 +14,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// A sink that writes to a flat file with a rolling overwrite behavior. 
     /// </summary>
     /// <remarks>This class is thread-safe.</remarks>
-    public partial class RollingFlatFileSink : IObserver<string>, IDisposable
+    public partial class RollingFlatFileSink : IObserver<EventEntry>, IDisposable
     {
         private readonly FileInfo file;
+        private readonly IEventTextFormatter formatter;
 
         private readonly StreamWriterRollingHelper rollingHelper;
         private readonly RollFileExistsBehavior rollFileExistsBehavior;
@@ -28,7 +30,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly object flushLockObject = new object();
 
         private readonly bool isAsync;
-        private BlockingCollection<string> pendingEntries;
+        private BlockingCollection<EventEntry> pendingEntries;
         private volatile TaskCompletionSource<bool> flushSource = new TaskCompletionSource<bool>();
         private CancellationTokenSource cancellationTokenSource;
         private Task asyncProcessorTask;
@@ -45,10 +47,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <param name="rollFileExistsBehavior">Expected behavior that will be used when the roll file has to be created.</param>
         /// <param name="rollInterval">The time interval that makes the file to be rolled.</param>
         /// <param name="maxArchivedFiles">The maximum number of archived files to keep.</param>
+        /// <param name="formatter">The event entry formatter.</param>
         /// <param name="isAsync">Specifies if the writing should be done asynchronously, or synchronously with a blocking call.</param>
-        public RollingFlatFileSink(string fileName, int rollSizeKB, string timestampPattern, RollFileExistsBehavior rollFileExistsBehavior, RollInterval rollInterval, int maxArchivedFiles, bool isAsync)
+        public RollingFlatFileSink(string fileName, int rollSizeKB, string timestampPattern, RollFileExistsBehavior rollFileExistsBehavior, RollInterval rollInterval, int maxArchivedFiles, IEventTextFormatter formatter, bool isAsync)
         {
+            Guard.ArgumentNotNull(formatter, "formatter");
+
             this.file = FileUtil.ProcessFileNameForLogging(fileName);
+            this.formatter = formatter;
 
             if (rollInterval == RollInterval.None)
             {
@@ -78,7 +84,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 var now = this.rollingHelper.DateTimeProvider.CurrentDateTime;
                 var midnight = now.AddDays(1).Date;
 
-                var callback = new TimerCallback(delegate(object o)
+                var callback = new TimerCallback(delegate
                 {
                     lock (this.lockObject)
                     {
@@ -93,8 +99,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             if (isAsync)
             {
                 this.cancellationTokenSource = new CancellationTokenSource();
-                this.pendingEntries = new BlockingCollection<string>();
-                this.asyncProcessorTask = Task.Factory.StartNew((Action)this.WriteEntries, TaskCreationOptions.LongRunning);
+                this.pendingEntries = new BlockingCollection<EventEntry>();
+                this.asyncProcessorTask = Task.Factory.StartNew(this.WriteEntries, TaskCreationOptions.LongRunning);
             }
         }
 
@@ -171,26 +177,31 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private void OnSingleEventWritten(string entry)
+        private void OnSingleEventWritten(EventEntry entry)
         {
-            try
+            var formattedEntry = entry.TryFormatAsString(this.formatter);
+
+            if (formattedEntry != null)
             {
-                lock (this.lockObject)
+                try
                 {
-                    this.rollingHelper.RollIfNecessary();
-                    this.writer.Write(entry);
-                    this.writer.Flush();
+                    lock (this.lockObject)
+                    {
+                        this.rollingHelper.RollIfNecessary();
+                        this.writer.Write(formattedEntry);
+                        this.writer.Flush();
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                SemanticLoggingEventSource.Log.RollingFlatFileSinkWriteFailed(e.ToString());
+                catch (Exception e)
+                {
+                    SemanticLoggingEventSource.Log.RollingFlatFileSinkWriteFailed(e.ToString());
+                }
             }
         }
 
         private void WriteEntries()
         {
-            string entry;
+            EventEntry entry;
             var token = this.cancellationTokenSource.Token;
 
             while (!token.IsCancellationRequested)
@@ -229,13 +240,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
                 this.rollingHelper.RollIfNecessary();
 
-                try
+                var formattedEntry = entry.TryFormatAsString(this.formatter);
+                if (formattedEntry != null)
                 {
-                    this.writer.Write(entry);
-                }
-                catch (Exception e)
-                {
-                    SemanticLoggingEventSource.Log.RollingFlatFileSinkWriteFailed(e.ToString());
+                    try
+                    {
+                        this.writer.Write(formattedEntry);
+                    }
+                    catch (Exception e)
+                    {
+                        SemanticLoggingEventSource.Log.RollingFlatFileSinkWriteFailed(e.ToString());
+                    }
                 }
             }
 
@@ -268,29 +283,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to the file.</param>
-        public void OnNext(string value)
+        public void OnNext(EventEntry value)
         {
-            if (value != null)
+            if (this.isAsync)
             {
-                if (this.isAsync)
-                {
-                    this.pendingEntries.Add(value);
+                this.pendingEntries.Add(value);
 
-                    if (this.flushSource.Task.IsCompleted)
+                if (this.flushSource.Task.IsCompleted)
+                {
+                    lock (this.flushLockObject)
                     {
-                        lock (this.flushLockObject)
+                        if (this.flushSource.Task.IsCompleted)
                         {
-                            if (this.flushSource.Task.IsCompleted)
-                            {
-                                this.flushSource = new TaskCompletionSource<bool>();
-                            }
+                            this.flushSource = new TaskCompletionSource<bool>();
                         }
                     }
                 }
-                else
-                {
-                    this.OnSingleEventWritten(value);
-                }
+            }
+            else
+            {
+                this.OnSingleEventWritten(value);
             }
         }
 

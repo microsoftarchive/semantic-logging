@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
@@ -13,14 +14,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// A sink that writes to a flat file.
     /// </summary>    
     /// <remarks>This class is thread-safe.</remarks>
-    public class FlatFileSink : IObserver<string>, IDisposable
+    public class FlatFileSink : IObserver<EventEntry>, IDisposable
     {
+        private readonly IEventTextFormatter formatter;
         private readonly bool isAsync;
         private readonly object lockObject = new object();
         private readonly object flushLockObject = new object();
         private StreamWriter writer;
         private bool disposed;
-        private BlockingCollection<string> pendingEntries;
+        private BlockingCollection<EventEntry> pendingEntries;
         private volatile TaskCompletionSource<bool> flushSource = new TaskCompletionSource<bool>();
         private CancellationTokenSource cancellationTokenSource;
         private Task asyncProcessorTask;
@@ -29,11 +31,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Initializes a new instance of the <see cref="FlatFileSink" /> class.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>
+        /// <param name="formatter">The formatter for entries</param>
         /// <param name="isAsync">Specifies if the writing should be done asynchronously, or synchronously with a blocking call.</param>
-        public FlatFileSink(string fileName, bool isAsync)
+        public FlatFileSink(string fileName, IEventTextFormatter formatter, bool isAsync)
         {
-            var file = FileUtil.ProcessFileNameForLogging(fileName);
+            Guard.ArgumentNotNull(formatter, "formatter");
 
+            var file = FileUtil.ProcessFileNameForLogging(fileName);
+            this.formatter = formatter;
             this.writer = new StreamWriter(file.Open(FileMode.Append, FileAccess.Write, FileShare.Read));
 
             this.isAsync = isAsync;
@@ -43,7 +48,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             if (isAsync)
             {
                 this.cancellationTokenSource = new CancellationTokenSource();
-                this.pendingEntries = new BlockingCollection<string>();
+                this.pendingEntries = new BlockingCollection<EventEntry>();
                 this.asyncProcessorTask = Task.Factory.StartNew((Action)this.WriteEntries, TaskCreationOptions.LongRunning);
             }
         }
@@ -99,25 +104,30 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private void OnSingleEventWritten(string entry)
+        private void OnSingleEventWritten(EventEntry entry)
         {
-            try
+            var formattedEntry = entry.TryFormatAsString(this.formatter);
+
+            if (formattedEntry != null)
             {
-                lock (this.lockObject)
+                try
                 {
-                    this.writer.Write(entry);
-                    this.writer.Flush();
+                    lock (this.lockObject)
+                    {
+                        this.writer.Write(formattedEntry);
+                        this.writer.Flush();
+                    }
                 }
-            }
-            catch (Exception e)
-            {
-                SemanticLoggingEventSource.Log.FlatFileSinkWriteFailed(e.ToString());
+                catch (Exception e)
+                {
+                    SemanticLoggingEventSource.Log.FlatFileSinkWriteFailed(e.ToString());
+                }
             }
         }
 
         private void WriteEntries()
         {
-            string entry;
+            EventEntry entry;
             var token = this.cancellationTokenSource.Token;
 
             while (!token.IsCancellationRequested)
@@ -147,13 +157,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     break;
                 }
 
-                try
+                var formattedEntry = entry.TryFormatAsString(this.formatter);
+                if (formattedEntry != null)
                 {
-                    this.writer.Write(entry);
-                }
-                catch (Exception e)
-                {
-                    SemanticLoggingEventSource.Log.FlatFileSinkWriteFailed(e.ToString());
+                    try
+                    {
+                        this.writer.Write(formattedEntry);
+                    }
+                    catch (Exception e)
+                    {
+                        SemanticLoggingEventSource.Log.FlatFileSinkWriteFailed(e.ToString());
+                    }
                 }
             }
 
@@ -195,29 +209,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to the file.</param>
-        public void OnNext(string value)
+        public void OnNext(EventEntry value)
         {
-            if (value != null)
+            if (this.isAsync)
             {
-                if (this.isAsync)
-                {
-                    this.pendingEntries.Add(value);
+                this.pendingEntries.Add(value);
 
-                    if (this.flushSource.Task.IsCompleted)
+                if (this.flushSource.Task.IsCompleted)
+                {
+                    lock (this.flushLockObject)
                     {
-                        lock (this.flushLockObject)
+                        if (this.flushSource.Task.IsCompleted)
                         {
-                            if (this.flushSource.Task.IsCompleted)
-                            {
-                                this.flushSource = new TaskCompletionSource<bool>();
-                            }
+                            this.flushSource = new TaskCompletionSource<bool>();
                         }
                     }
                 }
-                else
-                {
-                    this.OnSingleEventWritten(value);
-                }
+            }
+            else
+            {
+                this.OnSingleEventWritten(value);
             }
         }
     }

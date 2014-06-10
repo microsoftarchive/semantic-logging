@@ -69,14 +69,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_then_object_can_serialize()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance"
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values);
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", true).Serialize(new[] { logObject });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
@@ -86,16 +85,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_then_object_can_serialize_process_and_thread_id()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance",
-                ProcessId = 300,
-                ThreadId = 500
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values,
+                    processId: 300,
+                    threadId: 500);
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", true).Serialize(new[] { logObject });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
@@ -111,16 +109,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_with_activtyid_then_activityid_serialized()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance",
-                ActivityId = Guid.NewGuid(),
-                RelatedActivityId = Guid.NewGuid()
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values,
+                    activityId: Guid.NewGuid(),
+                    relatedActivityId: Guid.NewGuid());
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", true).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -135,14 +132,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_without_activtyid_then_activityid_not_serialized()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance"
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values);
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", true).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -157,14 +153,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         public void when_serializing_a_log_entry_without_flattened_payload_then_payload_nested()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance"
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values);
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", false).Serialize(new[] { logObject });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", false).Serialize(new[] { logObject });
 
             var serializedEntry = actual.Split('\n')[1];
             var jsonObject = JObject.Parse(serializedEntry);
@@ -180,21 +175,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             // Note: converting an array does not create valid message for use in elasticsearch bulk operation
 
-            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", true).Serialize(new[] { CreateJsonEventEntry(), CreateJsonEventEntry() });
+            var actual = new ElasticsearchEventEntrySerializer("logstash", "slab", "instance", true).Serialize(new[] { CreateEventEntry(), CreateEventEntry() });
 
             Assert.IsNotNull(actual);
             Assert.IsTrue(this.IsValidBulkMessage(actual));
         }
 
-        private static JsonEventEntry CreateJsonEventEntry()
+        private static EventEntry CreateEventEntry()
         {
             var payload = new Dictionary<string, object> { { "msg", "the message" }, { "date", DateTime.UtcNow } };
-            var logObject = new JsonEventEntry
-            {
-                EventDate = DateTime.UtcNow,
-                Payload = payload,
-                InstanceName = "instance"
-            };
+            var logObject =
+                EventEntryTestHelper.Create(
+                    timestamp: DateTimeOffset.UtcNow,
+                    payloadNames: payload.Keys,
+                    payload: payload.Values);
+
             return logObject;
         }
 
@@ -262,7 +257,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 
                 var sink = new ElasticsearchSink("instance", endpoint, "slabtest", "etw", true, TimeSpan.FromSeconds(1), 100, 800, TimeSpan.FromMinutes(1));
 
-                sink.OnNext(new JsonEventEntry());
+                sink.OnNext(EventEntryTestHelper.Create());
 
                 var flushCompleteInTime = sink.FlushAsync().Wait(TimeSpan.FromSeconds(45));
 
@@ -272,75 +267,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 Assert.IsTrue(collectErrorsListener.WrittenEntries.First().Payload.Single(m => m.ToString().Contains("InvalidIndexNameException")) != null);
                 Assert.IsTrue(flushCompleteInTime);
             }
-        }
-    }
-
-    [TestClass]
-    public class given_logged_entry : ContextBase
-    {
-        private InMemorySink sink;
-
-        protected override void Given()
-        {
-            this.sink = new InMemorySink();
-
-            using (var listener = new ObservableEventListener())
-            {
-                listener.Subscribe(this.sink);
-
-                listener.EnableEvents(TestEventSource.Log, EventLevel.LogAlways, ~EventKeywords.None);
-
-                Guid currentActivityId;
-                EventSource.SetCurrentThreadActivityId(Guid.NewGuid(), out currentActivityId);
-                try
-                {
-                    TestEventSource.Log.EventWithPayloadAndMessageAndRelatedActivityId(Guid.NewGuid(), "p1", 2);
-                }
-                finally
-                {
-                    EventSource.SetCurrentThreadActivityId(currentActivityId);
-                }
-            }
-        }
-
-        [TestMethod]
-        public void when_mapped_to_json_entry_then_copies_properties()
-        {
-            Assert.AreEqual(1, this.sink.Entries.Count);
-
-            var entry = this.sink.Entries.Single();
-            var jsonEntry = entry.TryConvertToJsonEventEntry();
-
-            Assert.AreEqual(entry.EventId, jsonEntry.EventId);
-
-            Assert.AreEqual(entry.ProcessId, jsonEntry.ProcessId);
-            Assert.AreEqual(entry.ThreadId, jsonEntry.ThreadId);
-
-            Assert.AreEqual(entry.ActivityId, entry.ActivityId);
-            Assert.AreEqual(entry.RelatedActivityId, entry.RelatedActivityId);
-        }
-
-        private class InMemorySink : IObserver<EventEntry>
-        {
-            public InMemorySink()
-            {
-                this.Entries = new List<EventEntry>();
-            }
-
-            public void OnCompleted()
-            {
-            }
-
-            public void OnError(Exception error)
-            {
-            }
-
-            public void OnNext(EventEntry value)
-            {
-                this.Entries.Add(value);
-            }
-
-            public IList<EventEntry> Entries { get; private set; }
         }
     }
 }

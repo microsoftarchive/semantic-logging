@@ -21,7 +21,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Sink that asynchronously writes entries to a Windows Azure table.
     /// </summary>
-    public class WindowsAzureTableSink : IObserver<CloudEventEntry>, IDisposable
+    public class WindowsAzureTableSink : IObserver<EventEntry>, IDisposable
     {
         private const int BufferCountTrigger = 100;
         private static readonly char[] DisallowedCharsInPartitionAndRowKeys = new[] { '/', '\\', '#', '@' };
@@ -143,7 +143,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to Windows Azure.</param>
-        public void OnNext(CloudEventEntry value)
+        public void OnNext(EventEntry value)
+        {
+            this.OnNext(value.TryConvertToCloudEventEntry());
+        }
+
+        internal void OnNext(CloudEventEntry value)
         {
             if (value == null)
             {

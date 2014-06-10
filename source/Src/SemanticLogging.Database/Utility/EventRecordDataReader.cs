@@ -3,24 +3,21 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database;
 using Microsoft.SqlServer.Server;
 
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
 {
     internal sealed class EventEntryDataReader : IDataReader, IConvertible
     {
-        private IEnumerator<EventRecord> enumerator;
+        private readonly string instanceName;
+        private IEnumerator<EventEntry> enumerator;
         private int recordsAffected;
         private SqlDataRecord currentRecord;
 
-        public EventEntryDataReader(IEnumerable<EventRecord> collection)
+        public EventEntryDataReader(IEnumerable<EventEntry> collection, string instanceName)
         {
-            Guard.ArgumentNotNull(collection, "collection");
-
             this.enumerator = collection.GetEnumerator();
+            this.instanceName = instanceName;
         }
 
         #region IDataReader
@@ -53,7 +50,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         {
             get
             {
-                return EventRecordExtensions.Fields.Length;
+                return EventEntryExtensions.Fields.Length;
             }
         }
 
@@ -94,8 +91,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             bool result = this.enumerator.MoveNext();
             if (result)
             {
-                this.recordsAffected++; 
-                this.currentRecord = this.enumerator.Current.ToSqlDataRecord();
+                this.recordsAffected++;
+                this.currentRecord = this.enumerator.Current.ToSqlDataRecord(this.instanceName);
             }
 
             return result;
@@ -188,12 +185,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
         public string GetName(int i)
         {
-            return EventRecordExtensions.Fields[i];
+            return EventEntryExtensions.Fields[i];
         }
 
         public int GetOrdinal(string name)
         {
-            return Array.IndexOf<string>(EventRecordExtensions.Fields, name);
+            return Array.IndexOf<string>(EventEntryExtensions.Fields, name);
         }
 
         public string GetString(int i)
@@ -291,7 +288,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
 
             while (this.enumerator.MoveNext())
             {
-                list.Add(this.enumerator.Current.ToSqlDataRecord());
+                list.Add(this.enumerator.Current.ToSqlDataRecord(this.instanceName));
             }
 
             this.enumerator.Reset();

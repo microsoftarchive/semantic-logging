@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 using Microsoft.Practices.EnterpriseLibrary.TransientFaultHandling;
 
@@ -16,13 +16,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Sink that asynchronously writes entries to SQL Server database.
     /// </summary>
-    public class SqlDatabaseSink : IObserver<EventRecord>, IDisposable
+    public class SqlDatabaseSink : IObserver<EventEntry>, IDisposable
     {
         private readonly RetryPolicy retryPolicy = new RetryPolicy<SqlDatabaseTransientErrorDetectionStrategy>(5, TimeSpan.FromSeconds(1), TimeSpan.FromMinutes(1), TimeSpan.FromSeconds(5));
         private readonly string instanceName;
         private readonly string connectionString;
         private readonly string tableName;
-        private readonly BufferedEventPublisher<EventRecord> bufferedPublisher;
+        private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
         private readonly TimeSpan onCompletedTimeout;
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
@@ -53,7 +53,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.onCompletedTimeout = onCompletedTimeout;
             this.retryPolicy.Retrying += Retrying;
             string sinkId = string.Format(CultureInfo.InvariantCulture, "SqlDatabaseSink ({0})", instanceName);
-            this.bufferedPublisher = BufferedEventPublisher<EventRecord>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval, bufferingCount, maxBufferSize, this.cancellationTokenSource.Token);
+            this.bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval, bufferingCount, maxBufferSize, this.cancellationTokenSource.Token);
         }
 
         /// <summary>
@@ -105,17 +105,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to the database.</param>
-        public void OnNext(EventRecord value)
+        public void OnNext(EventEntry value)
         {
-            if (value != null)
-            {
-                if (value.InstanceName == null)
-                {
-                    value.InstanceName = this.instanceName;
-                }
-
-                this.bufferedPublisher.TryPost(value);
-            }
+            this.bufferedPublisher.TryPost(value);
         }
 
         /// <summary>
@@ -152,7 +144,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private async Task<int> PublishEventsAsync(IList<EventRecord> collection)
+        private async Task<int> PublishEventsAsync(IList<EventEntry> collection)
         {
             int publishedEvents = collection.Count;
 
@@ -185,13 +177,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private async Task UseSqlBulkCopy(IList<EventRecord> collection)
+        private async Task UseSqlBulkCopy(IList<EventEntry> collection)
         {
             int initialCount = collection.Count;
 
             for (int retries = 0; retries < 3; retries++)
             {
-                using (var reader = new EventEntryDataReader(collection))
+                using (var reader = new EventEntryDataReader(collection, this.instanceName))
                 {
                     try
                     {
@@ -249,7 +241,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             }
         }
 
-        private async Task UseStoredProcedure(IList<EventRecord> collection)
+        private async Task UseStoredProcedure(IList<EventEntry> collection)
         {
             var token = this.cancellationTokenSource.Token;
 
@@ -260,7 +252,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     {
                         await conn.SuppressTransactionOpenAsync(token).ConfigureAwait(false);
 
-                        using (var reader = new EventEntryDataReader(collection))
+                        using (var reader = new EventEntryDataReader(collection, this.instanceName))
                         using (var cmd = new SqlCommand("dbo.WriteTraces", conn))
                         {
                             cmd.CommandType = CommandType.StoredProcedure;

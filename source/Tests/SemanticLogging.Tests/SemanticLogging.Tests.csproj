@@ -117,10 +117,12 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Sinks\FlatFileSinkTests.cs" />
+    <Compile Include="TestObjects\SimpleMessageFormatter.cs" />
     <Compile Include="TestSupport\AssemblyBuilder.cs" />
     <Compile Include="TestSupport\ConfigurationHelper.cs" />
     <Compile Include="TestSupport\DisposableDomain.cs" />
     <Compile Include="TestSupport\EnumerableAssert.cs" />
+    <Compile Include="TestSupport\EventEntryTestHelper.cs" />
     <Compile Include="UsingEventListener\DeferredEnablementFixture.cs" />
     <Compile Include="Utility\EventSourceAnalyzerFixture.cs" />
     <Compile Include="UsingEventListener\ObservableEventListenerFixture.cs" />

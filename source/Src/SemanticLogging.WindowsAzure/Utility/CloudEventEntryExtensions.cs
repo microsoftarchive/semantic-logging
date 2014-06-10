@@ -1,9 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using System;
-using System.Collections.Generic;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzure;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
@@ -33,54 +31,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
         /// </summary>
         /// <param name="entry">The entry to convert.</param>
         /// <returns>A converted entry, or <see langword="null"/> if the payload is invalid.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1062:Validate arguments of public methods", MessageId = "0", Justification = "Validated using Guard class")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+            "CA1062:Validate arguments of public methods", MessageId = "0",
+            Justification = "Validated using Guard class")]
         public static CloudEventEntry TryConvertToCloudEventEntry(this EventEntry entry)
         {
             Guard.ArgumentNotNull(entry, "entry");
 
-            var entity = new CloudEventEntry()
-            {
-                EventId = entry.EventId,
-                Keywords = (long)entry.Schema.Keywords,
-                ProviderId = entry.ProviderId,
-                ProviderName = entry.Schema.ProviderName,
-                Level = (int)entry.Schema.Level,
-                Message = entry.FormattedMessage,
-                Opcode = (int)entry.Schema.Opcode,
-                Task = (int)entry.Schema.Task,
-                Version = entry.Schema.Version,
-                EventDate = entry.Timestamp.UtcDateTime,
-                ProcessId = entry.ProcessId,
-                ThreadId = entry.ThreadId,
-                ActivityId = entry.ActivityId,
-                RelatedActivityId = entry.RelatedActivityId
-            };
-
-            if (!InitializePayload(entity, entry.Payload, entry.Schema))
-            {
-                return null;
-            }
-
-            return entity;
-        }
-
-        private static bool InitializePayload(CloudEventEntry entity, IList<object> payload, EventSchema schema)
-        {
             try
             {
-                entity.Payload = new Dictionary<string, object>(payload.Count);
-
-                for (int i = 0; i < payload.Count; i++)
-                {
-                    entity.Payload.Add(schema.Payload[i], payload[i]);
-                }
-
-                return true;
+                return new CloudEventEntry(entry);
             }
             catch (Exception e)
             {
                 SemanticLoggingEventSource.Log.WindowsAzureTableSinkEntityCreationFailed(e.ToString());
-                return false;
+                return null;
             }
         }
     }

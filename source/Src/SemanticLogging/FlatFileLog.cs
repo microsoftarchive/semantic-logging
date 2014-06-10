@@ -30,9 +30,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 fileName = FileUtil.CreateRandomFileName();
             }
 
-            var sink = new FlatFileSink(fileName, isAsync);
+            var sink = new FlatFileSink(fileName, formatter ?? new EventTextFormatter(), isAsync);
 
-            var subscription = eventStream.SubscribeWithFormatter(formatter ?? new EventTextFormatter(), sink);
+            var subscription = eventStream.Subscribe(sink);
 
             return new SinkSubscription<FlatFileSink>(subscription, sink);
         }
