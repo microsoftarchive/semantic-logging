@@ -105,7 +105,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Fo
             Assert.AreEqual<int>(3, Convert.ToInt32(XmlFormattedEntry.EventId.Value));
             Assert.AreEqual<byte>(0, Convert.ToByte(XmlFormattedEntry.Version.Value));
             Assert.AreEqual<int>((int)EventLevel.Informational, Int32.Parse(XmlFormattedEntry.Level.Value));
-            Assert.AreEqual<int>((int)EventTask.None, Int32.Parse(XmlFormattedEntry.Task.Value));
+            Assert.AreEqual<int>((int)MockEventSourceOutProcEnum.Tasks.Opcode, Int32.Parse(XmlFormattedEntry.Task.Value));
             Assert.AreEqual<long>(0, Int64.Parse(XmlFormattedEntry.Keywords.Value.Replace("0x", string.Empty)));
             Assert.AreEqual<int>((int)EventOpcode.Resume, Int32.Parse(XmlFormattedEntry.Opcode.Value));
             Assert.AreEqual<int>(System.Diagnostics.Process.GetCurrentProcess().Id, Int32.Parse(XmlFormattedEntry.ProcessId.Value));

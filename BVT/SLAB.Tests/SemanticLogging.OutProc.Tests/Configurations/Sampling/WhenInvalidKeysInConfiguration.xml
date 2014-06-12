@@ -1,0 +1,29 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <!--<flatFileSink fileName="ErrorsWhenInvalidKeyInConfiguration.log" name="ErrorFlatFileEventListener">
+      <sources>
+        <eventSource name="Microsoft-SemanticLogging" level="LogAlways" />
+      </sources>
+      <jsonEventTextFormatter/>
+    </flatFileSink>-->
+    <flatFileSink  fileName="WhenInvalidKeysInConfiguration.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="SamplingEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySamplingInvalidKey" value="true"/>
+          </arguments>
+        </eventSource>
+        <eventSource name="TriggerEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySamplingStartEventInvalidKey" value="TriggerEvent:2"/>
+          </arguments>
+          <filter>
+            <process name="vstest.executionengine.x86.exe"/>
+          </filter>
+        </eventSource>
+      </sources>
+      <jsonEventTextFormatter/>
+    </flatFileSink>
+  </sinks>
+</configuration>

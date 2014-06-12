@@ -164,7 +164,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
                     if (semanticLoggingServiceProcess != null)
                     {
                         semanticLoggingServiceProcess.Kill();
-                        semanticLoggingServiceProcess.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
+                        semanticLoggingServiceProcess.WaitForExit((int)TimeSpan.FromMinutes(1).TotalMilliseconds);
                     }
                 }
             }

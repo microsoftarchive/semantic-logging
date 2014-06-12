@@ -1,0 +1,23 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="WhenEnablingSamplingForAProcessWithNoTPLEventsEnabledActivityIDChainIsLogged.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="SamplingEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySampling" value="true"/>
+          </arguments>
+        </eventSource>
+        <eventSource name="TriggerEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySamplingStartEvent" value="TriggerEvent:1"/>
+          </arguments>
+          <filter>
+            <process name="someprocess.exe"/>
+          </filter>
+        </eventSource>
+      </sources>
+      <jsonEventTextFormatter/>
+    </flatFileSink>
+  </sinks>
+</configuration>

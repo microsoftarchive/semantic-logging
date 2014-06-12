@@ -418,7 +418,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             Task.Delay(TimeSpan.FromSeconds(2)).Wait();
         }
 
-        [EventSource(Name = "MyCompany1")]
+        [EventSource(Name = "MyNewCompanyEventSource")]
         private sealed class MyNewCompanyEventSource : EventSource
         {
             public static class Tasks
@@ -438,12 +438,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
             public static readonly MyNewCompanyEventSource Logger = new MyNewCompanyEventSource();
         }
 
-        [EventSource(Name = "MyCompany1")]
+        [EventSource(Name = "MyNewCompanyEventSource")]
         private sealed class MyNewCompanyEventSource2 : EventSource
         {
             public static class Tasks
             {
                 public const EventTask Opcode = (EventTask)1;
+            }
+
+            [Event(1, Message = "Event1 ID={0}", Opcode = EventOpcode.Start, Task = Tasks.Opcode)]
+            public void Event1(int id)
+            {
+                if (this.IsEnabled())
+                {
+                    this.WriteEvent(1, id);
+                }
             }
 
             [Event(2, Message = "Event2 ID={0}", Opcode = EventOpcode.Start, Task = Tasks.Opcode)]

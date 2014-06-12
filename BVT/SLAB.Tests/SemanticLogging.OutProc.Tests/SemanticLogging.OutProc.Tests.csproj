@@ -57,7 +57,7 @@
       <HintPath>..\..\..\source\packages\Microsoft.Data.Services.Client.5.6.0\lib\net40\Microsoft.Data.Services.Client.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent">
-      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.13\lib\net40\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>
+      <HintPath>..\..\..\source\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.15\lib\net40\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Configuration, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\source\packages\Microsoft.WindowsAzure.ConfigurationManager.2.0.3\lib\net40\Microsoft.WindowsAzure.Configuration.dll</HintPath>
@@ -105,6 +105,7 @@
     <Compile Include="Formatters\JsonEventTextFormatterFixture.cs" />
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SamplingFixture.cs" />
     <Compile Include="ServiceConfiguration\ElasticsearchSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\ReconfigFixture.cs" />
     <Compile Include="ServiceConfiguration\RFFLSinkConfigFixture.cs" />
@@ -130,14 +131,55 @@
     <Compile Include="TestObjects\MockEventSourceOutProcLevelFiltered.cs" />
     <Compile Include="TestObjects\MockEventSourceOutProcSvc.cs" />
     <Compile Include="TestObjects\MockFormatter.cs" />
+    <Compile Include="TestObjects\SamplingEventSource.cs" />
+    <Compile Include="TestObjects\SamplingEventSource1.cs" />
     <Compile Include="TestObjects\TestAttributesEventSource.cs" />
     <Compile Include="TestObjects\TestEventEntry.cs" />
     <Compile Include="TestObjects\TestEventSource.cs" />
     <Compile Include="TestObjects\TestEventSourceNoAttributes.cs" />
     <Compile Include="End2End\IntegrationFixture.cs" />
+    <Compile Include="TestObjects\TriggerEventSource.cs" />
     <Compile Include="TestScenarios\TestScenario.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Configurations\Sampling\WhenEnablingSamplingAndTPLEventsAndMultipleSources.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenEnablingSamplingForAProcessAndProcessIsNotRunning.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenEnablingSamplingForAProcessAndProcessIsRunning.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenEnablingSamplingForAProcessAndTPLEvents.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenFilteringMultipleProcessesSameEventSource.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenInvalidKeysInConfiguration.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenServiceStartedAfterProcessStarted.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenServiceStartedBeforeProcessStarted.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenInvalidKeyValueInConfiguration.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenSamplingIsEnabledAndDisabledAtRunTime.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Configurations\Sampling\WhenMultipleProcessesShareSameEventSource.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="slabsvcTest.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -195,6 +237,7 @@
   <ItemGroup>
     <Content Include="Configurations\AzureTables\AzureTables.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\AzureTables\AzureTablesEmptyConnectionString.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -246,6 +289,7 @@
     </Content>
     <Content Include="Configurations\BasicConfigSourceNameAndId.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\BasicConfigWithNoGuid.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -261,36 +305,46 @@
     </Content>
     <Content Include="Configurations\Console\ConsoleEmptyDateTimeFormat.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\Console\ConsoleFormatterNoParam.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\Console\ConsoleNoParams.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\CustomSinkDiffOrder.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\CustomSinkMissingParam.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\CustomSqlDBNotAllParams.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\CustomSqlSink.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\FlatFileCustomFormatter.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\FlatFileCustomFormatter2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\DataCorrectness\FlatFile.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations\EmptyKeyword.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\ExternalSchemaValidation.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -351,6 +405,7 @@
     </Content>
     <Content Include="Configurations\CustomSink\MockFlatFileSink.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\CustomSink\Multiple.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -576,16 +631,12 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\..\..\source\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\source\packages\StyleCop.MSBuild.4.7.49.0\build\StyleCop.MSBuild.Targets'))" />
   </Target>
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <Import Project="..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.13\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets" Condition="Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.13\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" />
+  <Import Project="..\..\..\source\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.15\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets" Condition="Exists('..\..\..\source\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.15\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.13\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.13\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets'))" />
+    <Error Condition="!Exists('..\..\..\source\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.15\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\source\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.15\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

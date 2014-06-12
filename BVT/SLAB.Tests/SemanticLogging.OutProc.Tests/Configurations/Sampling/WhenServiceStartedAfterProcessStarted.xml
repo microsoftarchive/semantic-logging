@@ -1,0 +1,28 @@
+﻿<?xml version="1.0"?>
+<configuration xmlns="http://schemas.microsoft.com/practices/2013/entlib/semanticlogging/etw">
+  <sinks>
+    <flatFileSink  fileName="WhenServiceStartedAfterPRocessStarted.log" name="FlatFileEventListener">
+      <sources>
+        <eventSource name="SamplingEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySampling" value="true"/>
+          </arguments>
+        </eventSource>
+        <eventSource name="TriggerEventSource" level="LogAlways">
+          <arguments>
+            <add key="ActivitySamplingStartEvent" value="TriggerEvent:1"/>
+          </arguments>
+          <filter>
+            <process name="ProcessToSample.exe"/>
+          </filter>
+        </eventSource>
+        <eventSource id="2e5dba47-a3d2-4d16-8ee0-6671ffdcd7b5" level="Informational" matchAnyKeyword="1">
+          <arguments>
+            <add key="ActivitySampling" value="true"/>
+          </arguments>
+        </eventSource>
+      </sources>
+      <jsonEventTextFormatter/>
+    </flatFileSink>
+  </sinks>
+</configuration>
