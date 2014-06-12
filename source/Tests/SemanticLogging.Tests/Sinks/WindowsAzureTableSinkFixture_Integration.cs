@@ -129,6 +129,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
     {
         private CloudEventEntry entry;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1500:CurlyBracketsForMultiLineStatementsMustNotShareLine", Justification = "inline array ok")]
         protected override void Act()
         {
             base.Act();
@@ -190,6 +191,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
     {
         private CloudEventEntry entry;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1500:CurlyBracketsForMultiLineStatementsMustNotShareLine", Justification = "inline array ok")]
         protected override void Act()
         {
             base.Act();
@@ -246,6 +248,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks.Wind
     {
         private CloudEventEntry entry;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.LayoutRules", "SA1500:CurlyBracketsForMultiLineStatementsMustNotShareLine", Justification = "inline array ok")]
         protected override void Act()
         {
             base.Act();

@@ -54,9 +54,17 @@
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>GlobalAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="Configuration\ConsoleSinkElement.cs" />
     <Compile Include="Configuration\Constants.cs" />
+    <Compile Include="Configuration\CustomFormatterElement.cs" />
+    <Compile Include="Configuration\CustomSinkElement.cs" />
+    <Compile Include="Configuration\EventTextFormatterElement.cs" />
+    <Compile Include="Configuration\FormatterElementFactory.cs" />
     <Compile Include="Configuration\IFormatterElement.cs" />
     <Compile Include="Configuration\ISinkElement.cs" />
+    <Compile Include="Configuration\JsonEventTextFormatterElement.cs" />
+    <Compile Include="Configuration\ParameterElement.cs" />
+    <Compile Include="Configuration\XmlEventTextFormatterElement.cs" />
     <Compile Include="ConsoleLog.cs" />
     <Compile Include="EventListenerExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -65,23 +73,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>SemanticLoggingEventSourceResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Sinks\TallyKeepingFileStreamWriter.cs" />
-    <Compile Include="Sinks\RollingFlatFileSink.Inner.cs" />
-    <Compile Include="Utility\EventSourceAnalyzer.cs" />
     <Compile Include="Sinks\ConsoleSink.cs" />
+    <Compile Include="Sinks\FlushFailedException.cs" />
     <Compile Include="Formatters\DefaultConsoleColorMapper.cs" />
-    <Compile Include="Sinks\FlatFileSink.cs" />
     <Compile Include="Formatters\IConsoleColorMapper.cs" />
-    <Compile Include="Sinks\RollFileExistsBehavior.cs" />
-    <Compile Include="Sinks\RollingFlatFileSink.cs" />
-    <Compile Include="Sinks\RollingFlatFilePurger.cs" />
-    <Compile Include="Sinks\RollInterval.cs" />
-    <Compile Include="RollingFlatFileLog.cs" />
     <Compile Include="ObservableEventListener.cs" />
     <Compile Include="SinkSubscription.cs" />
-    <Compile Include="FlatFileLog.cs" />
     <Compile Include="Observable\EventEntrySubject.cs" />
-    <Compile Include="Utility\EventSourceAnalyzerException.cs" />
     <Compile Include="Utility\BufferedEventPublisher.cs" />
     <Compile Include="EventEntry.cs" />
     <Compile Include="Formatters\PropertyNames.cs" />
@@ -104,19 +102,20 @@
     <Compile Include="Utility\Buffering.cs" />
     <Compile Include="Utility\EventEntryExtensions.cs" />
     <Compile Include="Observable\ObservableProjection.cs" />
-    <Compile Include="Sinks\FlushFailedException.cs" />
     <Compile Include="Utility\FileUtil.cs" />
     <Compile Include="Utility\TextFormatterExtensions.cs" />
     <Compile Include="Utility\Guard.cs" />
     <Compile Include="Utility\EventEntryUtil.cs" />
     <Compile Include="Utility\TypeExtensions.cs" />
     <Compile Include="Utility\XmlExtensions.cs" />
+    <Compile Include="Utility\XmlUtil.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\SemanticLogging.licenseheader">
       <Link>SemanticLogging.licenseheader</Link>
     </None>
     <None Include="packages.config" />
+    <None Include="SemanticLogging.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

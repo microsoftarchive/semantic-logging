@@ -2,8 +2,6 @@
 
 using System;
 using System.Diagnostics.Tracing;
-using System.IO;
-using System.Reflection;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;

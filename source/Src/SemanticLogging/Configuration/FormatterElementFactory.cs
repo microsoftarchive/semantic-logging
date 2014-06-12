@@ -9,7 +9,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
 {
     /// <summary>
     /// Creates formatter instances from configuration.

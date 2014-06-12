@@ -2,20 +2,18 @@
 
 using System;
 using System.Xml.Linq;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
 {
     /// <summary>
-    /// Represents a console configuration element that can create an instance of a console sink.
+    /// Represents a flat file configuration element that can create an instance of a flat file sink.
     /// </summary>
-    internal class ConsoleSinkElement : ISinkElement
+    internal class RollingFlatFileSinkElement : ISinkElement
     {
-        private readonly XName sinkName = XName.Get("consoleSink", Constants.Namespace);
+        private readonly XName sinkName = XName.Get("rollingFlatFileSink", Constants.Namespace);
 
         /// <summary>
         /// Determines whether this instance can create the specified configuration element.
@@ -44,8 +42,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
         {
             Guard.ArgumentNotNull(element, "element");
 
+            int rollSizeKB = (int?)element.Attribute("rollSizeKB") ?? default(int);
+            RollFileExistsBehavior rollFileExistsBehavior = (RollFileExistsBehavior)Enum.Parse(typeof(RollFileExistsBehavior), (string)element.Attribute("rollFileExistsBehavior") ?? default(RollFileExistsBehavior).ToString());
+            RollInterval rollInterval = (RollInterval)Enum.Parse(typeof(RollInterval), (string)element.Attribute("rollInterval") ?? default(RollInterval).ToString());
+            int maxArchivedFiles = (int?)element.Attribute("maxArchivedFiles") ?? default(int);
+
             var subject = new EventEntrySubject();
-            subject.LogToConsole(FormatterElementFactory.Get(element), XmlUtil.CreateInstance<IConsoleColorMapper>(element.Attribute("colorMapperType")));
+            subject.LogToRollingFlatFile(
+                (string)element.Attribute("fileName"),
+                rollSizeKB,
+                (string)element.Attribute("timeStampPattern"),
+                rollFileExistsBehavior,
+                rollInterval,
+                FormatterElementFactory.Get(element),
+                maxArchivedFiles);
+
             return subject;
         }
     }

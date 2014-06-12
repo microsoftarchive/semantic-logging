@@ -76,6 +76,7 @@
       <Link>SemanticLogging.licenseheader</Link>
     </None>
     <None Include="packages.config" />
+    <None Include="SemanticLogging.Database.nuspec" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

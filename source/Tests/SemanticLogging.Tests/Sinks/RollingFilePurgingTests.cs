@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Threading;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestSupport;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
 {

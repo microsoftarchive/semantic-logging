@@ -2,18 +2,19 @@
 
 using System;
 using System.Xml.Linq;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
-namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration
+namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
 {
     /// <summary>
-    /// Represents a flat file configuration element that can create an instance of a flat file sink.
+    /// Represents a console configuration element that can create an instance of a console sink.
     /// </summary>
-    internal class FlatFileSinkElement : ISinkElement
+    internal class ConsoleSinkElement : ISinkElement
     {
-        private readonly XName sinkName = XName.Get("flatFileSink", Constants.Namespace);
+        private readonly XName sinkName = XName.Get("consoleSink", Constants.Namespace);
 
         /// <summary>
         /// Determines whether this instance can create the specified configuration element.
@@ -43,7 +44,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
             Guard.ArgumentNotNull(element, "element");
 
             var subject = new EventEntrySubject();
-            subject.LogToFlatFile((string)element.Attribute("fileName"), FormatterElementFactory.Get(element));
+            subject.LogToConsole(FormatterElementFactory.Get(element), XmlUtil.CreateInstance<IConsoleColorMapper>(element.Attribute("colorMapperType")));
             return subject;
         }
     }

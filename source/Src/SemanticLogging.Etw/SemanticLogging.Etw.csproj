@@ -69,19 +69,10 @@
     </Compile>
     <Compile Include="Configuration\ConfigurationElement.cs" />
     <Compile Include="Configuration\ConfigurationReader.cs" />
-    <Compile Include="Configuration\ConsoleSinkElement.cs" />
     <Compile Include="Configuration\EventSourceArgumentElement.cs" />
     <Compile Include="Configuration\EventSourceProcessFilterElement.cs" />
     <Compile Include="Configuration\EventSourceSettingsEqualityComparer.cs" />
-    <Compile Include="Configuration\RollingFlatFileSinkElement.cs" />
-    <Compile Include="Configuration\JsonEventTextFormatterElement.cs" />
-    <Compile Include="Configuration\CustomFormatterElement.cs" />
-    <Compile Include="Configuration\CustomSinkElement.cs" />
-    <Compile Include="Configuration\EventTextFormatterElement.cs" />
     <Compile Include="Configuration\EventSourceElement.cs" />
-    <Compile Include="Configuration\FlatFileSinkElement.cs" />
-    <Compile Include="Configuration\FormatterElementFactory.cs" />
-    <Compile Include="Configuration\ParameterElement.cs" />
     <Compile Include="Configuration\SinkConfigurationElement.cs" />
     <Compile Include="Configuration\SinkSettingsEqualityComparer.cs" />
     <Compile Include="Configuration\TraceEventServiceElement.cs" />
@@ -92,9 +83,7 @@
     <Compile Include="Configuration\SinkSettings.cs" />
     <Compile Include="Configuration\ExtensionsInspector.cs" />
     <Compile Include="Configuration\ExtensionsLoader.cs" />
-    <Compile Include="Utility\XmlUtil.cs" />
     <Compile Include="Configuration\ConfigurationException.cs" />
-    <Compile Include="Configuration\XmlEventTextFormatterElement.cs" />
     <Compile Include="Configuration\EventSourceSettings.cs" />
     <Compile Include="Utility\AssemblyExtensions.cs" />
     <Compile Include="StatusChangedEventArgs.cs" />

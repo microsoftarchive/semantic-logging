@@ -135,12 +135,6 @@
   <data name="ExceptionSessionPrefixNameTooLong" xml:space="preserve">
     <value>The maximum length for a session name prefix is {0}.</value>
   </data>
-  <data name="FormatterElementNotResolvedError" xml:space="preserve">
-    <value>Could not created the formatter specified in configuration element name '{0}'.</value>
-  </data>
-  <data name="IncompleteArgumentsError" xml:space="preserve">
-    <value>The parameters specified in this element does not map to an existing type member. All paramters are required in the same order of the defined type member. </value>
-  </data>
   <data name="InsufficientPrivileges" xml:space="preserve">
     <value>Only users with administrative privileges, users in the Performance Log Users group, and services running as LocalSystem, LocalService, NetworkService can control event tracing sessions. To grant a restricted user the ability to control trace sessions, add them to the Performance Log Users group.</value>
   </data>
