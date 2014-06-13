@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using System;
+using System.Collections.Generic;
 using System.Configuration.Install;
 using System.Diagnostics;
 using System.Linq;
@@ -8,12 +9,13 @@ using System.Reflection;
 using System.Security.Principal;
 using System.ServiceProcess;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service.Properties;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 {
     internal class ParameterOptions
     {
+        internal const string AccountParameterKey = "account";
+
         private readonly TimeSpan startServiceTiemout = TimeSpan.FromSeconds(5);
         private readonly TraceSource logSource = new TraceSource("SemanticLogging-svc");
 
@@ -25,7 +27,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         public ApplicationExitCode ExitCode { get; private set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged. Only used when in console model")]
-        public void Install()
+        public void Install(IEnumerable<Tuple<string, string>> arguments)
         {
             // Check for admin rights
             if (false == this.IsAuthorized())
@@ -43,7 +45,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
             try
             {
-                ManagedInstallerClass.InstallHelper(new string[] { Assembly.GetExecutingAssembly().Location });
+                var installerArgs = new List<string>();
+
+                var accountArgument = arguments.FirstOrDefault(a => a.Item1 == AccountParameterKey);
+                if (accountArgument != null)
+                {
+                    installerArgs.Add("/account=" + accountArgument.Item2);
+                }
+
+                installerArgs.Add(Assembly.GetExecutingAssembly().Location);
+
+                ManagedInstallerClass.InstallHelper(installerArgs.ToArray());
             }
             catch (Exception e)
             {
@@ -72,7 +84,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
             try
             {
-                ManagedInstallerClass.InstallHelper(new string[] { "/u", Assembly.GetExecutingAssembly().Location });
+                ManagedInstallerClass.InstallHelper(new[] { "/u", Assembly.GetExecutingAssembly().Location });
             }
             catch (Exception e)
             {
@@ -82,11 +94,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "Exception is logged. Only used when in console model")]
-        public void Start()
+        public void Start(IEnumerable<Tuple<string, string>> arguments)
         {
             if (false == IsServiceInstalled())
             {
-                this.Install();
+                this.Install(arguments);
                 if (this.ExitCode != ApplicationExitCode.Success)
                 {
                     return;
@@ -132,7 +144,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         {
             try
             {
-                using (TraceEventServiceHost service = new TraceEventServiceHost())
+                using (var service = new TraceEventServiceHost())
                 {
                     service.Start();
                     Console.WriteLine();
@@ -152,8 +164,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
         public void ShowHelp(ParameterSet parameters)
         {
-            this.ShowHeader();
-
             foreach (var parameter in parameters)
             {
                 Console.WriteLine(parameter.Description);
@@ -178,8 +188,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         private bool IsAuthorized()
         {
             var user = WindowsIdentity.GetCurrent();
-            var principal = new WindowsPrincipal(user);
+            if (user == null)
+            {
+                return false;
+            }
 
+            var principal = new WindowsPrincipal(user);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
     }

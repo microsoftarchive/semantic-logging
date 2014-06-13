@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AccountArgDescription" xml:space="preserve">
+    <value>[ -a=type | -account=type]	Specifies the account type. Accepted values are 'User', 'LocalSystem', and 'LocalService'. Default is 'LocalService'.</value>
+  </data>
   <data name="AlreadyInstalledService" xml:space="preserve">
     <value>The service is already installed or has been marked for deletion.</value>
   </data>
@@ -173,6 +176,9 @@
   </data>
   <data name="ServiceDisplayName" xml:space="preserve">
     <value>Enterprise Library Semantic Logging Out-of-Process Service</value>
+  </data>
+  <data name="ServiceInvalidAccount" xml:space="preserve">
+    <value>The account identifier is invalid '{0}'.</value>
   </data>
   <data name="ServiceNotStarted" xml:space="preserve">
     <value>The service cannot start because it is in '{0}' state.</value>
