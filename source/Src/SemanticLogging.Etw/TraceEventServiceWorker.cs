@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Diagnostics.Tracing;
@@ -187,11 +188,21 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw
 
         private void ProcessUnhandledEvent(TraceEvent evt)
         {
-            if (evt.ID != TraceEventUtil.ManifestEventID)
+            if (evt.ID == TraceEventUtil.ManifestEventID)
             {
-                // Simply notify and count lost events since we don't have a manifest yet to parse this event.
-                this.NotifyEventLost();
+                // manifest event - ignore
+                return;
             }
+
+            if (evt.ID == 0)
+            {
+                // back channel event - log
+                this.logger.TraceEventServiceOutOfBandEvent(this.sessionName, evt.ProviderGuid, (EventLevel)evt.Level, (EventKeywords)evt.Keywords, evt.FormattedMessage);
+                return;
+            }
+
+            // Simply notify and count lost events since we don't have a manifest yet to parse this event.
+            this.NotifyEventLost();
         }
 
         private EventEntry CreateEventEntry(TraceEvent traceEvent)

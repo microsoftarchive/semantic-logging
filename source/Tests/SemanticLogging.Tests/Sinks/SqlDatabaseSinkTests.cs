@@ -294,7 +294,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
             }
         }
 
-        private static EventEntry CreateValidEntry(string providerName = "TestName", int processId = 0, int threadId = 0, Guid activityId = default(Guid), Guid relatedActivityId = default (Guid))
+        private static EventEntry CreateValidEntry(string providerName = "TestName", int processId = 0, int threadId = 0, Guid activityId = default(Guid), Guid relatedActivityId = default(Guid))
         {
             var record =
                 EventEntryTestHelper.Create(
