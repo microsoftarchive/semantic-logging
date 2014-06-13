@@ -312,13 +312,22 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 this.WriteEvent(809, message);
             }
         }
-        
+
         [Event(810, Level = EventLevel.Critical, Keywords = Keywords.TraceEvent, Message = "An improperly generated manifest was received for provider {0}. Message: {1}")]
         internal void TraceEventServiceManifestGenerationFault(Guid providerId, string message)
         {
             if (this.IsEnabled())
             {
                 this.WriteEvent(810, providerId, message);
+            }
+        }
+
+        [Event(811, Level = EventLevel.LogAlways, Keywords = Keywords.TraceEvent, Message = "Out of band event level {2} for provider {1} on session {0}. Message: {4}")]
+        internal void TraceEventServiceOutOfBandEvent(string sessionName, Guid providerId, EventLevel eventLevel, EventKeywords eventKeywords, string eventMessage)
+        {
+            if (this.IsEnabled())
+            {
+                this.WriteEvent(811, sessionName, providerId, eventLevel, eventKeywords, eventMessage);
             }
         }
 
