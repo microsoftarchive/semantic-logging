@@ -9,7 +9,7 @@
     <RepoRoot>$(MSBuildThisFileDirectory)..\</RepoRoot>
     <SourceRoot>$(RepoRoot)Source\</SourceRoot>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    
+
     <RunTests Condition=" '$(RunTests)' == '' ">true</RunTests>
     <GetCoverageInformation>true</GetCoverageInformation>
     <GetMstestCoverage>true</GetMstestCoverage>
@@ -19,9 +19,7 @@
 
   <!-- DevEnvDir: Provide a sensible default and add a trailing slash if necessary -->
   <PropertyGroup>
-    <DevEnvDir Condition="$(DevEnvDir) == ''">C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\</DevEnvDir>
-    <DevEnvDir Condition="!HasTrailingSlash('$(DevEnvDir)')">$(DevEnvDir)\</DevEnvDir>
-
+    <DevEnvDir Condition="('$(DevEnvDir)' != '') And (!HasTrailingSlash('$(DevEnvDir)'))">$(DevEnvDir)\</DevEnvDir>
     <TestRunner>$(DevEnvDir)CommonExtensions\Microsoft\TestWindow\vstest.console.exe</TestRunner>
   </PropertyGroup>
 
@@ -41,6 +39,8 @@
   </Target>
 
   <Target Name="_CheckTestRunner">
+    <Error Condition=" '$(DevEnvDir)' == '' "
+           Text="Ensure the 'DevEnvDir' variable is set to your Visual Studio install location in order to run the tests. Either set it manually or run this script from a Visual Studio command prompt."/>
     <Error Condition=" !Exists($(TestRunner)) "
            Text="Test runner not found at the expected location $(TestRunner). Ensure the test runner is available in your Visual Studio install location."/>
   </Target>
@@ -95,7 +95,7 @@
 
     <!-- Cannot use the built-in msbuild task. Its output of "error messages" causes the task to fail, and the output parsing cannot be prevented. -->
     <Exec Command="$(OpenCoverCommand)" IgnoreStandardErrorWarningFormat="true"/>
-    
+
     <Message Text="Generating code coverage report..." Importance="High" />
     <ReportGenerator ReportFiles="$(CoverageOutputDir)OpenCoverResults.xml"
                      TargetDirectory="$(CoverageOutputDir)"

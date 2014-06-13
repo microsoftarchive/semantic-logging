@@ -22,8 +22,7 @@
 
   <!-- DevEnvDir: Provide a sensible default and add a trailing slash if necessary -->
   <PropertyGroup>
-    <DevEnvDir Condition="$(DevEnvDir) == ''">C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\</DevEnvDir>
-    <DevEnvDir Condition="!HasTrailingSlash('$(DevEnvDir)')">$(DevEnvDir)\</DevEnvDir>
+    <DevEnvDir Condition="('$(DevEnvDir)' != '') And (!HasTrailingSlash('$(DevEnvDir)'))">$(DevEnvDir)\</DevEnvDir>
   </PropertyGroup>
 
   <ItemGroup>
