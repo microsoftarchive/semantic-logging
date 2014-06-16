@@ -31,6 +31,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
         {
             this.formatting = (Newtonsoft.Json.Formatting)formatting;
             this.DateTimeFormat = dateTimeFormat;
+            this.IncludeEntrySeparator = true;
         }
 
         /// <summary>
@@ -52,6 +53,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                 this.dateTimeFormat = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets a flag indicating whether the <see cref="JsonEventTextFormatter"/> will append a separator (",") at the end of each event
+        /// </summary>
+        public bool IncludeEntrySeparator { get; set; }
 
         /// <summary>
         /// Gets the <see cref="EventTextFormatting"/>.
@@ -115,10 +121,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
 
                 jsonWriter.WriteEndObject();
 
-                // Write an entry separator so all the logs can be read as an array, 
-                // adding the [] chars to the raw written data ( i.e: "[" + raw + "]" )
-                // where raw = {log1},{log2}, ... {logN},
-                jsonWriter.WriteRaw(EntrySeparator);
+                if (IncludeEntrySeparator)
+                {
+                    // Write an entry separator so all the logs can be read as an array, 
+                    // adding the [] chars to the raw written data ( i.e: "[" + raw + "]" )
+                    // where raw = {log1},{log2}, ... {logN},
+                    jsonWriter.WriteRaw(EntrySeparator);
+                }
 
                 // Writes new line when indented
                 if (jsonWriter.Formatting == Newtonsoft.Json.Formatting.Indented)

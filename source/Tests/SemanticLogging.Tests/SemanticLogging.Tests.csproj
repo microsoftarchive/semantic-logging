@@ -93,6 +93,7 @@
     <Compile Include="Etw\ElasticsearchSinkElementFixture.cs" />
     <Compile Include="Etw\ConfigurationReaderFixture.cs" />
     <Compile Include="Etw\ConsoleSinkElementFixture.cs" />
+    <Compile Include="Etw\FormatterFactoryFixture.cs" />
     <Compile Include="Etw\TraceEventServiceWorkerFixture.cs" />
     <Compile Include="Etw\WindowsAzureTableSinkElementFixture.cs" />
     <Compile Include="Etw\SinkSettingsFixture.cs" />
@@ -118,6 +119,7 @@
     </Compile>
     <Compile Include="Sinks\FlatFileSinkTests.cs" />
     <Compile Include="TestObjects\SimpleMessageFormatter.cs" />
+    <Compile Include="TestObjects\StringCollectionEventListener.cs" />
     <Compile Include="TestSupport\AssemblyBuilder.cs" />
     <Compile Include="TestSupport\ConfigurationHelper.cs" />
     <Compile Include="TestSupport\DisposableDomain.cs" />
