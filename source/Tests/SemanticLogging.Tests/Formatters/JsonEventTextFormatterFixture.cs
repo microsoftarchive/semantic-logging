@@ -482,7 +482,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
 
             protected override void Given()
             {
-                formatter = new JsonEventTextFormatter(){IncludeEntrySeparator = false};
+                formatter = new JsonEventTextFormatter() { IncludeEntrySeparator = false };
                 collectionListener = new StringCollectionEventListener(formatter);
                 collectionListener.EnableEvents(logger, EventLevel.LogAlways);
             }
@@ -505,6 +505,4 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Formatters
             }
         }
     }
-
-    
 }

@@ -44,11 +44,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuratio
             var jsonFormatter = new JsonEventTextFormatter(formatting, (string)formatter.Attribute("dateTimeFormat"));
             if (includeSeparator != null)
             {
-                bool parsedValue = false;
-                if (bool.TryParse(includeSeparator.Value, out parsedValue))
-                {
-                    jsonFormatter.IncludeEntrySeparator = parsedValue;
-                }
+                jsonFormatter.IncludeEntrySeparator = (bool)includeSeparator;
             }
 
             return jsonFormatter;

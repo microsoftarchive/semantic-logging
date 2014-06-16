@@ -33,12 +33,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.TestObject
 
         public void OnError(Exception error)
         {
-            
         }
 
         public void OnCompleted()
         {
-            
         }
     }
 }

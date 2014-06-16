@@ -57,6 +57,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
         /// <summary>
         /// Gets or sets a flag indicating whether the <see cref="JsonEventTextFormatter"/> will append a separator (",") at the end of each event
         /// </summary>
+        /// <value>The flag indicating whether to append a separator.</value>
         public bool IncludeEntrySeparator { get; set; }
 
         /// <summary>

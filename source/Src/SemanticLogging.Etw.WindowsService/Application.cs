@@ -20,7 +20,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
             var options = new ParameterOptions();
             var parameters = new ParameterSet
             {
-                { "i|install", Resources.InstallArgDescription, (p, a) => options.Install(a)  },
+                { "i|install", Resources.InstallArgDescription, (p, a) => options.Install(a) },
                 { "u|uninstall", Resources.UninstallArgDescription, (p, a) => options.Uninstall() },
                 { "s|start", Resources.StartArgDescription, (p, a) => options.Start(a) },
                 { "c|console", Resources.ConsoleArgDescription, (p, a) => options.ConsoleMode() },

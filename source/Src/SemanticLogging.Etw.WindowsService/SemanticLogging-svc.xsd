@@ -200,6 +200,7 @@
   <xs:complexType name="JsonEventTextFormatterElement">
     <xs:attribute name="formatting" type="EventTextFormatting" use="optional" default="None" />
     <xs:attribute name="dateTimeFormat" type="NoEmptyString" use="optional" />
+    <xs:attribute name="includeEntrySeparator" type="xs:boolean" use="optional" />
   </xs:complexType>
 
   <xs:complexType name="XmlEventTextFormatterElement">
