@@ -14,7 +14,7 @@ using System.Xml.Linq;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
-using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database;
+//using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.Database;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects
@@ -52,7 +52,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
     /// Sink that asynchronously writes entries to SQL Server database.
     /// </summary>
     [ComVisible(false)]
-    public class CustomSqlSink : IObserver<EventRecord>, IDisposable
+    public class CustomSqlSink : IObserver<EventEntry>, IDisposable
     {
         /// <summary>
         /// Default table name used to write traces.
@@ -62,7 +62,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         private readonly string instanceName;
         private readonly string connectionString;
         private readonly string tableName;
-        private readonly BufferedEventPublisher<EventRecord> bufferedPublisher;
+        private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
         private readonly EventSourceSchemaCache schemaCache = EventSourceSchemaCache.Instance;
         private readonly DbProviderFactory dbProviderFactory;
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -82,7 +82,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
 
             string sinkId = string.Format(CultureInfo.InvariantCulture, "DatabaseSink ({0})", instanceName);
             this.dbProviderFactory = SqlClientFactory.Instance;
-            this.bufferedPublisher = BufferedEventPublisher<EventRecord>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval ?? Buffering.DefaultBufferingInterval, bufferingCount, 30000, this.cancellationTokenSource.Token);
+            this.bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval ?? Buffering.DefaultBufferingInterval, bufferingCount, 30000, this.cancellationTokenSource.Token);
             this.instanceName = instanceName;
             this.connectionString = connectionString;
             this.tableName = tableName ?? "Traces";
@@ -137,15 +137,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         /// Provides the sink with new data to write.
         /// </summary>
         /// <param name="value">The current entry to write to the database.</param>
-        public void OnNext(EventRecord value)
+        public void OnNext(EventEntry value)
         {
             if (value != null)
             {
-                if (string.IsNullOrEmpty(value.InstanceName))
-                {
-                    value.InstanceName = this.instanceName;
-                }
-
                 this.bufferedPublisher.TryPost(value);
             }
         }
@@ -192,7 +187,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
             }
         }
 
-        private static DataTable GetDataTable(string instanceName, IEnumerable<EventRecord> collection)
+        private static DataTable GetDataTable(string instanceName, IEnumerable<EventEntry> collection)
         {
             var table = new DataTable();
             table.Columns.Add("InstanceName", typeof(string));
@@ -212,18 +207,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
             {
                 var values = new object[]
                 {
-                    entry.InstanceName,
-                    entry.ProviderId,
-                    entry.ProviderName,
-                    entry.EventId,
-                    entry.EventKeywords,
-                    entry.Level,
-                    entry.Opcode,
-                    entry.Task,
+                    instanceName,
+                    entry.Schema.ProviderId,
+                    entry.Schema.ProviderName,
+                    (int)entry.EventId,
+                    (long)entry.Schema.Keywords,
+                    (int)entry.Schema.Level,
+                    (int)entry.Schema.Opcode,
+                    (int)entry.Schema.Task,
                     entry.Timestamp.UtcDateTime,
-                    entry.Version,
+                    (int)entry.Schema.Version,
                     (object)entry.FormattedMessage ?? DBNull.Value,
-                    (object)entry.Payload ?? DBNull.Value
+                    (object)EventEntryUtil.JsonSerializePayload(entry) ?? DBNull.Value
                 };
 
                 table.Rows.Add(values);
@@ -232,7 +227,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
             return table;
         }
 
-        private async Task<int> PublishEventsAsync(IList<EventRecord> collection)
+        private async Task<int> PublishEventsAsync(IList<EventEntry> collection)
         {
             var token = this.cancellationTokenSource.Token;
             var table = GetDataTable(this.instanceName, collection);

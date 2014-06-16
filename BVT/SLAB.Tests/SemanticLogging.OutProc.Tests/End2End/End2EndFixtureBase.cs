@@ -40,7 +40,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
                     if (proc != null)
                     {
                         proc.Kill();
-                        proc.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
+                        proc.WaitForExit((int)TimeSpan.FromMinutes(1).TotalMilliseconds);
                         proc.Dispose();
                     }
                 }
@@ -207,7 +207,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
                 if (semanticLoggingServiceProcess != null)
                 {
                     semanticLoggingServiceProcess.Kill();
-                    semanticLoggingServiceProcess.WaitForExit(TimeSpan.FromMinutes(1).Milliseconds);
+                    semanticLoggingServiceProcess.WaitForExit((int)TimeSpan.FromMinutes(1).TotalMilliseconds);
                     semanticLoggingServiceProcess.Dispose();
                 }
 

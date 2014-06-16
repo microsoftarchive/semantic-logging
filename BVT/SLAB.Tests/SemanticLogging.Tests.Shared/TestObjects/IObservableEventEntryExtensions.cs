@@ -24,7 +24,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         {
             var sink = new CustomSqlSink(instanceName, connectionString, tableName, bufferingInterval ?? Buffering.DefaultBufferingInterval, bufferingCount);
 
-            var subscription = eventStream.SubscribeWithConversion(sink);
+            var subscription = eventStream.Subscribe(sink);
 
             return new SinkSubscription<CustomSqlSink>(subscription, sink);
         }
@@ -33,7 +33,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         {
             var sink = new MockFlatFileSink(fileName, header);
 
-            var subscription = eventStream.SubscribeWithConversion(sink);
+            var subscription = eventStream.Subscribe(sink);
 
             return new SinkSubscription<MockFlatFileSink>(subscription, sink);
         }

@@ -72,7 +72,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
                     var logger = MockEventSourceOutProc.Logger;
                     logger.LogSomeMessage(message);
                     logger.LogSomeMessage(message2);
-                    
+
                     entries = FlatFileHelper.PollUntilTextEventsAreWritten(fileName1, 2, "--==--");
                     entries2 = FlatFileHelper.PollUntilTextEventsAreWritten(fileName2, 2, "==-==");
                     DatabaseHelper.PollUntilEventsAreWritten(validConnectionString, 4);

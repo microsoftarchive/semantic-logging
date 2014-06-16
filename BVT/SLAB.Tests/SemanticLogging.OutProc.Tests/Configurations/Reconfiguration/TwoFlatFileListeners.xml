@@ -5,13 +5,13 @@
     <sinks>
       <flatFileSink  fileName="twoflatFileListeners.log" name="flatFileListener">
         <sources>
-          <eventSource name="MyCompany1" />
+          <eventSource name="MyNewCompanyEventSource" />
         </sources>
         <eventTextFormatter dateTimeFormat="d" header="======="/>
       </flatFileSink>
       <flatFileSink  fileName="twoflatFileListeners2.log" name="flatFileListener2">
         <sources>
-          <eventSource name="MyCompany1" />
+          <eventSource name="MyNewCompanyEventSource" />
         </sources>
         <eventTextFormatter dateTimeFormat="d" header="======="/>
       </flatFileSink>
