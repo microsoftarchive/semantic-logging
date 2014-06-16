@@ -335,11 +335,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests
 
             entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntry>(errorFileName, 1);
 
-            Assert.AreEqual(1, entries.Count());
 
             // Some events will be lost because of buffer overruns or schema synchronization delays in trace session
             // is the message reported by SLAB even though the real error is misconfiguration
-            Assert.AreEqual(entries.First().EventId, 806);
+            Assert.AreEqual(entries.First().EventId, 811);
 
             entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntry>(fileName, 1);
             Assert.AreEqual(0, entries.Count());
