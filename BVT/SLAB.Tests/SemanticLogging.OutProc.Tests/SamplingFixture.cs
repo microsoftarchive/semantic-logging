@@ -19,6 +19,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests
     [TestClass]
     public class SamplingFixture
     {
+        // Work around to load TextFile assembly
+        private static System.Type t = typeof(Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.FlatFileSink);
+
         private ManualResetEvent waitObject = new ManualResetEvent(false);
 
         [TestMethod]
@@ -334,7 +337,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests
             }
 
             entries = FlatFileHelper.PollUntilJsonEventsAreWritten<TestEventEntry>(errorFileName, 1);
-
 
             // Some events will be lost because of buffer overruns or schema synchronization delays in trace session
             // is the message reported by SLAB even though the real error is misconfiguration

@@ -15,6 +15,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
     [TestClass]
     public class RFFLSinkConfigFixture
     {
+        // Work around to load TextFile assembly
+        private static System.Type t = typeof(Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.FlatFileSink);
+
         [TestMethod]
         public void WhenConfigIsValidAndComplete()
         {

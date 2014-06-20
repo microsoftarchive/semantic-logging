@@ -116,6 +116,10 @@
       <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
       <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SemanticLogging.TextFile\SemanticLogging.TextFile.csproj">
+      <Project>{4b187511-187b-48b1-a593-18ba835b49c3}</Project>
+      <Name>SemanticLogging.TextFile</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SemanticLogging.WindowsAzure\SemanticLogging.WindowsAzure.csproj">
       <Project>{d7979e9b-7978-48fe-b345-3c767a20f9a1}</Project>
       <Name>SemanticLogging.WindowsAzure</Name>

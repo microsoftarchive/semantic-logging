@@ -10,6 +10,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.TestScenarios;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestObjects;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.TestSupport;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -19,6 +20,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Ex
     [TestClass]
     public class CustomSinkFixture
     {
+        // Work around to load TextFile assembly
+        private static System.Type t = typeof(Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.FlatFileSink);
+
         [ClassInitialize]
         public static void Setup(TestContext testContext)
         {

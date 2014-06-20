@@ -187,13 +187,17 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
 
         protected Process StartServiceAsConsoleWithConfig(string configFileName)
         {
-            string path = Path.Combine(Environment.CurrentDirectory, "SemanticLogging-svc.exe.config");
-            string appConfigContent = File.ReadAllText(path);
+            // TODO: can uncomment below and remove File.Copy's if probePath OOP Service issue is fixed. 
+
+            //string path = Path.Combine(Environment.CurrentDirectory, "SemanticLogging-svc.exe.config");
+            //string appConfigContent = File.ReadAllText(path);
             var semanticLoggingServiceProcess = new Process();
             try
             {
-                string appConfigContentReplace = appConfigContent.Replace("slabsvcTest.xml", configFileName);
-                File.WriteAllText(path, appConfigContentReplace);
+                File.Copy("slabsvcTest.xml", "slabsvcTest.xml.bak", true);               
+                File.Copy(configFileName, "slabsvcTest.xml", true);
+//                string appConfigContentReplace = appConfigContent.Replace("slabsvcTest.xml", configFileName);
+//                File.WriteAllText(path, appConfigContentReplace);
                 semanticLoggingServiceProcess.StartInfo.FileName = SemanticLoggingServiceExecutableFilePath;
                 semanticLoggingServiceProcess.StartInfo.Arguments = "-c";
                 semanticLoggingServiceProcess.StartInfo.UseShellExecute = false;
@@ -215,7 +219,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             }
             finally
             {
-                File.WriteAllText(path, appConfigContent);
+                //                File.WriteAllText(path, appConfigContent);
             }
 
             return semanticLoggingServiceProcess;

@@ -26,6 +26,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
         [TestCleanup]
         public override void TestCleanup()
         {
+            // TODO: Can remove File.Copy if probePath OOP Service issue is fixed. 
+            File.Copy("slabsvcTest.xml.bak", "slabsvcTest.xml", true);
+
             base.TestCleanup();
         }
 
