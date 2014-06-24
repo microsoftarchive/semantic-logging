@@ -18,6 +18,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6A93313C-F04A-4623-BD8C-2C314116A782}"
 	ProjectSection(SolutionItems) = preProject
 		EnterpriseLibrary.ruleset = EnterpriseLibrary.ruleset
+		NuGet\install-packages.ps1 = NuGet\install-packages.ps1
+		NuGet\packages-service.config = NuGet\packages-service.config
 		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
