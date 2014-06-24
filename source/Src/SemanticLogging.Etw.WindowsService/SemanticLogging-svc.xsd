@@ -21,7 +21,6 @@
             <xs:element name="sqlDatabaseSink" type="SqlDatabaseSinkElement" />
             <xs:element name="consoleSink" type="ConsoleSinkElement" />
             <xs:element name="customSink" type="CustomSinkElement" />
-            <xs:element name="elasticsearchSink" type="ElasticsearchSinkElement" />
             <xs:any namespace="##other" processContents="lax"/>
           </xs:choice>
         </xs:complexType>
@@ -142,22 +141,6 @@
         <xs:attribute name="tableAddress" type="NoEmptyString" use="optional" />
         <xs:attribute name="sortKeysAscending" type="xs:boolean" use="optional" />
         <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
-        <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
-        <xs:attribute name="bufferingFlushAllTimeoutInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-
-  <xs:complexType name="ElasticsearchSinkElement">
-    <xs:complexContent mixed="false">
-      <xs:extension base="SinkBase">
-        <xs:attribute name="instanceName" type="NoEmptyString" use="required" />
-        <xs:attribute name="connectionString" type="NoEmptyString" use="required" />
-        <xs:attribute name="index" type="NoEmptyString" use="optional" />
-        <xs:attribute name="type" type="NoEmptyString" use="optional" />
-        <xs:attribute name="flattenPayload" type="xs:boolean" use="optional" />
-        <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
-        <xs:attribute name="bufferingCount" type="PositiveInteger" use="optional" />
         <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
         <xs:attribute name="bufferingFlushAllTimeoutInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
       </xs:extension>
