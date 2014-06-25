@@ -93,7 +93,6 @@
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaReader\EventSourceSchemaReaderFixture.cs" />
-    <Compile Include="Sinks\ElasticsearchSinkFixture.cs" />
     <Compile Include="Sinks\WindowsAzureTableSinkFixture.cs" />
     <Compile Include="Sinks\DatabaseSinkFixture.cs" />
     <Compile Include="Sinks\ConsoleSinkFixture.cs" />
@@ -127,10 +126,6 @@
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Database\SemanticLogging.Database.csproj">
       <Project>{ac34c8e7-2a5b-412c-aff7-cf7f52ee4569}</Project>
       <Name>SemanticLogging.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
-      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Etw\SemanticLogging.Etw.csproj">
       <Project>{8440aea2-cd55-42a0-8724-2ecce2b32374}</Project>

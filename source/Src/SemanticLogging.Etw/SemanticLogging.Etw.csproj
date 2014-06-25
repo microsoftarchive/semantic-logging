@@ -112,10 +112,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
-      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.Elasticsearch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SemanticLogging.TextFile\SemanticLogging.TextFile.csproj">
       <Project>{4b187511-187b-48b1-a593-18ba835b49c3}</Project>
       <Name>SemanticLogging.TextFile</Name>

@@ -113,10 +113,6 @@
       <Project>{ac34c8e7-2a5b-412c-aff7-cf7f52ee4569}</Project>
       <Name>SemanticLogging.Database</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
-      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.Elasticsearch</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Etw\SemanticLogging.Etw.csproj">
       <Project>{8440aea2-cd55-42a0-8724-2ecce2b32374}</Project>
       <Name>SemanticLogging.Etw</Name>

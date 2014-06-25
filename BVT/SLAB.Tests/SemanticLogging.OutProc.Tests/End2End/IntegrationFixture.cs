@@ -119,39 +119,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             Assert.IsNotNull(event2);
         }
 
-        [TestMethod]
-        public void WhenUsingElasticsearch()
-        {
-            var elasticsearchUri = ConfigurationManager.AppSettings["ElasticsearchUri"];
-            try
-            {
-                ElasticsearchHelper.DeleteIndex(elasticsearchUri);
-            }
-            catch (Exception exp)
-            {
-                Assert.Inconclusive(String.Format("Error occured connecting to ES: Message{0}, StackTrace: {1}", exp.Message, exp.StackTrace));
-            }
-
-            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", ElasticsearchIndexPrefix, DateTime.UtcNow);
-            var type = "testtype";
-            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "ElasticsearchWinService.xml");
-
-            QueryResult result = null;
-            var logger = MockEventSourceOutProc.Logger;
-
-            this.ExecuteServiceTest(configFile, () =>
-            {
-                logger.LogSomeMessage("logging using windows service to elastic search");
-                logger.LogSomeMessage("logging using windows service to elastic search 2");
-
-                result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, type, 2);
-            });
-
-            Assert.AreEqual(2, result.Hits.Total);
-            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging using windows service to elastic search"));
-            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging using windows service to elastic search 2"));
-        }
-
         private void ExecuteServiceTest(string configFile, Action runTest)
         {
             using (var semanticLoggingServiceProcess = this.StartServiceAsConsoleWithConfig(configFile))

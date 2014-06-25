@@ -12,7 +12,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared.Tes
         {
             EnsureAssemblyIsLoaded("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.WindowsAzure", "Microsoft.Practices.EnterpriseLibrary.SemanticLogging.WindowsAzure.dll");
             EnsureAssemblyIsLoaded("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database", "Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.dll");
-            EnsureAssemblyIsLoaded("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Elasticsearch", "Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Elasticsearch.dll");
+            EnsureAssemblyIsLoaded("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.TextFile", "Microsoft.Practices.EnterpriseLibrary.SemanticLogging.TextFile.dll");
         }
 
         private static void EnsureAssemblyIsLoaded(string assemblyName, string assemblyFileName)

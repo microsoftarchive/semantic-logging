@@ -106,7 +106,6 @@
     <Compile Include="Formatters\XmlEventTextFormatterFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SamplingFixture.cs" />
-    <Compile Include="ServiceConfiguration\ElasticsearchSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\ReconfigFixture.cs" />
     <Compile Include="ServiceConfiguration\RFFLSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\FlatFileSinkConfigFixture.cs" />
@@ -115,7 +114,6 @@
     <Compile Include="ServiceConfiguration\AzureSinkConfigFixture.cs" />
     <Compile Include="ServiceConfiguration\ConfigIntegrationFixture.cs" />
     <Compile Include="ServiceConfiguration\TraceEventServiceConfigFixture.cs" />
-    <Compile Include="Sinks\ElasticsearchSinkFixture.cs" />
     <Compile Include="Sinks\WindowsAzureTableSinkFixture.cs" />
     <Compile Include="Sinks\DatabaseSinkFixture.cs" />
     <Compile Include="Sinks\FlatFileSinkFixture.cs" />
@@ -182,6 +180,7 @@
     </Content>
     <Content Include="slabsvcTest.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <None Include="App.config" />
     <None Include="Configurations\ExternalSchemas\MyCustomSinkElement.xxsd">
@@ -192,38 +191,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkAllProperties.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkEmptyConnectionString.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkEmptyIndex.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkEmptyInstanceName.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkEmptyTypeName.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkMandatoryProperties.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkMissingConnectionString.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\ElasticsearchSink\ElasticSinkMissingInstanceName.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Configurations\RollingFlatFile\RollingFlatFile.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations\WinService\AzureTablesWinService.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Configurations\WinService\ElasticsearchWinService.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Configurations\WinService\FlatFileWinService.xml">
@@ -499,6 +470,7 @@
     </Content>
     <Content Include="Configurations\SqlDatabase\SqlDatabaseHappyPath.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\SqlDatabase\SqlDB.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -511,6 +483,7 @@
     </Content>
     <Content Include="Configurations\SqlDatabase\SqlDBEmptyName.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Configurations\SqlDatabase\SqlDBMissingConnStr.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -578,10 +551,6 @@
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Database\SemanticLogging.Database.csproj">
       <Project>{ac34c8e7-2a5b-412c-aff7-cf7f52ee4569}</Project>
       <Name>SemanticLogging.Database</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
-      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Src\SemanticLogging.Etw.WindowsService\SemanticLogging.Etw.WindowsService.csproj">
       <Project>{0ebf89e7-d2b2-4968-bc17-0da066029c46}</Project>

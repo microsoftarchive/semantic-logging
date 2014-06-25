@@ -17,11 +17,6 @@
         <eventSource name="MockEventSourceOutProcSvc"  />
       </sources>
     </windowsAzureTableSink>
-    <elasticsearchSink name="ElasticSeachEventListener" instanceName="testInstalce" connectionString="http://localhost:9200" bufferingFlushAllTimeoutInSeconds="1" bufferingIntervalInSeconds="1" index="elasticsearch2eusingwindowsservice"  type="testtype">
-      <sources>
-        <eventSource name="MockEventSourceOutProcSvc"/>
-      </sources>
-    </elasticsearchSink>
   </sinks>
 </configuration>
 

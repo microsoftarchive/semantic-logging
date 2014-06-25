@@ -19,10 +19,13 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests
     [TestClass]
     public class SamplingFixture
     {
-        // Work around to load TextFile assembly
-        private static System.Type t = typeof(Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.FlatFileSink);
-
         private ManualResetEvent waitObject = new ManualResetEvent(false);
+
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
 
         [TestMethod]
         public void WhenEnablingSamplingForAProcessAndProcessIsRunning()

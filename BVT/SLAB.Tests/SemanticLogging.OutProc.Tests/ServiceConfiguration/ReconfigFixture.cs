@@ -21,8 +21,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.Se
     [TestClass]
     public class ReconfigFixture
     {
-        // Work around to load TextFile assembly
-        private static System.Type t = typeof(Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.FlatFileSink);
+        [ClassInitialize]
+        public static void Setup(TestContext testContext)
+        {
+            AssemblyLoaderHelper.EnsureAllAssembliesAreLoadedForSinkTest();
+        }
 
         [TestInitialize]
         public void TestInit()

@@ -67,25 +67,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             Assert.IsNotNull(event2);
         }
 
-        // Ignore until permission issue for Windows service is sorted
-        [Ignore]
-        [TestMethod]
-        public void WhenUsingElasticsearch()
-        {
-            var elasticsearchUri = ConfigurationManager.AppSettings["ElasticsearchUri"];
-
-            var index = string.Format(CultureInfo.InvariantCulture, "{0}-{1:yyyy.MM.dd}", ElasticsearchIndexPrefix, DateTime.UtcNow);
-            var type = "testtype";
-            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "ElasticsearchWinService.xml");
-
-            QueryResult result = null;
-            result = ElasticsearchHelper.PollUntilEvents(elasticsearchUri, index, type, 2);
-
-            Assert.AreEqual(2, result.Hits.Total);
-            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging to the windows service"));
-            Assert.IsNotNull(result.Hits.Hits.SingleOrDefault(h => (string)h.Source["Payload_message"] == "logging to the windows service 2"));
-        }
-
         private static void CleanAzure()
         {
             var connectionString = System.Configuration.ConfigurationManager.AppSettings["StorageConnectionString"];
