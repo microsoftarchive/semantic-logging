@@ -13,7 +13,7 @@ using System.Security;
 
 [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyFileVersion("2.0.1406.0")]
-[assembly: AssemblyInformationalVersion("2.0.1406-rc")]
+[assembly: AssemblyInformationalVersion("2.0.1406.0")]
 
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
