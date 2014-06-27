@@ -64,7 +64,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="SemanticLogging.Elasticsearch.nuspec" />
+    <None Include="SemanticLogging.Elasticsearch.nuspec.exclude" />
     <None Include="Settings.StyleCop" />
   </ItemGroup>
   <ItemGroup>

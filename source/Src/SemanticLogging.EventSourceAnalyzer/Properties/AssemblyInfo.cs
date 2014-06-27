@@ -9,8 +9,8 @@ using System.Security;
 
 [assembly: SecurityTransparent]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.1.1403.0")]
-[assembly: AssemblyInformationalVersion("1.1.1403.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.1406.0")]
+[assembly: AssemblyInformationalVersion("2.0.1406.0")]
 
 [assembly: ComVisible(false)]
