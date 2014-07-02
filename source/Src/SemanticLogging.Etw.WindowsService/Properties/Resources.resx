@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AccountArgDescription" xml:space="preserve">
-    <value>[ -a=type | -account=type]	Specifies the account type. Accepted values are 'User', 'LocalSystem', and 'LocalService'. Default is 'LocalService'.</value>
+    <value>[ -a=type | -account=type]	Specifies the account type. Accepted values are User, LocalSystem, and LocalService. Default is LocalService.</value>
   </data>
   <data name="AlreadyInstalledService" xml:space="preserve">
     <value>The service is already installed or has been marked for deletion.</value>
