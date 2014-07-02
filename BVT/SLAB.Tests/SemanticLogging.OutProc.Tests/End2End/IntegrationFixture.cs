@@ -26,9 +26,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
         [TestCleanup]
         public override void TestCleanup()
         {
-            // TODO: Can remove File.Copy if probePath OOP Service issue is fixed. 
-            File.Copy("slabsvcTest.xml.bak", "slabsvcTest.xml", true);
-
             base.TestCleanup();
         }
 
@@ -50,7 +47,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests.En
             string fileName = "FlatFileOutProcCfgWS.log";
 
             File.Delete(fileName);
-            string configFile = "Configurations\\WinService\\FlatFileWinService.xml";
+            string configFile = CopyConfigFileToWhereServiceExeFileIsLocatedAndReturnNewConfigFilePath("Configurations\\WinService", "FlatFileWinService.xml");
+//            string configFile = "Configurations\\WinService\\FlatFileWinService.xml";
 
             IEnumerable<string> entries = null;
             var logger = MockEventSourceOutProc.Logger;
