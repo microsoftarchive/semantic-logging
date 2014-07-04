@@ -5,7 +5,7 @@ The Semantic Logging Application Block provides a set of destinations (sinks) to
 
 An out-of-proc Windows Service is available as a separate NuGet package (EnterpriseLibrary.SemanticLogging.Service).
 
-The SQL Server setup scripts for using with the SQL Server sink is available inside this package at: $(SolutionDir)\packages\EnterpriseLibrary.SemanticLogging.Database.1.0.1304.0\scripts\
+The SQL Server setup scripts for using with the SQL Server sink is available inside this package at: $(SolutionDir)\packages\EnterpriseLibrary.SemanticLogging.Database.2.0.1406.0\scripts\
 
 Updated release notes are available at http://slab.codeplex.com/wikipage?title=SLAB2.0ReleaseNotes
 
