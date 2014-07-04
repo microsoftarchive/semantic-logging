@@ -3,17 +3,17 @@
   <metadata schemaVersion="2">
     <id>EnterpriseLibrary.SemanticLogging.EventSourceAnalyzer</id>
     <version>$Microsoft_Practices_EnterpriseLibrary_SemanticLogging_EventSourceAnalyzer_Version$</version>
-    <title>Semantic Logging Application Block - EventSource analyzer</title>
+    <title>Semantic Logging Application Block - EventSource Analyzer</title>
     <authors>Microsoft</authors>
     <owners>Microsoft; patterns-and-practices</owners>
     <licenseUrl>http://opensource.org/licenses/Apache-2.0</licenseUrl>
     <projectUrl>http://slab.codeplex.com</projectUrl>
     <iconUrl>http://nuget.org/Media/Default/Packages/Unity/2.0/entlib_new_icon_100x100.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
-    <summary>The Semantic Logging Application Block provides a set of destinations to persist events published by a subclass of EventSource.</summary>
-    <description>The Semantic Logging Application Block provides a set of destinations to persist events published by a subclass of EventSource, This add-on packages adds support to persisting log entries into Elasticsearch.</description>
+    <summary>The EventSource Analyzer helps validate EventSource instances.</summary>
+    <description>The EventSource Analyzer is part of the Semantic Logging Application Block. It can be incorporated into your automated tests to help validate your EventSource instances.</description>
    <copyright>© 2014 Microsoft Corporation</copyright>
-   <tags>entlib entlib6 slab enterprise library ETW semantic logging EventSource event listener structured strongly-typed block sink analyzer OSS</tags>
+   <tags>slab ETW semantic logging EventSource analyzer test testing</tags>
     <dependencies>
       <dependency id="EnterpriseLibrary.SemanticLogging" version="$Microsoft_Practices_EnterpriseLibrary_SemanticLogging_Version$" />
     </dependencies>

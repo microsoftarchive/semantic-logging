@@ -11,9 +11,9 @@
     <iconUrl>http://nuget.org/Media/Default/Packages/Unity/2.0/entlib_new_icon_100x100.png</iconUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <summary>The Semantic Logging Application Block provides a set of destinations to persist events published by a subclass of EventSource.</summary>
-    <description>The Semantic Logging Application Block provides a set of destinations to persist events published by a subclass of EventSource, This add-on packages adds support to persisting log entries into Elasticsearch.</description>
+    <description>The Semantic Logging Application Block provides a set of destinations to persist events published by a subclass of EventSource, This add-on packages adds support to persisting log entries into text files.</description>
    <copyright>© 2014 Microsoft Corporation</copyright>
-   <tags>entlib entlib6 slab enterprise library ETW semantic logging EventSource event listener structured strongly-typed block sink file OSS</tags>
+   <tags>slab ETW semantic logging EventSource file text sink</tags>
     <dependencies>
       <dependency id="EnterpriseLibrary.SemanticLogging" version="$Microsoft_Practices_EnterpriseLibrary_SemanticLogging_Version$" />
     </dependencies>
