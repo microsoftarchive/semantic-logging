@@ -6,7 +6,7 @@ To run the tests follow these steps:
 2. Run SQL scripts, located at source/scripts.
 3. Build the SemanticLogging source code before building the BVT solution.
 
-Some tests are configured to wait for a fixed amount of time until events are written to the SqlDatabase and to the Windows Azure Table.
+Some tests are configured to wait for a fixed amount of time until events are written to the SqlDatabase and to the Azure Table.
 These tests may fail if the events are not written in time.
 
 Microsoft patterns & practices
