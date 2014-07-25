@@ -8,7 +8,7 @@ using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks.WindowsAzure
 {
     /// <summary>
-    /// Represents a log entry in a Windows Azure Table.
+    /// Represents a log entry in an Azure Table.
     /// </summary>
     public sealed class CloudEventEntry
     {

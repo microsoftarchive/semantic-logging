@@ -10,7 +10,7 @@ using System.Linq;
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListeners
 {
     /// <summary>
-    /// Represents a log entry in a Windows Azure Table.
+    /// Represents a log entry in an Azure Table.
     /// </summary>
     internal class TestCloudTableEntry : TableEntity
     {

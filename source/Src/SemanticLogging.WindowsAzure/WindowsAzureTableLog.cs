@@ -28,7 +28,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <param name="bufferingInterval">The buffering interval between each batch publishing. Default value is <see cref="Buffering.DefaultBufferingInterval" />.</param>
         /// <param name="sortKeysAscending">The value indicating whether to sort the row keys in ascending order.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="WindowsAzureTableSink.OnCompleted" /> call is received and before disposing the sink.</param>
-        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.
+        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Azure Storage before the sink starts dropping entries.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose" /> on
         /// the <see cref="System.Diagnostics.Tracing.EventListener" /> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null" /> is specified, then the call will block indefinitely until the flush operation finishes.</param>
@@ -61,7 +61,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// <param name="bufferingInterval">The buffering interval between each batch publishing.</param>
         /// <param name="sortKeysAscending">The value indicating whether to sort the row keys in ascending order.</param>
         /// <param name="listenerDisposeTimeout">Defines a timeout interval for the flush operation when the listener is disposed.</param>
-        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.
+        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Azure Storage before the sink starts dropping entries.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Calling <see cref="IDisposable.Dispose" /> on
         /// the <see cref="EventListener" /> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null" /> is specified, then the call will block indefinitely until the flush operation finishes.</param>

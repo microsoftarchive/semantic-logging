@@ -19,7 +19,7 @@ using WindowsAzureResources = Microsoft.Practices.EnterpriseLibrary.SemanticLogg
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
     /// <summary>
-    /// Sink that asynchronously writes entries to a Windows Azure table.
+    /// Sink that asynchronously writes entries to an Azure table.
     /// </summary>
     public class WindowsAzureTableSink : IObserver<EventEntry>, IDisposable
     {
@@ -42,8 +42,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string for the storage account.</param>
         /// <param name="tableAddress">Either the name of the table, or the absolute URI to the table.</param>
-        /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Windows Azure Storage.</param>
-        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Windows Azure Storage before the sink starts dropping entries.</param>
+        /// <param name="bufferInterval">The buffering interval to wait for events to accumulate before sending them to Azure Storage.</param>
+        /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to Azure Storage before the sink starts dropping entries.</param>
         /// <param name="onCompletedTimeout">Defines a timeout interval for when flushing the entries after an <see cref="OnCompleted"/> call is received and before disposing the sink.
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
@@ -142,7 +142,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <summary>
         /// Provides the sink with new data to write.
         /// </summary>
-        /// <param name="value">The current entry to write to Windows Azure.</param>
+        /// <param name="value">The current entry to write.</param>
         public void OnNext(EventEntry value)
         {
             this.OnNext(value.TryConvertToCloudEventEntry());
