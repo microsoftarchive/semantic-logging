@@ -115,7 +115,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(500, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "A Windows Azure Table sink failed to write a batch of events. Message: {0}")]
+        [Event(500, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An Azure Table sink failed to write a batch of events. Message: {0}")]
         internal void WindowsAzureTableSinkPublishEventsFailed(string message)
         {
             if (this.IsEnabled())
@@ -124,7 +124,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(501, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "A Windows Azure Table sink failed to create a table. Message: {0}")]
+        [Event(501, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An Azure Table sink failed to create a table. Message: {0}")]
         internal void WindowsAzureTableSinkTableCreationFailed(string message)
         {
             if (this.IsEnabled())
@@ -133,7 +133,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(502, Level = EventLevel.Warning, Keywords = Keywords.Sink, Message = "A transient fault occurred in a Windows Azure Table sink. Message: {0}")]
+        [Event(502, Level = EventLevel.Warning, Keywords = Keywords.Sink, Message = "A transient fault occurred in an Azure Table sink. Message: {0}")]
         internal void WindowsAzureTableSinkTransientError(string message)
         {
             if (this.IsEnabled())
@@ -142,7 +142,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(503, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "A Windows Azure Table sink failed to create an entity. Message: {0}")]
+        [Event(503, Level = EventLevel.Critical, Keywords = Keywords.Sink, Message = "An Azure Table sink failed to create an entity. Message: {0}")]
         internal void WindowsAzureTableSinkEntityCreationFailed(string message)
         {
             if (this.IsEnabled())
@@ -151,7 +151,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             }
         }
 
-        [Event(504, Level = EventLevel.Error, Keywords = Keywords.Sink, Message = "A Windows Azure Table sink discarded {0} events due to failures while attempting to publish a batch.")]
+        [Event(504, Level = EventLevel.Error, Keywords = Keywords.Sink, Message = "An Azure Table sink discarded {0} events due to failures while attempting to publish a batch.")]
         internal void WindowsAzureTableSinkPublishEventsFailedAndDiscardsEntries(int numberOfEntries)
         {
             if (this.IsEnabled())

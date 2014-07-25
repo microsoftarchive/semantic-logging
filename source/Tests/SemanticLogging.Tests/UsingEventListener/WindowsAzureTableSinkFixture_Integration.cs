@@ -30,7 +30,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
                 || connectionString.Contains("[AccountName]")
                 || connectionString.Contains("[AccountKey]"))
             {
-                Assert.Inconclusive("Cannot run tests because the Windows Azure Storage credentials are not configured");
+                Assert.Inconclusive("Cannot run tests because the Azure Storage credentials are not configured");
             }
 
             this.account = CloudStorageAccount.Parse(connectionString);

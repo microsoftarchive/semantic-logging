@@ -211,18 +211,18 @@
     <value>An unhandled exception occurred for the trace session '{0}'. Message: {1}</value>
   </data>
   <data name="event_WindowsAzureTableSinkEntityCreationFailed" xml:space="preserve">
-    <value>A Windows Azure Table sink failed to create an entity. Message: {0}</value>
+    <value>A Microsoft Azure Table sink failed to create an entity. Message: {0}</value>
   </data>
   <data name="event_WindowsAzureTableSinkPublishEventsFailed" xml:space="preserve">
-    <value>A Windows Azure Table sink failed to write a batch of events. Message: {0}</value>
+    <value>A Microsoft Azure Table sink failed to write a batch of events. Message: {0}</value>
   </data>
   <data name="event_WindowsAzureTableSinkPublishEventsFailedAndDiscardsEntries" xml:space="preserve">
-    <value>A Windows Azure Table sink discarded {0} events due to failures while attempting to publish a batch.</value>
+    <value>A Microsoft Azure Table sink discarded {0} events due to failures while attempting to publish a batch.</value>
   </data>
   <data name="event_WindowsAzureTableSinkTableCreationFailed" xml:space="preserve">
-    <value>A Windows Azure Table sink failed to create a table. Message: {0}</value>
+    <value>A Microsoft Azure Table sink failed to create a table. Message: {0}</value>
   </data>
   <data name="event_WindowsAzureTableSinkTransientError" xml:space="preserve">
-    <value>A transient fault occurred in a Windows Azure Table sink. Message: {0}</value>
+    <value>A transient fault occurred in a Microsoft Azure Table sink. Message: {0}</value>
   </data>
 </root>
