@@ -152,13 +152,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
                     Console.ReadLine();
                 }
             }
+            catch (ReflectionTypeLoadException rtle)
+            {
+                var loaderExceptions = rtle.LoaderExceptions;
+                foreach (var e in loaderExceptions)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+                DisplayExceptionOnConsole(rtle);
+            }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
-                Console.WriteLine();
-                Console.WriteLine(Resources.StopServiceMessage);
-                Console.ReadLine();
-                this.ExitCode = ApplicationExitCode.RuntimeError;
+                DisplayExceptionOnConsole(e);
             }
         }
 
@@ -183,6 +188,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         private static ServiceController GetController()
         {
             return ServiceController.GetServices().FirstOrDefault(s => s.ServiceName.Equals(Constants.ServiceName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void DisplayExceptionOnConsole(Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            Console.WriteLine();
+            Console.WriteLine(Resources.StopServiceMessage);
+            Console.ReadLine();
+            this.ExitCode = ApplicationExitCode.RuntimeError;
         }
 
         private bool IsAuthorized()
