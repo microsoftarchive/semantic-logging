@@ -1,5 +1,7 @@
 ## What is Semantic Logging?
 
+[![Join the chat at https://gitter.im/mspnp/semantic-logging](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mspnp/semantic-logging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Semantic Logging (formerly know at the Semantic Logging Application Block or SLAB) is designed by the
 [patterns & practices](http://aka.ms/mspnp) team to help .NET developers move from the unstructured
 logging approach towards the strongly-typed (semantic) logging approach, making it easier to consume
