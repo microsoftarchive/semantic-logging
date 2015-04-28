@@ -16,11 +16,11 @@ For more information on setting up a project to use Microsoft Azure diagnostics,
 ### Installation
 1. Install Visual Studio 2013
 2. Launch Web Platform Installer and install Microsoft Azure SDK for Visual Studio 2013   
-![SetupEnv-1.png](/md-images/SetupEnv-1.png) 
+![SetupEnv-1.png](./md-images/SetupEnv-1.png) 
 3. Install Microsoft Azure Powershell  
-![SetupEnv-2.png](/md-images/SetupEnv-2.png)
+![SetupEnv-2.png](./md-images/SetupEnv-2.png)
 4. Launch Microsoft Azure Powershell and type "Get-Module" and see if the Azure module is imported. If not, try rebooting and then check again. In certain cases after powershell installation, the powershell module path is not updated properly and requires a reboot.    
-![SetupEnv-3.png](/md-images/SetupEnv-3.png)
+![SetupEnv-3.png](./md-images/SetupEnv-3.png)
 5. Install msysgit from [here]( https://github.com/msysgit/msysgit/releases/). On the site, choose the a stable version of msysGit-netinstall exe and install the tools
 
 ### Environment Variables
@@ -73,12 +73,12 @@ This command will create a logstash.conf file which can configure logstash to pu
     .\New-SampleELKInstance.ps1 -Location "West US" -Username "elk" -Password "Elk1234" -LogstashConfig "logstash.conf" -UseKibana4
     ```
 3. Wait for the script to complete. This  will take about 10 to 20 min. Along with the ELK VM, it will also create a new cloud service and storage account for you. Once completed, it should show you the name of the cloud service after the text "To see your kibana dashboard visit". Verify your setup by launching the browser and navigating to http://yourcloudservice.cloudapp.net to see the default Kibana page.  
-![SetupElk-1.png](/md-images/SetupElk-1.png)
+![SetupElk-1.png](./md-images/SetupElk-1.png)
     
 ### Verifying data on Kibana
 1. Once the cloud service is deployed, refresh your browser on the kibana dashboard. Check the "User event times to create index names" checkbox, it should use the logstash timestamp pattern to match and find some indices. Select Timestamp as the Time-field name and click Create      
-![VerifyData-1.png](/md-images/VerifyData-1.png)
+![VerifyData-1.png](./md-images/VerifyData-1.png)
 2. Click Discover at the top, and you should start seeing data  
-![VerifyData-2.png](/md-images/VerifyData-2.png)
+![VerifyData-2.png](./md-images/VerifyData-2.png)
 3. Your ELK stack is now up and running.  
 
