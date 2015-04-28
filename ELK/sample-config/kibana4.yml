@@ -1,0 +1,49 @@
+# Kibana is served by a back end server. This controls which port to use.
+port: 80
+
+# The host to bind the server to.
+host: "0.0.0.0"
+
+# The Elasticsearch instance to use for all your queries.
+elasticsearch_url: "http://localhost:9200"
+
+# If your Elasticsearch is protected with basic auth:
+# elasticsearch_username: user
+# elasticsearch_password: pass
+
+# preserve_elasticsearch_host true will send the hostname specified in `elasticsearch`. If you set it to false,
+# then the host you use to connect to *this* Kibana instance will be sent.
+elasticsearch_preserve_host: true
+
+# Kibana uses an index in Elasticsearch to store saved searches, visualizations
+# and dashboards. It will create a new index if it doesn't already exist.
+kibana_index: ".kibana"
+
+# The default application to load.
+default_app_id: "discover"
+
+# Time in milliseconds to wait for responses from the back end or elasticsearch.
+# This must be > 0
+request_timeout: 500000
+
+# Time in milliseconds for Elasticsearch to wait for responses from shards.
+# Set to 0 to disable.
+shard_timeout: 0
+
+# Set to false to have a complete disregard for the validity of the SSL
+# certificate.
+verify_ssl: true
+
+
+# Plugins that are included in the build, and no longer found in the plugins/ folder
+bundled_plugin_ids:
+ - plugins/dashboard/index
+ - plugins/discover/index
+ - plugins/doc/index
+ - plugins/kibana/index
+ - plugins/markdown_vis/index
+ - plugins/metric_vis/index
+ - plugins/settings/index
+ - plugins/table_vis/index
+ - plugins/vis_types/index
+ - plugins/visualize/index
