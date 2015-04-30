@@ -234,8 +234,8 @@ function Install-LogStashPlugIns
   Invoke-WrappedCommand -Command {scp -o ConnectTimeout=360 -r -o StrictHostKeychecking=no -o UserKnownHostsFile=NUL -i id_rsa -P $SshPort $LogstashPluginLocation $Destination}
   $Command = "sudo \cp -rf logstash-extension/* /opt/logstash/lib/logstash"
   Invoke-WrappedCommand -Command {ssh -o ConnectTimeout=360 -o StrictHostKeychecking=no -o UserKnownHostsFile=NUL -i id_rsa -p $SshPort $SshString  $Command}
-  $Command = "sudo \cp logstash-extension/jars/* /opt/logstash/lib"
-  Invoke-WrappedCommand -Command {ssh -o ConnectTimeout=360 -o StrictHostKeychecking=no -o UserKnownHostsFile=NUL -i id_rsa -p $SshPort $SshString  $Command}
+  #$Command = "sudo \cp logstash-extension/jars/* /opt/logstash/lib"
+  #Invoke-WrappedCommand -Command {ssh -o ConnectTimeout=360 -o StrictHostKeychecking=no -o UserKnownHostsFile=NUL -i id_rsa -p $SshPort $SshString  $Command}
   # install azure ruby sdk
   $Command = 'sudo env GEM_HOME=/opt/logstash/vendor/bundle/jruby/1.9 GEM_PATH=\"\" java -jar /opt/logstash/vendor/jar/jruby-complete-1.7.11.jar -S gem install azure'
   Invoke-WrappedCommand -Command {ssh -o ConnectTimeout=360 -o StrictHostKeychecking=no -o UserKnownHostsFile=NUL -i id_rsa -p $SshPort $SshString  $Command}
