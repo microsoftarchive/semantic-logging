@@ -1,9 +1,10 @@
-#Microsoft Azure Diagnostics with ELK
+# Microsoft Azure Diagnostics with ELK
 This repository contains PowerShell Scripts to setup Elastic Search, LogStash and Kibana (ELK) on Azure. Also included are Logstash plugins to pull in Microsoft Azure Diagnostics data into Elastic Search.
   
+# Known Issues and Bugs
+1. When running the New-ElasticSearchCluser.ps1, the $username parameter must match the username on line 15 of the [mountDisks.sh](./sh/mountDisks.sh) script. If you use a different $username parameter remember to update the mountDisks.sh script.
 
-
-#Quick Setup
+# Quick Setup
 The following step by step instructions show you how to create a minimalist ELK setup and is ideal for folks who want to try out the ELK stack.
 See [Reference](Reference.md) for more details on the available commandlets and extensions. 
 
