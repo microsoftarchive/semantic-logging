@@ -1,10 +1,10 @@
 # Preparation
-Follow the [setup instructions](/md/SetupInstructions.md) on this page to install tools such as Azure Commandlets, git, ssh, scp, and openssl.
+Follow the [setup instructions](./md/SetupInstructions.md) on this page to install tools such as Azure Commandlets, git, ssh, scp, and openssl.
 
 # Scenarios
 The following consumption scenarios are available:
-- [Windows Azure Diagnostics](/md/AzureDiagnostics.md)
-- [Blob Storage (e.g. from Application Insights)](/md/ApplicationInsights.md)
+- [Windows Azure Diagnostics](./md/AzureDiagnostics.md)
+- [Blob Storage (e.g. from Application Insights)](./md/ApplicationInsights.md)
 
 
 # Commandlet Usage
@@ -109,4 +109,4 @@ We have two commandlets to set up a Elastic Search cluster: (1) the simple scrip
 - -**UseKibana4** - flag to use Kibana 4 instead of Kibana 3
 
 # Logstash Extensions
-To make the usage of logstash easier with Azure we provide a set of logstash extensions that can be configured [(link to page)](/md/LogstashExtensions.md).
+To make the usage of logstash easier with Azure we provide a set of logstash extensions that can be configured [(link to page)](./md/LogstashExtensions.md).
