@@ -18,6 +18,14 @@ The Azure Blob Storage extension consumes blobs from a given azure container and
 - **container** - container name containing the blobs
 - **sleep_time** - sleep time between 
 
+### Azure Topics
+The Azure Topics input extension consumes messages posted to Azure Topics and has the following configuration values:
+- **codec** - codec used to parse the message content [default: json_list]
+- **namespace** - name space of the service bus
+- **access_key** - ACS key to access the service bus
+- **subscription** - subscription to dequeue messages from
+- **topic** - topic to post message to
+- **deliverycount** - number of messages consumes at once
 
 ## JSON list Codec
 This codec allows the ingestion of JSON objects, the following values can be configured:
