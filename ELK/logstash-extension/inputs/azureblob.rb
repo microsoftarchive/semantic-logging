@@ -5,7 +5,7 @@ require "logstash/namespace"
 require "azure"
 require "securerandom"
 
-# Reads events from Azure event-hub
+# Reads events from Azure Blobs
 class LogStash::Inputs::Azureblob < LogStash::Inputs::Base
 
   config_name "azureblob"
