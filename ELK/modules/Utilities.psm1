@@ -9,10 +9,29 @@ function Assert-AzureModuleIsInstalled
 
 function Assert-LinuxCommandsAreAvailable
 {
-  if ( (Get-Command ssh -errorAction SilentlyContinue) -and (Get-Command scp -errorAction SilentlyContinue) -and (Get-Command openssl -errorAction SilentlyContinue) -and (Get-Command sed -errorAction SilentlyContinue) ) {
+  if ( (Get-Command ssh -errorAction SilentlyContinue) ) {
     return
+  } else {
+    throw "The following command cannot be found on ENV:PATH : ssh"
   }
-  throw "One or more of the follwoing commands cannot be found on ENV:PATH : ssh, scp, ssh-keygen, sed"
+  
+  if ( (Get-Command scp -errorAction SilentlyContinue) ) {
+    return
+  } else {
+    throw "The following command cannot be found on ENV:PATH : scp"
+  }
+  
+  if ( (Get-Command openssl -errorAction SilentlyContinue) ) {
+    return
+  } else {
+    throw "The following command cannot be found on ENV:PATH : openssl"
+  }
+  
+  if ( (Get-Command sed -errorAction SilentlyContinue) ) {
+    return
+  } else {
+    throw "The following command cannot be found on ENV:PATH : sed"
+  }
 }
 
 function Set-CurrentStorageAccount
