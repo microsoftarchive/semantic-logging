@@ -9,27 +9,19 @@ function Assert-AzureModuleIsInstalled
 
 function Assert-LinuxCommandsAreAvailable
 {
-  if ( (Get-Command ssh -errorAction SilentlyContinue) ) {
-    return
-  } else {
+  if ( (Get-Command ssh -errorAction SilentlyContinue) -eq $null) {
     throw "The following command cannot be found on ENV:PATH : ssh"
-  }
+  } 
   
-  if ( (Get-Command scp -errorAction SilentlyContinue) ) {
-    return
-  } else {
+  if ( (Get-Command scp -errorAction SilentlyContinue) -eq $null) {
     throw "The following command cannot be found on ENV:PATH : scp"
-  }
+  } 
   
-  if ( (Get-Command openssl -errorAction SilentlyContinue) ) {
-    return
-  } else {
+  if ( (Get-Command openssl -errorAction SilentlyContinue) -eq $null) {
     throw "The following command cannot be found on ENV:PATH : openssl"
   }
   
-  if ( (Get-Command sed -errorAction SilentlyContinue) ) {
-    return
-  } else {
+  if ( (Get-Command sed -errorAction SilentlyContinue) -eq $null) {
     throw "The following command cannot be found on ENV:PATH : sed"
   }
 }
