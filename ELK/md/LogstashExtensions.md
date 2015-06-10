@@ -10,6 +10,25 @@ The Azure WAD Table extension consumes table entries created by the Windows Azur
 - **entity_count_to_process** - the number of entities to request at a time
 - **collection_start_time_utc** - the earliest time stamp of the data requested
 
+####Sample Configuration:
+```
+input { 
+	azurewadtable {
+		account_name => "STORAGE ACCOUNT NAME"
+		access_key => "STORAGE ACCESS KEY"
+		table_name => "TABLE NAME"
+	}
+}
+
+output {
+	elasticsearch {
+		host => "localhost"
+		protocol => "http"
+        port => 9200
+	}
+}
+```
+
 ### Azure Blob Storage
 The Azure Blob Storage extension consumes blobs from a given azure container and has the following configuration values:
 - **codec** - codec used to parse the message content [default: json_lines]
