@@ -1,0 +1,8 @@
+{
+  "itemDisplayName": "Install Logstash Cluster on Virtual Machines",
+  "description": "This template deploys a Logstash cluster to Azure Compute v2 on ARM.",
+  "summary": "Install Logstash cluster on Virtual Machines",
+  "githubUsername": "juliusl",
+  "dateUpdated": "2015-07-15"
+}
+
