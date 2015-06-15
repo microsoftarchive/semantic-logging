@@ -1,3 +1,5 @@
+:warning: We don't officially start this project yet. At this moment, we're experimenting a few concepts of semantic logging and envisioning the project.
+
 ## What is Semantic Logging?
 
 Semantic Logging (formerly know at the Semantic Logging Application Block or SLAB) is designed by the
