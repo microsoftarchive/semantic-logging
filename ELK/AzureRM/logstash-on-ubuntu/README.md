@@ -7,7 +7,7 @@
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-This template deploys and installs logstash with azure plugins. TODO: For now we only install 1 azure plugin for testing purposes with the others on the way.
+This template deploys and installs logstash with azure plugins. TODO: For now we only install azurewadtable logstash plugin for testing purposes with the others on the way.
 
 Below are the parameters that the template expects:
 
