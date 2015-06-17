@@ -7,9 +7,10 @@ The Azure WAD Table extension consumes table entries created by the Windows Azur
 - **account_name** - the account name holding the table
 - **access_key** - the access key to the storage account
 - **table_name** - the table name containing the diagnostics data
-- **entity_count_to_process** - the number of entities to request at a time
-- **collection_start_time_utc** - the earliest time stamp of the data requested
-- **etw_pretty_print** - Whether to try and pretty print the ETW messages. Will override the EventMessage column. The format for this is: EventMessage:Hi this is %1, Message:adj="cool" notused=" ", where EventMessage is the format string, %1 is what to replace, and "cool" is the value to use to replace %1.
+- **entity_count_to_process** - the number of entities to request at a time. Defaults to 100.
+- **collection_start_time_utc** - the earliest time stamp of the data requested. Defaults to Time.now.
+- **etw_pretty_print** - Whether to try and pretty print the ETW messages. Will override the EventMessage column. The format for this is: EventMessage:Hi this is %1, Message:adj="cool" notused=" ", where EventMessage is the format string, %1 is what to replace, and "cool" is the value to use to replace %1. Defaults to false.
+- **idle_delay_seconds** - the number of seconds to delay between cycles when idle (no data is being found). Defaults to 15 seconds.
 
 ####Sample Configuration:
 ```
@@ -18,6 +19,10 @@ input {
 		account_name => "STORAGE ACCOUNT NAME"
 		access_key => "STORAGE ACCESS KEY"
 		table_name => "TABLE NAME"
+		entity_count_to_process => 100
+		collection_start_time_utc => "2015-06-10T23:57:27.307Z"
+		etw_pretty_print => false
+		idle_delay_seconds => 15
 	}
 }
 
