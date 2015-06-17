@@ -16,6 +16,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
   config :entity_count_to_process, :validate => :string, :default => 100
   config :collection_start_time_utc, :validate => :string, :default => Time.now.utc.inspect
   config :etw_pretty_print, :validate => :boolean, :default => false
+  config :idle_delay_seconds, :validate => :number, :default => 15
 
   TICKS_SINCE_EPOCH = Time.utc(0001, 01, 01).to_i * 10000000
 
@@ -31,12 +32,16 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
      end
     @azure_table_service = Azure::TableService.new
     @last_timestamp = @collection_start_time_utc
+	@idle_delay = @idle_delay_seconds
   end # register
   
   public
   def run(output_queue)
-    while true
+    loop do
+	  @logger.debug("Starting process method @" + Time.now.to_s);
       process(output_queue)
+	  @logger.debug("Starting delay of: " + @idle_delay_seconds.to_s + " seconds @" + Time.now.to_s);
+	  sleep @idle_delay
     end # loop
   end # run
  
@@ -82,10 +87,11 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
 		
         output_queue << event
       end # each block
-      
+      @idle_delay = 0
       @last_timestamp = result.last.properties["PreciseTimeStamp"].inspect
     else
       @logger.debug("No new results found.")
+	  @idle_delay = @idle_delay_seconds
     end # if block
     
   rescue => e
