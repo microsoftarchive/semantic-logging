@@ -15,6 +15,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
   config :table_name, :validate => :string
   config :entity_count_to_process, :validate => :string, :default => 100
   config :collection_start_time_utc, :validate => :string, :default => Time.now.utc.inspect
+  config :etw_pretty_print, :validate => :boolean, :default => false
 
   TICKS_SINCE_EPOCH = Time.utc(0001, 01, 01).to_i * 10000000
 
@@ -44,6 +45,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
   end  
 
   def process(output_queue)
+    @logger.debug(@last_timestamp)
     # query data using start_from_time
     query_filter = "PartitionKey gt '#{partitionkey_from_datetime(@last_timestamp)}' and PreciseTimeStamp gt datetime'#{@last_timestamp}'".gsub('"','')
     query = { :top => @entity_count_to_process, :filter => query_filter }
@@ -53,12 +55,36 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
       result.each do |entity|
         event = LogStash::Event.new(entity.properties)
         event["type"] = @table_name
+		
+		logger.debug("event: " + event.to_s)
+		eventMessage = event["EventMessage"].to_s
+		message = event["Message"].to_s
+		logger.debug("EventMessage: " + eventMessage)
+		logger.debug("Message: " + message)
+		
+		# Help pretty print etw files
+		if (@etw_pretty_print && (eventMessage.include? "%"))
+		  logger.debug("starting pretty print")
+		  toReplace = eventMessage.scan(/%\d+/)
+		  payload = message.scan(/(?<!\\S)([a-zA-Z]+)=(\"[^\"]*\")(?!\\S)/)
+		  # Split up the format string to seperate all of the numbers
+	      toReplace.each do |key| 
+		    logger.debug("Replacing key: " + key.to_s)
+		    index = key.scan(/\d+/).join.to_i
+			newValue = payload[index - 1][1]
+			logger.debug("New Value: " + newValue)
+		    eventMessage[key] = newValue
+		  end
+		  event["EventMessage"] = eventMessage
+		  logger.debug("pretty print end. result: " + event["EventMessage"].to_s)
+		end
+		
         output_queue << event
       end # each block
       
       @last_timestamp = result.last.properties["PreciseTimeStamp"].inspect
     else
-      @logger.warn("result not found")
+      @logger.debug("No new results found.")
     end # if block
     
   rescue => e
