@@ -55,28 +55,29 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
       result.each do |entity|
         event = LogStash::Event.new(entity.properties)
         event["type"] = @table_name
-		
-		logger.debug("event: " + event.to_s)
-		eventMessage = event["EventMessage"].to_s
-		message = event["Message"].to_s
-		logger.debug("EventMessage: " + eventMessage)
-		logger.debug("Message: " + message)
-		
+
 		# Help pretty print etw files
-		if (@etw_pretty_print && (eventMessage.include? "%"))
-		  logger.debug("starting pretty print")
-		  toReplace = eventMessage.scan(/%\d+/)
-		  payload = message.scan(/(?<!\\S)([a-zA-Z]+)=(\"[^\"]*\")(?!\\S)/)
-		  # Split up the format string to seperate all of the numbers
-	      toReplace.each do |key| 
-		    logger.debug("Replacing key: " + key.to_s)
-		    index = key.scan(/\d+/).join.to_i
-			newValue = payload[index - 1][1]
-			logger.debug("New Value: " + newValue)
-		    eventMessage[key] = newValue
-		  end
+		if (@etw_pretty_print && !event["EventMessage"].nil? && !event["Message"].nil?)
+		  logger.debug("event: " + event.to_s)
+		  eventMessage = event["EventMessage"].to_s
+		  message = event["Message"].to_s
+		  logger.debug("EventMessage: " + eventMessage)
+		  logger.debug("Message: " + message)
+		  if (eventMessage.include? "%")
+		    logger.debug("starting pretty print")
+		    toReplace = eventMessage.scan(/%\d+/)
+		    payload = message.scan(/(?<!\\S)([a-zA-Z]+)=(\"[^\"]*\")(?!\\S)/)
+		    # Split up the format string to seperate all of the numbers
+	        toReplace.each do |key| 
+		      logger.debug("Replacing key: " + key.to_s)
+		      index = key.scan(/\d+/).join.to_i
+			  newValue = payload[index - 1][1]
+			  logger.debug("New Value: " + newValue)
+		      eventMessage[key] = newValue
+		    end
 		  event["EventMessage"] = eventMessage
 		  logger.debug("pretty print end. result: " + event["EventMessage"].to_s)
+		  end
 		end
 		
         output_queue << event
