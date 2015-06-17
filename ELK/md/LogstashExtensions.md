@@ -9,6 +9,7 @@ The Azure WAD Table extension consumes table entries created by the Windows Azur
 - **table_name** - the table name containing the diagnostics data
 - **entity_count_to_process** - the number of entities to request at a time
 - **collection_start_time_utc** - the earliest time stamp of the data requested
+- **etw_pretty_print** - Whether to try and pretty print the ETW messages. Will override the EventMessage column. The format for this is: EventMessage:Hi this is %1, Message:adj="cool" notused=" ", where EventMessage is the format string, %1 is what to replace, and "cool" is the value to use to replace %1.
 
 ####Sample Configuration:
 ```
