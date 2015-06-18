@@ -3,19 +3,19 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
-            "value": "logstashtest"
+            "value": "null"
         },
         "adminUsername": {
-            "value": "juliusl"
+            "value": "null"
         },
         "dnsNameForPublicIP": {
-            "value": "juliusllogstashtest1"
+            "value": "null"
         },
         "encodedConfigString": {
-            "value": "***REMOVED***+ICJXQURBaXJUcmFmZmljQ29udHJvbCIgIAljb2xsZWN0aW9uX3N0YXJ0X3RpbWVfdXRjID0+ICIyMDE1LTA2LTEwVDIzOjU3OjI3LjMwN1oiICAgICBldHdfcHJldHR5X3ByaW50ID0+IHRydWUgICAgfSAgfSAgIG91dHB1dCB7ICAgIGVsYXN0aWNzZWFyY2ggeyAgCWhvc3QgImxvY2FsaG9zdCIsIAlwcm90b2NvbCA9PiAiaHR0cCIsIAlwb3J0ID0+IDkyMDAJICAgfSAgfQ=="
+            "value": "null"
         },
         "ubuntuOSVersion": {
-            "value": "14.04.2-LTS"
+            "value": "null"
         }
     }
 }
