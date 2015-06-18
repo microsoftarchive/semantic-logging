@@ -1,0 +1,21 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "newStorageAccountName": {
+            "value": "logstashtest"
+        },
+        "adminUsername": {
+            "value": "juliusl"
+        },
+        "dnsNameForPublicIP": {
+            "value": "juliusllogstashtest1"
+        },
+        "encodedConfigString": {
+            "value": "***REMOVED***+ICJXQURBaXJUcmFmZmljQ29udHJvbCIgIAljb2xsZWN0aW9uX3N0YXJ0X3RpbWVfdXRjID0+ICIyMDE1LTA2LTEwVDIzOjU3OjI3LjMwN1oiICAgICBldHdfcHJldHR5X3ByaW50ID0+IHRydWUgICAgfSAgfSAgIG91dHB1dCB7ICAgIGVsYXN0aWNzZWFyY2ggeyAgCWhvc3QgImxvY2FsaG9zdCIsIAlwcm90b2NvbCA9PiAiaHR0cCIsIAlwb3J0ID0+IDkyMDAJICAgfSAgfQ=="
+        },
+        "ubuntuOSVersion": {
+            "value": "14.04.2-LTS"
+        }
+    }
+}

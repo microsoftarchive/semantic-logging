@@ -1,0 +1,8 @@
+{
+  "itemDisplayName": "Install ELK as a single instance on Virtual Machines",
+  "description": "This template deploys a ELK stack to Azure Compute v2 on ARM.",
+  "summary": "Install ELK on Virtual Machines",
+  "githubUsername": "juliusl",
+  "dateUpdated": "2015-07-18"
+}
+
