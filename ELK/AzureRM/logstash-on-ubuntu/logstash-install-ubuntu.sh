@@ -108,7 +108,7 @@ sudo env GEM_HOME=/opt/logstash/vendor/bundle/jruby/1.9 GEM_PATH=\"\" java -jar 
 
 # Copy Plugins
 log "Copying plugins"
-sudo \cp -f /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-input-azurewadtable-0.9.1/lib/logstash/inputs/azurewadtable.rb /opt/logstash/lib/logstash/inputs/azurewadtable.rb
+sudo \cp -f /opt/logstash/vendor/bundle/jruby/1.9/gems/logstash-input-azurewadtable-0.9.2/lib/logstash/inputs/azurewadtable.rb /opt/logstash/lib/logstash/inputs/azurewadtable.rb
 
 #log "Installing user configuration file"
 log "Installing user configuration file"
