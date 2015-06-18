@@ -1,6 +1,25 @@
 #!/bin/bash
 #
-#  
+# ========================================================================================
+# Microsoft patterns & practices (http://microsoft.com/practices)
+# SEMANTIC LOGGING APPLICATION BLOCK
+# ========================================================================================
+#
+# Copyright (c) Microsoft.  All rights reserved.
+# Microsoft would like to thank its contributors, a list
+# of whom are at http://aka.ms/entlib-contributors
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you
+# may not use this file except in compliance with the License. You may
+# obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+# implied. See the License for the specific language governing permissions
+# and limitations under the License.
 #
 
 help()
@@ -25,12 +44,15 @@ log()
 LOGSTASH_DEBIAN_PACKAGE_URL="https://download.elasticsearch.org/logstash/logstash/packages/debian/logstash_1.4.2-1-2c0f5a1_all.deb"
 
 #Loop through options passed
-while getopts :p:he: optname; do
+while getopts :p:e:hs optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     p)  #package url
       LOGSTASH_DEBIAN_PACKAGE_URL=${OPTARG}
       ;;
+	s)  #skip common install steps
+	  SKIP_COMMON_INSTALL="YES"
+	  ;;
     h)  #show help
       help
       exit 2
@@ -49,10 +71,17 @@ while getopts :p:he: optname; do
 done
 
 # Install Logstash
-log "Updating apt-get"
-sudo apt-get update
-log "Installing Java Runtime"
-sudo apt-get -f -y install default-jre
+
+if [ -z $SKIP_COMMON_INSTALL ] 
+then
+  log "Updating apt-get"
+  sudo apt-get update
+  log "Installing Java Runtime"
+  sudo apt-get -f -y install default-jre
+else
+  log "Skipping common install"
+fi
+
 log "Downloading logstash package"
 wget ${LOGSTASH_DEBIAN_PACKAGE_URL} -O logstash.deb
 log "Download completed, Installing Logstash"
