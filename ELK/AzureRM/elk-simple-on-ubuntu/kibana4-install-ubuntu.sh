@@ -37,12 +37,13 @@ help()
 log()
 {
 	echo "$1"
+	logger "kibana4-install-ubuntu.sh:" $1
 }
 
 # Add to Kibana Config
 atkcfg()
 {
-	echo "$1" >> ~/kibana.yml
+	echo "$1" >> ./kibana.yml
 }
 
 #Script Parameters
@@ -82,11 +83,11 @@ else
 fi
 
 log "Downloading Kibana"
-wget $KIBANA_PACKAGE_URL -O ~/kibana.tar.gz
+wget $KIBANA_PACKAGE_URL -O ./kibana.tar.gz
 
 log "Download Completed, Installing Kibana"
-mkdir ~/kibana
-sudo tar -xf ~/kibana.tar.gz -C ~/kibana --strip 1
+mkdir ./kibana
+sudo tar -xf ./kibana.tar.gz -C ./kibana --strip 1
 
 #Create User Configuration
 atkcfg "port: 80"
@@ -113,8 +114,8 @@ atkcfg " - plugins/visualize/index"
 
 #Install User Configuration
 log "Installing user configuration file"
-sudo \cp ~/kibana.yml ~/kibana/config/
+sudo \cp ./kibana.yml ./kibana/config/
 
 # Configure Start
 log "Starting Kibana"
-screen -d -m sh -c "while :; do sudo ~/kibana/bin/kibana; done;"
+screen -d -m sh -c "while :; do sudo ./kibana/bin/kibana; done;"
