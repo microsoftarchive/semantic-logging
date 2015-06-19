@@ -3,6 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "newStorageAccountName": {
+<<<<<<< HEAD
             "value": "logstashtest"
         },
         "adminUsername": {
@@ -19,3 +20,21 @@
         }
     }
 }
+=======
+            "value": "null"
+        },
+        "adminUsername": {
+            "value": "null"
+        },
+        "dnsNameForPublicIP": {
+            "value": "null"
+        },
+        "encodedConfigString": {
+            "value": "null"
+        },
+        "ubuntuOSVersion": {
+            "value": "null"
+        }
+    }
+}
+>>>>>>> 25fbc23c0baf485ceeceda3110a7fdbe28adb1fe

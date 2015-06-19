@@ -49,13 +49,13 @@ atkcfg()
 KIBANA_PACKAGE_URL="https://download.elasticsearch.org/kibana/kibana/kibana-4.0.0-linux-x64.tar.gz"
 
 #Loop through options passed
-while getopts :p:s optname; do
+while getopts :p:sh optname; do
     log "Option $optname set with value ${OPTARG}"
   case $optname in
     p)  #package url
       KIBANA_PACKAGE_URL=${OPTARG}
       ;;
-	d)  #skip common install steps
+	s)  #skip common install steps
 	  SKIP_COMMON_INSTALL="YES"
 	  ;;
     h)  #show help

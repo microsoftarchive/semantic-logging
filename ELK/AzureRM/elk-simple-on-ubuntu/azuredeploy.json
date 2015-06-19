@@ -17,7 +17,7 @@
                 "1.5.1",
                 "1.5.0",
                 "1.4.5",
-                "1.4.4",
+                "1.4.4"
             ],
             "metadata": {
                 "description": "Elasticsearch version to install"
@@ -218,7 +218,7 @@
                 }
             }
         },
-        {
+		{
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "name": "[concat(variables('vmName'),'/', variables('extensionName'))]",
             "apiVersion": "2015-05-01-preview",
@@ -231,46 +231,10 @@
                 "type": "CustomScriptForLinux",
                 "typeHandlerVersion": "1.2",
                 "settings": {
-                    "fileUris": [ "https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/logstash-on-ubuntu/logstash-install-ubuntu.sh" ],
-                    "commandToExecute": "[concat('bash logstash-install-ubuntu.sh -e ', parameters('encodedConfigString'))]"
+                    "fileUris": [ "https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/logstash-on-ubuntu/elk-simple-install-ubuntu.sh" ],
+                    "commandToExecute": "[concat('bash ./elk-simple-install-ubuntu.sh -n ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -d ', variables('esDiscoveryHosts'), ' -e ', parameters('encodedConfigString'))]"
                 }
             }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/', variables('extensionName'))]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [ "https://raw.githubusercontent.com/juliusl/azure-quickstart-templates/master/elasticsearch/elasticsearch-ubuntu-install.sh" ],
-                    "commandToExecute": "[concat('bash elasticsearch-ubuntu-install.sh -xn ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -d ', variables('esDiscoveryHosts'))]"
-                }              
-            }
-        },
-		        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('vmName'),'/', variables('extensionName'))]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[variables('location')]",
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [ "https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/elk-sample-on-ubuntu/kibana4-install-ubuntu.sh" ],
-                    "commandToExecute": "[concat('bash kibana4-install-ubuntu.sh, ' -s ')]"
-                }              
-            }
         }
-    ]
+	]
 }
