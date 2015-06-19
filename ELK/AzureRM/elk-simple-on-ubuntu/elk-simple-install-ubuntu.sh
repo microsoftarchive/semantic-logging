@@ -25,7 +25,7 @@
 log()
 {
 	echo $1
-	echo $1 >> /var/log/elk-simple-on-ubuntu.log
+	logger "elk-simple-on-ubuntu:" $1
 }
 
 #Loop through options passed
