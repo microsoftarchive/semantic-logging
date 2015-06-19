@@ -232,7 +232,7 @@
                 "typeHandlerVersion": "1.2",
                 "settings": {
                     "fileUris": [ "https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/elk-simple-on-ubuntu/elk-simple-install-ubuntu.sh" ],
-                    "commandToExecute": "[concat('sudo -u ', parameters('adminUsername'),' bash ./elk-simple-install-ubuntu.sh -n ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -d ', variables('esDiscoveryHosts'), ' -e ', parameters('encodedConfigString'))]"
+                    "commandToExecute": "[concat('bash ./elk-simple-install-ubuntu.sh -n ', parameters('esClusterName'), ' -v ', parameters('esVersion'), ' -d ', variables('esDiscoveryHosts'), ' -e ', parameters('encodedConfigString'))]"
                 }
             }
         }
