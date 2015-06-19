@@ -60,6 +60,8 @@ while getopts :n:v:d:e:sh optname; do
 done
 
 #ELK (Simple) Install Script
+mkdir /opt/elk-simple/
+cd /opt/elk-simple/
 
 #Install ELK
 log "Installing Elasticsearch" 
