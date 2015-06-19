@@ -70,7 +70,7 @@ cd ~
 
 #Install ELK
 log "Installing Elasticsearch" 
-bash ./elasticsearch-ubuntu-install.sh -xn $ES_CLUSTER_NAME -v $ES_VERSION -d $ES_DISCOVERY_HOSTS
+bash ./elasticsearch-ubuntu-install.sh -n $ES_CLUSTER_NAME -v $ES_VERSION -d $ES_DISCOVERY_HOSTS
 log "Installing Elasticsearch Completed"
 
 #Install Logstash
