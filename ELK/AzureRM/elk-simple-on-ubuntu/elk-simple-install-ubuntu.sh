@@ -22,6 +22,12 @@
 # and limitations under the License.
 #
 
+log()
+{
+	echo $1
+	echo $1 >> /var/log/elk-simple-on-ubuntu.log
+}
+
 #Loop through options passed
 while getopts :n:v:d:e:sh optname; do
     log "Option $optname set with value ${OPTARG}"
@@ -56,12 +62,18 @@ done
 #ELK (Simple) Install Script
 
 #Install ELK
+log "Installing Elasticsearch" 
 wget https://raw.githubusercontent.com/juliusl/azure-quickstart-templates/master/elasticsearch/elasticsearch-ubuntu-install.sh
 bash ./elasticsearch-ubuntu-install.sh -xn $ES_CLUSTER_NAME -v $ES_VERSION -d $ES_DISCOVERY_HOSTS
+log "Installing Elasticsearch Completed"
 
 #Install Logstash
+log "Installing Logstash"
 wget https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/logstash-on-ubuntu/logstash-install-ubuntu.sh
-bash ./logstash-install-ubuntu -e $ENCODED_LOGSTASH_CONFIG
+bash ./logstash-install-ubuntu.sh -e $ENCODED_LOGSTASH_CONFIG
+log "Installing Logstash Completed"
 
+log "Installing Kibana 4"
 wget https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/elk-simple-on-ubuntu/kibana4-install-ubuntu.sh
 bash ./kibana4-install-ubuntu.sh
+log "Installing Kiibana 4 Completed"
