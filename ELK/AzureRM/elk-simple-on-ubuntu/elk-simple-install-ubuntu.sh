@@ -63,5 +63,5 @@ bash ./elasticsearch-ubuntu-install.sh -xn $ES_CLUSTER_NAME -v $ES_VERSION -d $E
 wget https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/logstash-on-ubuntu/logstash-install-ubuntu.sh
 bash ./logstash-install-ubuntu -e $ENCODED_LOGSTASH_CONFIG
 
-wget https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/elk-sample-on-ubuntu/kibana4-install-ubuntu.sh
+wget https://raw.githubusercontent.com/mspnp/semantic-logging/v3/ELK/AzureRM/elk-simple-on-ubuntu/kibana4-install-ubuntu.sh
 bash ./kibana4-install-ubuntu.sh
