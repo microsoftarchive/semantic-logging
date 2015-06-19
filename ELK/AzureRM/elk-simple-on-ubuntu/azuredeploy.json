@@ -73,7 +73,7 @@
     },
     "variables": {
         "esDiscoveryHosts": "10.0.0.1-3",
-        "extensionName": "LogstashExtension",
+        "extensionName": "ELKSimple",
         "location": "West US",
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
