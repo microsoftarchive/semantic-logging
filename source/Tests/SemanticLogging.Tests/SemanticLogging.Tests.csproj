@@ -90,7 +90,6 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Etw\ElasticsearchSinkElementFixture.cs" />
     <Compile Include="Etw\ConfigurationReaderFixture.cs" />
     <Compile Include="Etw\ConsoleSinkElementFixture.cs" />
     <Compile Include="Etw\FormatterFactoryFixture.cs" />
@@ -101,8 +100,6 @@
     <Compile Include="Etw\SqlDatabaseSinkElementFixture.cs" />
     <Compile Include="Etw\XmlUtilFixture.cs" />
     <Compile Include="Observable\ObservableProjectionFixture.cs" />
-    <Compile Include="Sinks\ElasticsearchSinkTestFixture_Integration.cs" />
-    <Compile Include="Sinks\ElasticsearchSinkTests.cs" />
     <Compile Include="TestObjects\DifferentEnumsEventSource.cs" />
     <Compile Include="TestObjects\CustomSink.cs" />
     <Compile Include="TestObjects\LargeManifestEventSource.cs" />
@@ -179,10 +176,6 @@
     <ProjectReference Include="..\..\Src\SemanticLogging.TextFile\SemanticLogging.TextFile.csproj">
       <Project>{4b187511-187b-48b1-a593-18ba835b49c3}</Project>
       <Name>SemanticLogging.TextFile</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Src\SemanticLogging.Elasticsearch\SemanticLogging.Elasticsearch.csproj">
-      <Project>{5f7f3bfe-6117-43c3-aabb-7195516d9f1c}</Project>
-      <Name>SemanticLogging.Elasticsearch</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Src\SemanticLogging.EventSourceAnalyzer\SemanticLogging.EventSourceAnalyzer.csproj">
       <Project>{27eacc2a-ee11-420b-8760-4945412b0c4a}</Project>

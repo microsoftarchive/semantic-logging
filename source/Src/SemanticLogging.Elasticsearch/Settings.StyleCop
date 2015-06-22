@@ -1,7 +1,0 @@
-<StyleCopSettings Version="105">
-  <GlobalSettings>
-    <CollectionProperty Name="RecognizedWords">
-      <Value>Elasticsearch</Value>
-    </CollectionProperty>
-  </GlobalSettings>
-</StyleCopSettings>
