@@ -12,7 +12,7 @@ Param (
   [Parameter(Mandatory=$False)][string] $AvailabilitySetName = "elk-as",
   [Parameter(Mandatory=$False)][string] $VirtualNetworkName,
   [Parameter(Mandatory=$False)][string] $SubnetName,
-  [Parameter(Mandatory=$False)][string] $ElasticSearchDebianPackageUrl = "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.4.deb",
+  [Parameter(Mandatory=$False)][string] $ElasticSearchDebianPackageUrl = "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb",
   [Parameter(Mandatory=$False)][string] $ElasticSearchConfig="sample-config/elasticsearch.yml",
   [Parameter(Mandatory=$False)][string] $LogstashDebianPackageUrl = "https://download.elasticsearch.org/logstash/logstash/packages/debian/logstash_1.4.2-1-2c0f5a1_all.deb",
   [Parameter(Mandatory=$True)][string] $LogstashConfig,
