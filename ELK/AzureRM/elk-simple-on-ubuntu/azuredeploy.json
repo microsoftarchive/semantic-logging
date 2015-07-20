@@ -11,13 +11,9 @@
         },
         "esVersion": {
             "type": "string",
-            "defaultValue": "1.5.0",
+            "defaultValue": "1.5.2",
             "allowedValues": [
-                "1.5.2",
-                "1.5.1",
-                "1.5.0",
-                "1.4.5",
-                "1.4.4"
+                "1.5.2"
             ],
             "metadata": {
                 "description": "Elasticsearch version to install"
