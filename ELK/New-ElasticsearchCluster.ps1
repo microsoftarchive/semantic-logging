@@ -16,7 +16,7 @@ Param (
   [Parameter(Mandatory=$False)][string] $vnetName,
   [Parameter(Mandatory=$False)][string] $subnetName,
   [Parameter(Mandatory=$True)][int] $numInstances,
-  [Parameter(Mandatory=$False)][string] $ElasticSearchDebianPackageUrl = "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.4.deb",
+  [Parameter(Mandatory=$False)][string] $ElasticSearchDebianPackageUrl = "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.deb",
   [Parameter(Mandatory=$True)][string] $configFile,
   [Parameter(Mandatory=$False)][int] $NumberOfHardDisks = 0,
   [Parameter(Mandatory=$False)][int] $DiskSizeInGB = 50,
