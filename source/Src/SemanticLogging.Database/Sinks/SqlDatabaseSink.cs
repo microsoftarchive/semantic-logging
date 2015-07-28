@@ -24,6 +24,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly string tableName;
         private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
         private readonly TimeSpan onCompletedTimeout;
+        private readonly PayloadFormatting payloadFormatting;
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
         /// <summary>
@@ -39,7 +40,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public SqlDatabaseSink(string instanceName, string connectionString, string tableName, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout)
+        /// <param name="payloadFormatting">The formatting of the payload data.</param>
+        public SqlDatabaseSink(string instanceName, string connectionString, string tableName, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout, PayloadFormatting payloadFormatting = PayloadFormatting.Json)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
             Guard.ArgumentNotNullOrEmpty(connectionString, "connectionString");
@@ -51,6 +53,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             this.connectionString = connectionString;
             this.tableName = tableName;
             this.onCompletedTimeout = onCompletedTimeout;
+            this.payloadFormatting = payloadFormatting;
             this.retryPolicy.Retrying += Retrying;
             string sinkId = string.Format(CultureInfo.InvariantCulture, "SqlDatabaseSink ({0})", instanceName);
             this.bufferedPublisher = BufferedEventPublisher<EventEntry>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferingInterval, bufferingCount, maxBufferSize, this.cancellationTokenSource.Token);
@@ -183,7 +186,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
             for (int retries = 0; retries < 3; retries++)
             {
-                using (var reader = new EventEntryDataReader(collection, this.instanceName))
+                using (var reader = new EventEntryDataReader(collection, this.instanceName, this.payloadFormatting))
                 {
                     try
                     {
@@ -252,7 +255,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     {
                         await conn.SuppressTransactionOpenAsync(token).ConfigureAwait(false);
 
-                        using (var reader = new EventEntryDataReader(collection, this.instanceName))
+                        using (var reader = new EventEntryDataReader(collection, this.instanceName, this.payloadFormatting))
                         using (var cmd = new SqlCommand("dbo.WriteTraces", conn))
                         {
                             cmd.CommandType = CommandType.StoredProcedure;

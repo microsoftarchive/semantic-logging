@@ -54,6 +54,7 @@
     </Compile>
     <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Sinks\PayloadFormatting.cs" />
     <Compile Include="Sinks\SqlDatabaseSink.cs" />
     <Compile Include="Utility\EventRecordDataReader.cs" />
     <Compile Include="SqlDatabaseLog.cs" />

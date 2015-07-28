@@ -3,6 +3,7 @@
 using System;
 using System.Xml.Linq;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Observable;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
@@ -24,6 +25,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
         {
             Guard.ArgumentNotNull(element, "element");
 
+            PayloadFormatting payloadFormatting = (PayloadFormatting)Enum.Parse(typeof(PayloadFormatting), (string)element.Attribute("payloadFormatting") ?? default(PayloadFormatting).ToString());
+
             var subject = new EventEntrySubject();
             subject.LogToSqlDatabase(
                 (string)element.Attribute("instanceName"),
@@ -32,7 +35,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 (int?)element.Attribute("bufferingCount") ?? Buffering.DefaultBufferingCount,
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ?? Constants.DefaultBufferingFlushAllTimeout,
-                (int?)element.Attribute("maxBufferSize") ?? Buffering.DefaultMaxBufferSize);
+                (int?)element.Attribute("maxBufferSize") ?? Buffering.DefaultMaxBufferSize,
+                payloadFormatting);
 
             return subject;
         }
