@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 {
     /// <summary>
@@ -8,6 +10,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <summary>
         /// Json Formatting.
         /// </summary>
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Needs Review.")]
         Json,
 
         /// <summary>

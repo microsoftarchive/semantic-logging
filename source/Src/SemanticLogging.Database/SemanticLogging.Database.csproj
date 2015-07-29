@@ -54,6 +54,9 @@
     </Compile>
     <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <None Include="Scripts\CreateSemanticLoggingDatabaseObjectsXml.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Compile Include="Sinks\PayloadFormatting.cs" />
     <Compile Include="Sinks\SqlDatabaseSink.cs" />
     <Compile Include="Utility\EventRecordDataReader.cs" />
