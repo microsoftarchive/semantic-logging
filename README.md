@@ -2,11 +2,11 @@
 This repository contains PowerShell Scripts to setup Elastic Search, LogStash and Kibana (ELK) on Azure. Also included are Logstash plugins to pull in Microsoft Azure Diagnostics data into Elastic Search.
   
 # Known Issues and Bugs
-1. When running the New-ElasticSearchCluser.ps1, the $username parameter must match the username on line 15 of the [mountDisks.sh](./sh/mountDisks.sh) script. If you use a different $username parameter remember to update the mountDisks.sh script.
+1. When running the New-ElasticSearchCluser.ps1, the $username parameter must match the username on line 15 of the [mountDisks.sh](./ELK/sh/mountDisks.sh) script. If you use a different $username parameter remember to update the mountDisks.sh script.
 
 # Quick Setup
 The following step by step instructions show you how to create a minimalist ELK setup and is ideal for folks who want to try out the ELK stack.
-See [Reference](Reference.md) for more details on the available commandlets and extensions. 
+See [Reference](./ELK/Reference.md) for more details on the available commandlets and extensions. 
 
 ## Pre-requisite
 The assumption is that you already have a VM or cloud service deployment using Microsoft Azure diagnostics to collect and transfer diagnostics data to Azure Storage tables.
@@ -17,11 +17,11 @@ For more information on setting up a project to use Microsoft Azure diagnostics,
 ### Installation
 1. Install Visual Studio 2013
 2. Launch Web Platform Installer and install Microsoft Azure SDK for Visual Studio 2013   
-![SetupEnv-1.png](./md-images/SetupEnv-1.png) 
+![SetupEnv-1.png](./ELK/md-images/SetupEnv-1.png) 
 3. Install Microsoft Azure Powershell  
-![SetupEnv-2.png](./md-images/SetupEnv-2.png)
+![SetupEnv-2.png](./ELK/md-images/SetupEnv-2.png)
 4. Launch Microsoft Azure Powershell and type "Get-Module" and see if the Azure module is imported. If not, try rebooting and then check again. In certain cases after powershell installation, the powershell module path is not updated properly and requires a reboot.    
-![SetupEnv-3.png](./md-images/SetupEnv-3.png)
+![SetupEnv-3.png](./ELK/md-images/SetupEnv-3.png)
 5. Install msysgit from [here]( https://github.com/msysgit/msysgit/releases/). On the site, choose the a stable version of msysGit-netinstall exe and install the tools
 
 ### Environment Variables
@@ -74,12 +74,12 @@ This command will create a logstash.conf file which can configure logstash to pu
     .\New-SampleELKInstance.ps1 -Location "West US" -Username "elk" -Password "Elk1234" -LogstashConfig "logstash.conf" -UseKibana4
     ```
 3. Wait for the script to complete. This  will take about 10 to 20 min. Along with the ELK VM, it will also create a new cloud service and storage account for you. Once completed, it should show you the name of the cloud service after the text "To see your kibana dashboard visit". Verify your setup by launching the browser and navigating to http://yourcloudservice.cloudapp.net to see the default Kibana page.  
-![SetupElk-1.png](./md-images/SetupElk-1.png)
+![SetupElk-1.png](./ELK/md-images/SetupElk-1.png)
     
 ### Verifying data on Kibana
 1. Once the cloud service is deployed, refresh your browser on the kibana dashboard. Check the "User event times to create index names" checkbox, it should use the logstash timestamp pattern to match and find some indices. Select Timestamp as the Time-field name and click Create      
-![VerifyData-1.png](./md-images/VerifyData-1.png)
+![VerifyData-1.png](./ELK/md-images/VerifyData-1.png)
 2. Click Discover at the top, and you should start seeing data  
-![VerifyData-2.png](./md-images/VerifyData-2.png)
+![VerifyData-2.png](./ELK/md-images/VerifyData-2.png)
 3. Your ELK stack is now up and running.  
 
