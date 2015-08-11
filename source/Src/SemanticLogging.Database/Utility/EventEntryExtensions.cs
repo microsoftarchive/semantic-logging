@@ -19,11 +19,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
 
         internal static void BuildSqlMetaData(PayloadFormatting payloadFormatting)
         {
-            if (SqlMetaData != null)
-            {
-                return;
-            }
-
             var payloadMetaData = payloadFormatting == PayloadFormatting.Json
                 ? new SqlMetaData("Payload", SqlDbType.NVarChar, 4000)
                 : new SqlMetaData("Payload", SqlDbType.Xml);
@@ -53,8 +48,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
 
         internal static SqlDataRecord ToSqlDataRecord(this EventEntry record, string instanceName, PayloadFormatting payloadFormatting)
         {
-            BuildSqlMetaData(payloadFormatting);
-
             var sqlDataRecord = new SqlDataRecord(SqlMetaData);
             var payloadValue = payloadFormatting == PayloadFormatting.Json
                 ? EventEntryUtil.JsonSerializePayload(record)

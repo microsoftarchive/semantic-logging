@@ -21,6 +21,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
             this.enumerator = collection.GetEnumerator();
             this.instanceName = instanceName;
             this.payloadFormatting = payloadFormatting;
+
+            EventEntryExtensions.BuildSqlMetaData(payloadFormatting);
         }
 
         #region IDataReader
