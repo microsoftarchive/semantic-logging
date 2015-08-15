@@ -22,6 +22,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         private readonly string instanceName;
         private readonly string connectionString;
         private readonly string tableName;
+        private readonly string storedProcedureName;
         private readonly BufferedEventPublisher<EventEntry> bufferedPublisher;
         private readonly TimeSpan onCompletedTimeout;
         private CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
@@ -32,6 +33,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// <param name="instanceName">The name of the instance originating the entries.</param>
         /// <param name="connectionString">The connection string.</param>
         /// <param name="tableName">The name of the table.</param>
+        /// <param name="storedProcedureName">The name of the stored procedure that writes to table></param>
         /// <param name="bufferingInterval">The buffering interval between each batch publishing.</param>
         /// <param name="bufferingCount">The number of entries that will trigger a batch publishing.</param>
         /// <param name="maxBufferSize">The maximum number of entries that can be buffered while it's sending to the store before the sink starts dropping entries.</param>      
@@ -39,17 +41,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose"/> on 
         /// the <see cref="System.Diagnostics.Tracing.EventListener"/> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null"/> is specified, then the call will block indefinitely until the flush operation finishes.</param>
-        public SqlDatabaseSink(string instanceName, string connectionString, string tableName, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout)
+        public SqlDatabaseSink(string instanceName, string connectionString, string tableName, string storedProcedureName, TimeSpan bufferingInterval, int bufferingCount, int maxBufferSize, TimeSpan onCompletedTimeout)
         {
             Guard.ArgumentNotNullOrEmpty(instanceName, "instanceName");
             Guard.ArgumentNotNullOrEmpty(connectionString, "connectionString");
             Guard.ArgumentNotNullOrEmpty(tableName, "tableName");
+            Guard.ArgumentNotNullOrEmpty(tableName, "storedProcedureName");
             Guard.ArgumentIsValidTimeout(onCompletedTimeout, "onCompletedTimeout");
             ValidateSqlConnectionString(connectionString, "connectionString");
 
             this.instanceName = instanceName;
             this.connectionString = connectionString;
             this.tableName = tableName;
+            this.storedProcedureName = storedProcedureName;
             this.onCompletedTimeout = onCompletedTimeout;
             this.retryPolicy.Retrying += Retrying;
             string sinkId = string.Format(CultureInfo.InvariantCulture, "SqlDatabaseSink ({0})", instanceName);
@@ -253,7 +257,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                         await conn.SuppressTransactionOpenAsync(token).ConfigureAwait(false);
 
                         using (var reader = new EventEntryDataReader(collection, this.instanceName))
-                        using (var cmd = new SqlCommand("dbo.WriteTraces", conn))
+                        using (var cmd = new SqlCommand(storedProcedureName, conn))
                         {
                             cmd.CommandType = CommandType.StoredProcedure;
                             cmd.Parameters.Add(new SqlParameter("@InsertTraces", SqlDbType.Structured));

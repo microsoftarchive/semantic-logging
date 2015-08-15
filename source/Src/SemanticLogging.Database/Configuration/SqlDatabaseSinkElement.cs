@@ -29,6 +29,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Configuration
                 (string)element.Attribute("instanceName"),
                 (string)element.Attribute("connectionString"),
                 (string)element.Attribute("tableName") ?? SqlDatabaseLog.DefaultTableName,
+                (string)element.Attribute("storedProcedureName") ?? SqlDatabaseLog.DefaultStoredProcedureName,
                 element.Attribute("bufferingIntervalInSeconds").ToTimeSpan(),
                 (int?)element.Attribute("bufferingCount") ?? Buffering.DefaultBufferingCount,
                 element.Attribute("bufferingFlushAllTimeoutInSeconds").ToTimeSpan() ?? Constants.DefaultBufferingFlushAllTimeout,
