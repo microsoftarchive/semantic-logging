@@ -88,7 +88,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
         output_queue << event
       end # each block
       @idle_delay = 0
-      @last_timestamp = result.last.properties["PreciseTimeStamp"].inspect
+      @last_timestamp = result.last.properties["PreciseTimeStamp"].iso8601
     else
       @logger.debug("No new results found.")
 	  @idle_delay = @idle_delay_seconds
