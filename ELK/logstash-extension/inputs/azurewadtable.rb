@@ -14,7 +14,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
   config :access_key, :validate => :string
   config :table_name, :validate => :string
   config :entity_count_to_process, :validate => :string, :default => 100
-  config :collection_start_time_utc, :validate => :string, :default => Time.now.utc.inspect
+  config :collection_start_time_utc, :validate => :string, :default => Time.now.utc.iso8601
   config :etw_pretty_print, :validate => :boolean, :default => false
   config :idle_delay_seconds, :validate => :number, :default => 15
 
