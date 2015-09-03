@@ -152,15 +152,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
                     Console.ReadLine();
                 }
             }
-            catch (ReflectionTypeLoadException rtle)
-            {
-                var loaderExceptions = rtle.LoaderExceptions;
-                foreach (var e in loaderExceptions)
-                {
-                    Console.WriteLine(e.ToString());
-                }
-                DisplayExceptionOnConsole(rtle);
-            }
             catch (Exception e)
             {
                 DisplayExceptionOnConsole(e);
@@ -192,11 +183,25 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 
         private void DisplayExceptionOnConsole(Exception e)
         {
+            var rtle = e as ReflectionTypeLoadException;
+            if (rtle != null)
+            {
+                DisplayLoaderExceptionsOnConsole(rtle);
+            }
+
             Console.WriteLine(e.ToString());
             Console.WriteLine();
             Console.WriteLine(Resources.StopServiceMessage);
             Console.ReadLine();
             this.ExitCode = ApplicationExitCode.RuntimeError;
+        }
+
+        private static void DisplayLoaderExceptionsOnConsole(ReflectionTypeLoadException e)
+        {
+            foreach (var loaderException in e.LoaderExceptions)
+            {
+                Console.WriteLine(loaderException.ToString());
+            }
         }
 
         private bool IsAuthorized()
