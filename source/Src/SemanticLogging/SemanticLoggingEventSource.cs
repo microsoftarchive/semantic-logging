@@ -372,7 +372,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         {
             if (this.IsEnabled())
             {
-                this.WriteEvent(903, providerName, eventId, message);
+                this.WriteEvent(1000, providerName, eventId, message);
             }
         }
 
