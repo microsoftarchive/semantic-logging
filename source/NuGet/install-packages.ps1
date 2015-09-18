@@ -9,7 +9,8 @@
 # ==============================================================================
 
 param (
-    [switch] $autoAcceptTerms
+    [switch] $autoAcceptTerms,
+    [string] $packagesFolder="packages"
 )
 
 # list all the solution folders where the "packages" folder will be placed.
@@ -81,7 +82,7 @@ for($i=0; $i -lt $solutionFolders.Length; $i++)
     pushd $solutionFolders[$i]
 
     # install the packages
-    $allPackagesFiles[$i] | ForEach-Object { & $nuget install $_.FullName -o packages }
+    $allPackagesFiles[$i] | ForEach-Object { & $nuget install $_.FullName -o $packagesFolder }
 
     $dependencies = @(
 		'*NET45\Microsoft.Practices.EnterpriseLibrary.SemanticLogging.dll',
@@ -102,7 +103,7 @@ for($i=0; $i -lt $solutionFolders.Length; $i++)
     
     foreach ($dependency in $dependencies)
     {
-        Get-ChildItem $packgagedFolder -Recurse | Where { $_.FullName -like $dependency } | Copy-Item -Destination $scriptPath
+        Get-ChildItem $packagesFolder -Recurse | Where { $_.FullName -like $dependency } | Copy-Item -Destination $scriptPath
     }
 
     popd
