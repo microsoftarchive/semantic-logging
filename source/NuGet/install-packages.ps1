@@ -102,19 +102,22 @@ for($i=0; $i -lt $solutionFolders.Length; $i++)
     
     foreach ($dependency in $dependencies)
     {
-        Get-ChildItem -Recurse | Where { $_.FullName -like $dependency } | Copy-Item -Destination $scriptPath
+        Get-ChildItem $packgagedFolder -Recurse | Where { $_.FullName -like $dependency } | Copy-Item -Destination $scriptPath
     }
 
     popd
 }
 
-Write-Host "
+if (-not $autoAcceptTerms)
+{
+    Write-Host "
 You can now edit the configuration file to log events from your own application by opening 'SemanticLogging-svc.xml'.
 To get IntelliSense from the XML schema file, you can open the configuration in Microsoft Visual Studio.
 After the configuration is updated, start the Windows service by executing 'SemanticLogging-svc.exe -start' from an elevated command prompt.
 
 Press ENTER key to finish..."
-$x = $host.UI.ReadLine()
+    $x = $host.UI.ReadLine()
+}
 # SIG # Begin signature block
 # MIIatwYJKoZIhvcNAQcCoIIaqDCCGqQCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
