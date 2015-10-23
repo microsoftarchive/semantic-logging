@@ -1,0 +1,31 @@
+# nginx proxy configuration for ES cluster node (running ES and Kibana)
+
+server { 
+    listen 80;
+    server_name __ES_DNS_NAME;
+
+    auth_basic "Elasticsearch Basic Auth";
+    auth_basic_user_file /etc/nginx/conf.d/elasticsearch.pwd;
+
+    location /es {        
+        rewrite ^/es/(.*)$ /$1 break;
+        rewrite ^/es$ / break;
+
+        proxy_redirect http://localhost:9200 http://__ES_DNS_NAME/;
+        proxy_set_header  X-Real-IP  $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  Host $http_host;
+
+        proxy_pass http://localhost:9200;
+    }
+   
+    location / {
+        proxy_redirect http://localhost:5601 http://__ES_DNS_NAME/;
+  
+        proxy_set_header  X-Real-IP  $remote_addr;
+        proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header  Host $http_host;
+
+        proxy_pass http://localhost:5601;  
+    }
+}
