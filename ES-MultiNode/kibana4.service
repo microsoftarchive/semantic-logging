@@ -1,0 +1,11 @@
+[Unit]
+Description=Kibana 4 Web Interface
+After=elasticsearch.service
+After=logstash.service
+[Service]
+ExecStartPre=/bin/rm -rf /var/run/kibana.pid
+ExecStart=/opt/kibana/bin/kibana
+ExecReload=/bin/kill -9 $(/bin/cat /var/run/kibana.pid) && /bin/rm -rf /var/run/kibana.pid && /opt/kibana/bin/kibana
+ExecStop=/bin/kill -9 $(/bin/cat /var/run/kibana.pid)
+[Install]
+WantedBy=multi-user.target
