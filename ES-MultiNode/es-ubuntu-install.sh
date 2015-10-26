@@ -179,7 +179,7 @@ sudo systemctl enable nginx
 echo "#################### Configuring nginx ####################"
 sudo apt-get -qy install apache2-utils
 printf '%s' "$es_user_password" | sudo htpasswd -ic /etc/nginx/conf.d/elasticsearch.pwd $es_user_name
-config_fetch_cmd='curl -s https://raw.githubusercontent.com/kzadora/esdiagstore/master/elasticsearch.nginx | perl -wnlp -e s/__ES_DNS_NAME/'
+config_fetch_cmd='curl -s https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/elasticsearch.nginx | perl -wnlp -e s/__ES_DNS_NAME/'
 config_fetch_cmd+="$es_dns_name"
 config_fetch_cmd+='/g > elasticsearch.nginx.conf'
 eval "$config_fetch_cmd"
@@ -194,7 +194,7 @@ sudo wget "https://download.elastic.co/kibana/kibana/kibana-${kibana_version}-li
 sudo tar xvf kibana-*.tar.gz 1>/dev/null
 sudo mkdir -p /opt/kibana
 sudo cp -R ./kibana-4*/* /opt/kibana
-sudo wget https://raw.githubusercontent.com/kzadora/esdiagstore/master/kibana4.service
+sudo wget https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/kibana4.service
 sudo cp ./kibana4.service /etc/systemd/system/kibana4.service
 sudo systemctl daemon-reload
 sudo systemctl enable kibana4.service
