@@ -67,6 +67,27 @@ get_discovery_endpoints()
     echo $retval
 }
 
+wait_for_elastic_svc()
+{
+    declare cluster_health=''
+    declare HEALTHY='"status":"green"'
+    declare -i MAX_TRIES=30    # Keep trying for 5 minutes
+    declare -i i=0
+
+    until [[ $cluster_health =~ $HEALTHY || $i -eq $MAX_TRIES ]]; do
+        sleep 10
+        i+=1
+        cluster_health=$(curl -s http://localhost:9200/_cluster/health)
+    done
+
+    if [[ $i -eq $MAX_TRIES ]]; then
+        return 1
+    else
+        return 0
+    fi
+}
+
+
 if [ "${UID}" -ne 0 ];
 then
     echo "You must be root to run this program." >&2
@@ -219,11 +240,11 @@ echo "bootstrap.mlockall: true" >> /etc/elasticsearch/elasticsearch.yml
 echo "#################### Starting services ####################"
 sudo systemctl start elasticsearch.service
 
-# 9/10/2015 Kibana 4 has a bug that causes it to disregard connection timeout and fail to start up if ES is not immediately available when Kibana is starting
-# https://discuss.elastic.co/t/kibana-4-start-up-is-failing-with-error-service-unavailable/26809/2
-# So as a workaround, let's sleep for 30 seconds, ES should be able to finish initialization in that time
-sleep 30
-
+wait_for_elastic_svc;
+if [[ $? -ne 0 ]]; then
+    echo "ElasticSearch service has not started within expected time period. Cannot start Kibana service or install ES head plugin." >&2
+    exit 5
+fi
 sudo systemctl start kibana4.service
 
 
