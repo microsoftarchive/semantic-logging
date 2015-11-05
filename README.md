@@ -1,3 +1,5 @@
+![Microsoft patterns & practices](http://pnp.azurewebsites.net/images/pnp-logo.png)
+
 ## What is Semantic Logging?
 
 Semantic Logging (formerly know at the Semantic Logging Application Block or SLAB) is designed by the
