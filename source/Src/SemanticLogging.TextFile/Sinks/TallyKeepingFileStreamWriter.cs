@@ -17,7 +17,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         /// </summary>
         /// <param name="stream">The <see cref="FileStream"/> to write to.</param>
         public TallyKeepingFileStreamWriter(FileStream stream)
-            : base(stream)
+            : base(stream, GetEncodingWithFallback())
         {
             this.tally = stream.Length;
         }
@@ -102,6 +102,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
             base.Write(value);
             this.tally += Encoding.GetByteCount(value);
+        }
+
+        private static Encoding GetEncodingWithFallback()
+        {
+            Encoding encoding = (Encoding)new UTF8Encoding(false).Clone();
+            encoding.EncoderFallback = EncoderFallback.ReplacementFallback;
+            encoding.DecoderFallback = DecoderFallback.ReplacementFallback;
+            return encoding;
         }
     }
 }
