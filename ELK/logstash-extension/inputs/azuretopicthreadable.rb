@@ -38,7 +38,7 @@ class LogStash::Inputs::Azuretopicthreadable < LogStash::Inputs::Base
   
   def process(output_queue, pid)
     # Get a new instance of a service
-  	azure_service_bus = Azure::ServiceBusService.new
+  	azure_service_bus = Azure::ServiceBus::ServiceBusService.new
 	while true
 		begin
 	    # check if we have a message in the subscription

@@ -30,7 +30,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
       config.storage_account_name = @account_name
       config.storage_access_key = @access_key
      end
-    @azure_table_service = Azure::TableService.new
+    @azure_table_service = Azure::Table::TableService.new
     @last_timestamp = @collection_start_time_utc
 	@idle_delay = @idle_delay_seconds
   end # register

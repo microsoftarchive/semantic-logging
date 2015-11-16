@@ -29,7 +29,7 @@ class LogStash::Inputs::Azureblob < LogStash::Inputs::Base
       config.storage_account_name = @storage_account_name
       config.storage_access_key = @storage_access_key
     end
-    @azure_blob = Azure::BlobService.new
+    @azure_blob = Azure::Blob::BlobService.new
   end # def register
   
   def list_blob_names
