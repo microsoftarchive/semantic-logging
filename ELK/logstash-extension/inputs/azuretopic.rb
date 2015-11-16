@@ -29,7 +29,7 @@ class LogStash::Inputs::Azuretopic < LogStash::Inputs::Base
 	    config.sb_namespace = @namespace
 	    config.sb_access_key = @access_key
  	  end
-	@azure_service_bus = Azure::ServiceBusService.new
+	@azure_service_bus = Azure::ServiceBus::ServiceBusService.new
   end # def register
   
   def process(output_queue)
