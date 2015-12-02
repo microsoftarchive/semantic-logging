@@ -52,7 +52,12 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
   def process(output_queue)
     @logger.debug(@last_timestamp)
     # query data using start_from_time
-    query_filter = "PartitionKey gt '#{partitionkey_from_datetime(@last_timestamp)}' and PreciseTimeStamp gt datetime'#{@last_timestamp}'".gsub('"','')
+    query_filter = "(PartitionKey gt '#{partitionkey_from_datetime(@last_timestamp)}')"
+    for i in 0..99
+      query_filter << " or (PartitionKey gt '#{i.to_s.rjust(19, '0')}___#{partitionkey_from_datetime(@last_timestamp)}' and PartitionKey lt '#{i.to_s.rjust(19, '0')}___9999999999999999999')"
+    end # for block
+    query_filter = query_filter.gsub('"','')
+    @logger.debug("Query filter: " + query_filter)
     query = { :top => @entity_count_to_process, :filter => query_filter }
     result = @azure_table_service.query_entities(@table_name, query)
     
@@ -88,7 +93,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
         output_queue << event
       end # each block
       @idle_delay = 0
-      @last_timestamp = result.last.properties["PreciseTimeStamp"].iso8601
+      @last_timestamp = result.last.properties["TIMESTAMP"].iso8601
     else
       @logger.debug("No new results found.")
 	  @idle_delay = @idle_delay_seconds
