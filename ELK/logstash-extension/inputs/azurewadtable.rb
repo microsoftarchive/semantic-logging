@@ -32,7 +32,8 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
      end
     @azure_table_service = Azure::Table::TableService.new
     @last_timestamp = @collection_start_time_utc
-	@idle_delay = @idle_delay_seconds
+    @idle_delay = @idle_delay_seconds
+    @continuation_token = nil
   end # register
   
   public
@@ -58,8 +59,9 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
     end # for block
     query_filter = query_filter.gsub('"','')
     @logger.debug("Query filter: " + query_filter)
-    query = { :top => @entity_count_to_process, :filter => query_filter }
+    query = { :top => @entity_count_to_process, :filter => query_filter, :continuation_token => @continuation_token }
     result = @azure_table_service.query_entities(@table_name, query)
+    @continuation_token = result.continuation_token
     
     if result and result.length > 0
       result.each do |entity|
@@ -93,7 +95,7 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
         output_queue << event
       end # each block
       @idle_delay = 0
-      @last_timestamp = result.last.properties["TIMESTAMP"].iso8601
+      @last_timestamp = result.last.properties["TIMESTAMP"].iso8601 unless @continuation_token
     else
       @logger.debug("No new results found.")
 	  @idle_delay = @idle_delay_seconds
