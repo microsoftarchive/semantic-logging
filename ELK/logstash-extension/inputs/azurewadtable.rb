@@ -91,6 +91,8 @@ class LogStash::Inputs::AzureWADTable < LogStash::Inputs::Base
 		  logger.debug("pretty print end. result: " + event["EventMessage"].to_s)
 		  end
 		end
+	
+	decorate(event)
 		
         output_queue << event
       end # each block
