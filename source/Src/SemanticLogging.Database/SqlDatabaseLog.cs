@@ -35,8 +35,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose" /> on
         /// the <see cref="System.Diagnostics.Tracing.EventListener" /> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null" /> is specified, then the call will block indefinitely until the flush operation finishes.</param>
+        /// <param name="payloadFormatting">The formatting of the payload data.</param>
         /// <returns>A subscription to the sink that can be disposed to unsubscribe the sink and dispose it, or to get access to the sink instance.</returns>
-        public static SinkSubscription<SqlDatabaseSink> LogToSqlDatabase(this IObservable<EventEntry> eventStream, string instanceName, string connectionString, string tableName = DefaultTableName, TimeSpan? bufferingInterval = null, int bufferingCount = Buffering.DefaultBufferingCount, TimeSpan? onCompletedTimeout = null, int maxBufferSize = Buffering.DefaultMaxBufferSize)
+        public static SinkSubscription<SqlDatabaseSink> LogToSqlDatabase(this IObservable<EventEntry> eventStream, string instanceName, string connectionString, string tableName = DefaultTableName, TimeSpan? bufferingInterval = null, int bufferingCount = Buffering.DefaultBufferingCount, TimeSpan? onCompletedTimeout = null, int maxBufferSize = Buffering.DefaultMaxBufferSize, PayloadFormatting payloadFormatting = PayloadFormatting.Json)
         {
             var sink = new SqlDatabaseSink(
                 instanceName,
@@ -45,7 +46,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 bufferingInterval ?? Buffering.DefaultBufferingInterval,
                 bufferingCount,
                 maxBufferSize,
-                onCompletedTimeout ?? Timeout.InfiniteTimeSpan);
+                onCompletedTimeout ?? Timeout.InfiniteTimeSpan,
+                payloadFormatting);
 
             var subscription = eventStream.Subscribe(sink);
 
@@ -68,11 +70,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
         /// This means that if the timeout period elapses, some event entries will be dropped and not sent to the store. Normally, calling <see cref="IDisposable.Dispose" /> on
         /// the <see cref="System.Diagnostics.Tracing.EventListener" /> will block until all the entries are flushed or the interval elapses.
         /// If <see langword="null" /> is specified, then the call will block indefinitely until the flush operation finishes.</param>
+        /// <param name="payloadFormatting">The formatting of the payload data.</param>
         /// <returns>An event listener that uses <see cref="SqlDatabaseSink"/> to log events.</returns>
-        public static EventListener CreateListener(string instanceName, string connectionString, string tableName = DefaultTableName, TimeSpan? bufferingInterval = null, int bufferingCount = Buffering.DefaultBufferingCount, TimeSpan? listenerDisposeTimeout = null, int maxBufferSize = Buffering.DefaultMaxBufferSize)
+        public static EventListener CreateListener(string instanceName, string connectionString, string tableName = DefaultTableName, TimeSpan? bufferingInterval = null, int bufferingCount = Buffering.DefaultBufferingCount, TimeSpan? listenerDisposeTimeout = null, int maxBufferSize = Buffering.DefaultMaxBufferSize, PayloadFormatting payloadFormatting = PayloadFormatting.Json)
         {
             var listener = new ObservableEventListener();
-            listener.LogToSqlDatabase(instanceName, connectionString, tableName, bufferingInterval, bufferingCount, listenerDisposeTimeout, maxBufferSize);
+            listener.LogToSqlDatabase(instanceName, connectionString, tableName, bufferingInterval, bufferingCount, listenerDisposeTimeout, maxBufferSize, payloadFormatting);
             return listener;
         }
     }

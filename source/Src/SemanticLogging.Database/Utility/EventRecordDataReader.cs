@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.SqlServer.Server;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
@@ -10,14 +11,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
     internal sealed class EventEntryDataReader : IDataReader, IConvertible
     {
         private readonly string instanceName;
+        private readonly PayloadFormatting payloadFormatting;
         private IEnumerator<EventEntry> enumerator;
         private int recordsAffected;
         private SqlDataRecord currentRecord;
 
-        public EventEntryDataReader(IEnumerable<EventEntry> collection, string instanceName)
+        public EventEntryDataReader(IEnumerable<EventEntry> collection, string instanceName, PayloadFormatting payloadFormatting)
         {
             this.enumerator = collection.GetEnumerator();
             this.instanceName = instanceName;
+            this.payloadFormatting = payloadFormatting;
+
+            EventEntryExtensions.BuildSqlMetaData(payloadFormatting);
         }
 
         #region IDataReader
@@ -92,7 +97,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
             if (result)
             {
                 this.recordsAffected++;
-                this.currentRecord = this.enumerator.Current.ToSqlDataRecord(this.instanceName);
+                this.currentRecord = this.enumerator.Current.ToSqlDataRecord(this.instanceName, this.payloadFormatting);
             }
 
             return result;
@@ -288,7 +293,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
 
             while (this.enumerator.MoveNext())
             {
-                list.Add(this.enumerator.Current.ToSqlDataRecord(this.instanceName));
+                list.Add(this.enumerator.Current.ToSqlDataRecord(this.instanceName, this.payloadFormatting));
             }
 
             this.enumerator.Reset();

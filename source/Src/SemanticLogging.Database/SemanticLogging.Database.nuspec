@@ -25,6 +25,7 @@
     <file src="NuGet\Readme-Database.txt" target="Readme.txt" />
     <file src="scripts\CreateSemanticLoggingDatabase.sql" target="scripts" />
     <file src="scripts\CreateSemanticLoggingDatabaseObjects.sql" target="scripts" />
+	<file src="scripts\CreateSemanticLoggingDatabaseObjectsXml.sql" target="scripts" />
     <file src="scripts\CreateSemanticLoggingDb.cmd" target="scripts" />
   </files>
 </package>

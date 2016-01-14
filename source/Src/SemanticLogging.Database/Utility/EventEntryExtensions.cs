@@ -3,6 +3,7 @@
 using System;
 using System.Data;
 using System.Linq;
+using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 using Microsoft.SqlServer.Server;
 
@@ -13,11 +14,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
     /// </summary>
     internal static class EventEntryExtensions
     {
-        internal static readonly SqlMetaData[] SqlMetaData;
-        internal static readonly string[] Fields;
+        internal static SqlMetaData[] SqlMetaData;
+        internal static string[] Fields;
 
-        static EventEntryExtensions()
+        internal static void BuildSqlMetaData(PayloadFormatting payloadFormatting)
         {
+            var payloadMetaData = payloadFormatting == PayloadFormatting.Json
+                ? new SqlMetaData("Payload", SqlDbType.NVarChar, 4000)
+                : new SqlMetaData("Payload", SqlDbType.Xml);
+            
             SqlMetaData = new[]
             {
                 new SqlMetaData("InstanceName", SqlDbType.NVarChar, 1000),
@@ -31,7 +36,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
                 new SqlMetaData("Timestamp", SqlDbType.DateTimeOffset),
                 new SqlMetaData("Version", SqlDbType.Int),
                 new SqlMetaData("FormattedMessage", SqlDbType.NVarChar, 4000),
-                new SqlMetaData("Payload", SqlDbType.NVarChar, 4000),
+                payloadMetaData,
                 new SqlMetaData("ActivityId", SqlDbType.UniqueIdentifier),
                 new SqlMetaData("RelatedActivityId", SqlDbType.UniqueIdentifier),
                 new SqlMetaData("ProcessId", SqlDbType.Int),
@@ -41,9 +46,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
             Fields = SqlMetaData.Select(x => x.Name).ToArray();
         }
 
-        internal static SqlDataRecord ToSqlDataRecord(this EventEntry record, string instanceName)
+        internal static SqlDataRecord ToSqlDataRecord(this EventEntry record, string instanceName, PayloadFormatting payloadFormatting)
         {
             var sqlDataRecord = new SqlDataRecord(SqlMetaData);
+            var payloadValue = payloadFormatting == PayloadFormatting.Json
+                ? EventEntryUtil.JsonSerializePayload(record)
+                : EventEntryUtil.XmlSerializePayload(record);
 
             sqlDataRecord.SetValue(0, instanceName ?? string.Empty);
             sqlDataRecord.SetValue(1, record.ProviderId);
@@ -56,7 +64,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Database.Utility
             sqlDataRecord.SetValue(8, record.Timestamp);
             sqlDataRecord.SetValue(9, record.Schema.Version);
             sqlDataRecord.SetValue(10, (object)record.FormattedMessage ?? DBNull.Value);
-            sqlDataRecord.SetValue(11, (object)EventEntryUtil.JsonSerializePayload(record) ?? DBNull.Value);
+            sqlDataRecord.SetValue(11, (object)payloadValue ?? DBNull.Value);
             sqlDataRecord.SetValue(12, record.ActivityId);
             sqlDataRecord.SetValue(13, record.RelatedActivityId);
             sqlDataRecord.SetValue(14, record.ProcessId);

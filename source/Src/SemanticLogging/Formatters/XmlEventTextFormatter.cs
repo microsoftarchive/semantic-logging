@@ -165,7 +165,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
 
                     if (entry.Payload[i] != null)
                     {
-                        SanitizeAndWritePayload(entry.Payload[i], writer);
+                        writer.WriteValue(EventEntryUtil.SanitizeXml(entry.Payload[i]));
                     }
 
                     writer.WriteEndElement();
@@ -177,23 +177,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
                     // We are in Error state so abort the write operation
                     throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, Properties.Resources.XmlSerializationError, e.Message), e);
                 }
-            }
-        }
-
-        private static void SanitizeAndWritePayload(object value, XmlWriter writer)
-        {
-            var valueType = value.GetType();
-            if (valueType == typeof(Guid))
-            {
-                writer.WriteValue(XmlConvert.ToString((Guid)value));
-            }
-            else if (valueType.IsEnum)
-            {
-                writer.WriteValue(((Enum)value).ToString("D"));
-            }
-            else
-            {
-                writer.WriteValue(value);
             }
         }
     }

@@ -54,6 +54,7 @@
     </Compile>
     <Compile Include="Configuration\SqlDatabaseSinkElement.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Sinks\PayloadFormatting.cs" />
     <Compile Include="Sinks\SqlDatabaseSink.cs" />
     <Compile Include="Utility\EventRecordDataReader.cs" />
     <Compile Include="SqlDatabaseLog.cs" />
@@ -78,7 +79,11 @@
     <None Include="packages.config" />
     <None Include="SemanticLogging.Database.nuspec" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Scripts\CreateSemanticLoggingDatabaseObjectsXml.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Scripts\CreateSemanticLoggingDatabase.sql">
       <Link>Scripts\CreateSemanticLoggingDatabase.sql</Link>
