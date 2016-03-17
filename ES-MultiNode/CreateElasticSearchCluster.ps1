@@ -1,8 +1,10 @@
 ﻿param(
-[string] $TemplateParameterFile = ".\azuredeploy-parameters.json",
-[string] $PublicSshKeyFile = "",
+[Parameter(Mandatory=$true)][string] $TemplateParameterFile,
 [Parameter(Mandatory=$true)][string] $ResourceGroupName,
+[Parameter(Mandatory=$true)][string] $Region,
+[Parameter(Mandatory=$true)][string] $EsPassword,
 [string] $DeploymentName = "ES-default-deployment",
+[string] $PublicSshKeyFile = "",
 [switch] $RemoveExistingResourceGroup
 )
 
@@ -31,6 +33,7 @@ foreach($key in $templateParametersAzureFormat.Keys)
 {
     $templateParameters[$key] = $templateParametersAzureFormat[$key].value;
 }
+$templateParameters['esPassword'] = $EsPassword
 
 if (!$PublicSshKeyFile)
 {
@@ -58,24 +61,23 @@ else
 }
 $templateParameters['sshKeyData'] = $keyData
 
-$templateParameters['dnsDomainForLoadBalancerIP'] = ([string] $templateParameters['region']).ToLowerInvariant().Replace(" ", "") + ".cloudapp.azure.com";
+$templateParameters['dnsDomainForLoadBalancerIP'] = $Region.ToLowerInvariant().Replace(" ", "") + ".cloudapp.azure.com";
 Write-Verbose "Using $($templateParameters['dnsDomainForLoadBalancerIP']) as the domain name for the ElasticSearch cluster"
 
-Switch-AzureMode AzureResourceManager
-
-if (-Not (Test-AzureResourceGroup -ResourceGroupName $ResourceGroupName))
+Get-AzureRmResourceGroup -Name $ResourceGroupName -ErrorAction SilentlyContinue -ErrorVariable groupMissing
+if ($groupMissing)
 {
-    Write-Host "Creating new resource group $ResourceGroupName..."
-    New-AzureResourceGroup -Name $ResourceGroupName -Location $templateParameters.region
+    Write-Host "Creating new resource group $ResourceGroupName ..."
+    New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Region
 }
 else 
 {
     if ($RemoveExistingResourceGroup)
     {
         Write-Host "Removing old resource group $ResourceGroupName..."
-        Remove-AzureResourceGroup -Name $ResourceGroupName -Force -ErrorAction Continue -Verbose
+        Remove-AzureRmResourceGroup -Name $ResourceGroupName -Force -ErrorAction Continue -Verbose
         Write-Host "Creating new resource group $ResourceGroupName..."
-        New-AzureResourceGroup -Name $ResourceGroupName -Location $templateParameters.region
+        New-AzureRmResourceGroup -Name $ResourceGroupName -Location $Region
     }
     else 
     {
@@ -83,33 +85,13 @@ else
     }
 }
 
-# Workaround for issue https://github.com/Azure/azure-powershell/issues/309
-# Using TemplateParameterObject parameter with New-AzureResourceGroupDeployment causes the cmdlet to stop outputting error messages completely
-# so we will create and use a temporary parameter file instead.
-$parameterFileContent = "{ "
-foreach($key in $templateParameters.Keys)
-{
-    if ($templateParameters[$key] -is [int]) 
-    {
-        $parameterFileContent += '"{0}": {{"value": {1}}},' -f $key, $templateParameters[$key]
-    }
-    else 
-    {
-        $parameterFileContent += '"{0}": {{"value": "{1}"}},' -f $key, $templateParameters[$key]
-    }
-}
-$parameterFileContent = $parameterFileContent.Substring(0, $parameterFileContent.Length - 1)   # Remove last comma
-$parameterFileContent += " }"
-$TemplateParameterFile = $TemplateParameterFile + ".temp"
-$parameterFileContent | Out-File -FilePath $TemplateParameterFile
-
 
 Write-Host "Creating ElasticSearch cluster deployment..."
-New-AzureResourceGroupDeployment `
+New-AzureRmResourceGroupDeployment `
     -Name $DeploymentName `
     -ResourceGroupName $ResourceGroupName `
     -TemplateFile '.\azuredeploy.json' `
-    -TemplateParameterFile $TemplateParameterFile `
+    -TemplateParameterObject $templateParameters `
     -Verbose
 Write-Host "ElasticSearch cluster deployment completed."
     
