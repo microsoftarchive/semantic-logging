@@ -1,564 +1,530 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
 
-    "parameters": {
-        "dnsNameForLoadBalancerIP": {
-            "type": "string",
-            "metadata": {
-                "description": "Load balancer subdomain name: for example [subdomain].westus.cloudapp.azure.com. Also the prefix for all data nodes and other artifacts related to ES cluster"
-            }
-        },
-        "dnsDomainForLoadBalancerIP": {
-            "type": "string",
-            "metadata": {
-                "description": "The DNS domain part of the load balancer name: for example subdomain.[westus.cloudapp.azure.com]"
-            }
-        },
-        "storageAccountPrefix": {
-            "type": "string",
-            "metadata": {
-                "description": "Unique namespace for the Storage Account where the Virtual Machine's disks will be placed"
-            }
-        },
-        "adminUsername": {
-            "type": "string",
-            "metadata": {
-                "description": "Machine administrator username used when provisioning virtual machines (using SSH key instead of password for credentials)"
-            }
-        },
-        "sshKeyData": {
-            "type": "string",
-            "metadata": {
-                "description": "SSH key data to identify machine administrator"
-            }
-        },
-        "dataNodeCount": {
-            "type": "int",
-            "defaultValue": 3,
-            "metadata": {
-                "description": "Number of Elasticsearch data nodes to provision"
-            }
-        },
-        "dataDiskSize": {
-            "type": "string",
-            "defaultValue": "256",
-            "metadata": {
-                "description": "Size of data disks in data nodes (in GB). Four data disks will be provisioned"
-            }
-        },
-        "region": {
-            "type": "string",
-            "metadata": {
-                "description": "The location where resources will be deployed."
-            },
-            "allowedValues": [
-                "Central US",
-                "East Asia",
-                "East US",
-                "East US 2",
-                "Japan East",
-                "Japan West",
-                "North Central US",
-                "North Europe",
-                "South Central US",
-                "Southeast Asia",
-                "West Europe",
-                "West US"
-            ]
-        },
-        "esClusterName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the ElasticSearch cluster"
-            }
-        },
-        "esUserName": {
-            "type": "string",
-            "metadata": {
-                "description": "The name of the user that will be provision to have access to ElasticSearch services"
-            }
-        },
-        "esPassword": {
-            "type": "string",
-            "metadata": {
-                "description": "Password for the ElasticSearch user"
-            }
-        },
-        "vmSizeDataNodes": {
-            "type": "string",
-            "defaultValue": "Standard_D1",
-            "metadata": {
-                "description": "VM size"
-            },
-            "allowedValues": [
-                "Standard_D2",
-                "Standard_D3",
-                "Standard_D4",
-                "Standard_D11",
-                "Standard_D12",
-                "Standard_D13",
-                "Standard_D14",
-                "Standard_DS2",
-                "Standard_DS3",
-                "Standard_DS4",
-                "Standard_DS11",
-                "Standard_DS12",
-                "Standard_DS13",
-                "Standard_DS14",
-                "Standard_A2",
-                "Standard_A3",
-                "Standard_A4",
-                "Standard_A5",
-                "Standard_A6",
-                "Standard_A7",
-                "Standard_A8",
-                "Standard_A9",
-                "Standard_A10",
-                "Standard_A11"
-            ]
+  "parameters": {
+    "dnsNameForLoadBalancerIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Load balancer subdomain name: for example [subdomain].westus.cloudapp.azure.com. Also the prefix for all data nodes and other artifacts related to ES cluster"
+      }
+    },
+    "dnsDomainForLoadBalancerIP": {
+      "type": "string",
+      "metadata": {
+        "description": "The DNS domain part of the load balancer name: for example subdomain.[westus.cloudapp.azure.com]"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Machine administrator username used when provisioning virtual machines (using SSH key instead of password for credentials)"
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH key data to identify machine administrator"
+      }
+    },
+    "dataNodeCount": {
+      "type": "int",
+      "defaultValue": 3,
+      "metadata": {
+        "description": "Number of Elasticsearch data nodes to provision"
+      }
+    },
+    "dataDiskSize": {
+      "type": "string",
+      "defaultValue": "256",
+      "metadata": {
+        "description": "Size of data disks in data nodes (in GB). Four data disks will be provisioned"
+      }
+    },
+    "esUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "The name of the user that will be provision to have access to ElasticSearch services"
+      }
+    },
+    "esPassword": {
+      "type": "string",
+      "metadata": {
+        "description": "Password for the ElasticSearch user"
+      }
+    },
+    "vmSizeDataNodes": {
+      "type": "string",
+      "defaultValue": "Standard_D1",
+      "metadata": {
+        "description": "VM size"
+      },
+      "allowedValues": [
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D11",
+        "Standard_D12",
+        "Standard_D13",
+        "Standard_D14",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS11",
+        "Standard_DS12",
+        "Standard_DS13",
+        "Standard_DS14",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_A5",
+        "Standard_A6",
+        "Standard_A7",
+        "Standard_A8",
+        "Standard_A9",
+        "Standard_A10",
+        "Standard_A11"
+      ]
+    }
+  },
+
+
+  "variables": {
+    "esDataNodeAvailabilitySetName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-availabilitySet')]",
+    "publicIpAddressName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-public-ip')]",
+    "adminIpAddressName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin-ip')]",
+    "adminSecurityGroupName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin-sg')]",
+    "loadBalancerName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-loadBalancer')]",
+    "networkSettings": {
+      "virtualNetworkName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-vnet')]",
+      "addressPrefix": "10.0.0.0/16",
+      "subnet": {
+        "main": {
+          "name": "main",
+          "prefix": "10.0.1.0/24",
+          "vnet": "[concat(parameters('dnsNameForLoadBalancerIP'), '-vnet')]"
         }
+      }
+    },
+    "dataNodesIpPrefix": "10.0.1.",
+    "dataNodesSubnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').subnet.main.vnet), '/subnets/', variables('networkSettings').subnet.main.name)]",
+    "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
+    "imagePublisher": "Canonical",
+    "imageOffer": "UbuntuServer",
+    "ubuntuOSVersion": "15.10",
+    "sharedStorageAccountName": "[concat('storage', uniqueString(resourceGroup().id))]",
+    "esVersion": "1.7.1",
+    "esClusterDnsName": "[concat(parameters('dnsNameForLoadBalancerIP'), '.', parameters('dnsDomainForLoadBalancerIP'))]",
+    "adminNodeNicName": "adminNodeNic"
+  },
+
+
+  "resources": [
+
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('sharedStorageAccountName')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
     },
 
-
-    "variables": {
-        "esDataNodeAvailabilitySetName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-availabilitySet')]",
-        "publicIpAddressName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-public-ip')]",
-        "adminIpAddressName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin-ip')]",
-        "adminSecurityGroupName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin-sg')]",
-        "loadBalancerName": "[concat(parameters('dnsNameForLoadBalancerIP'),'-loadBalancer')]",
-        "networkSettings": {
-            "virtualNetworkName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-vnet')]",
-            "addressPrefix": "10.0.0.0/16",
-            "subnet": {
-                "main": {
-                    "name": "main",
-                    "prefix": "10.0.1.0/24",
-                    "vnet": "[concat(parameters('dnsNameForLoadBalancerIP'), '-vnet')]"
-                }
-            }
-        },
-        "dataNodesIpPrefix": "10.0.1.",
-        "dataNodesSubnetRef": "[concat(resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').subnet.main.vnet), '/subnets/', variables('networkSettings').subnet.main.name)]",
-        "sshKeyPath": "[concat('/home/',parameters('adminUsername'),'/.ssh/authorized_keys')]",
-        "imagePublisher": "Canonical",
-        "imageOffer": "UbuntuServer",
-        "ubuntuOSVersion": "15.04",
-        "sharedStorageAccountName": "[concat(parameters('storageAccountPrefix'),'shared')]",
-        "esVersion": "1.7.1",
-        "esClusterDnsName":  "[concat(parameters('dnsNameForLoadBalancerIP'), '.', parameters('dnsDomainForLoadBalancerIP'))]"
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('esDataNodeAvailabilitySetName')]",
+      "location": "[resourceGroup().location]",
+      "properties": { }
     },
 
-
-    "resources": [
-
-        {
-            "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('sharedStorageAccountName')]",
-            "apiVersion": "2015-05-01-preview",
-            "location": "[parameters('region')]",
-            "properties": {
-                "accountType": "Standard_LRS"
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/availabilitySets",
-            "name": "[variables('esDataNodeAvailabilitySetName')]",
-            "location": "[parameters('region')]",
-            "properties": { }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('publicIpAddressName')]",
-            "location": "[parameters('region')]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsNameForLoadBalancerIP')]"
-                }
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/virtualNetworks",
-            "name": "[variables('networkSettings').virtualNetworkName]",
-            "location": "[parameters('region')]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": [
-                        "[variables('networkSettings').addressPrefix]"
-                    ]
-                },
-                "subnets": [
-                    {
-                        "name": "[variables('networkSettings').subnet.main.name]",
-                        "properties": {
-                            "addressPrefix": "[variables('networkSettings').subnet.main.prefix]"
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "name": "[variables('loadBalancerName')]",
-            "type": "Microsoft.Network/loadBalancers",
-            "location": "[parameters('region')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]"
-            ],
-            "properties": {
-                "frontendIPConfigurations": [
-                    {
-                        "name": "LBFE",
-                        "properties": {
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))]"
-                            }
-                        }
-                    }
-                ],
-                "backendAddressPools": [
-                    {
-                        "name": "LBBE"
-                    }
-                ],
-                "loadBalancingRules": [
-                    {
-                        "name": "LBRule",
-                        "properties": {
-                            "frontendIPConfiguration": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/frontendIPConfigurations/LBFE')]"
-                            },
-                            "backendAddressPool": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/backendAddressPools/LBBE')]"
-                            },
-                            "protocol": "tcp",
-                            "frontendPort": 80,
-                            "backendPort": 80,
-                            "enableFloatingIP": false,
-                            "idleTimeoutInMinutes": 5,
-                            "probe": {
-                                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/probes/esProbe')]"
-                            }
-                        }
-                    }
-                ],
-                "probes": [
-                    {
-                        "name": "esProbe",
-                        "properties": {
-                            "protocol": "tcp",
-                            "port": 80,
-                            "intervalInSeconds": 5,
-                            "numberOfProbes": 2
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "[concat('dataNodeNic', copyindex(1))]",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "dataNodesNicLoop",
-                "count": "[parameters('dataNodeCount')]"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIpAddressName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('networkSettings').virtualNetworkName)]",
-                "[concat('Microsoft.Network/loadBalancers/', variables('loadBalancerName'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(variables('dataNodesIpPrefix'),copyindex(4))]",
-                            "subnet": {
-                                "id": "[variables('dataNodesSubnetRef')]"
-                            },
-                            "loadBalancerBackendAddressPools": [
-                                {
-                                    "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/backendAddressPools/LBBE')]"
-                                }
-                            ]
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(parameters('dnsNameForLoadBalancerIP'), copyindex(1))]",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "dataNodeLoop",
-                "count": "[parameters('dataNodeCount')]"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'dataNodeNic', copyindex(1))]",
-                "[concat('Microsoft.Compute/availabilitySets/', variables('esDataNodeAvailabilitySetName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('sharedStorageAccountName'))]"
-            ],
-            "properties": {
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('esDataNodeAvailabilitySetName'))]"
-                },
-                "hardwareProfile": {
-                    "vmSize": "[parameters('vmSizeDataNodes')]"
-                },
-                "osProfile": {
-                    "computerName": "[concat(parameters('dnsNameForLoadBalancerIP'), copyIndex(1))]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": "true",
-                        "ssh": {
-                            "publicKeys": [
-                                {
-                                    "path": "[variables('sshKeyPath')]",
-                                    "keyData": "[parameters('sshKeyData')]"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
-                        "sku": "[variables('ubuntuOSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "name": "osdisk",
-                        "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-osdisk.vhd')]"
-                        },
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
-                    },
-                    "dataDisks": [
-                        {
-                          "name": "datadisk1",
-                          "diskSizeGB": "[parameters('dataDiskSize')]",
-                          "lun": 0,
-                          "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data1.vhd')]"
-                          },
-                          "caching": "None",
-                          "createOption": "Empty"
-                        },
-                        {
-                          "name": "datadisk2",
-                          "diskSizeGB": "[parameters('dataDiskSize')]",
-                          "lun": 1,
-                          "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data2.vhd')]"
-                          },
-                          "caching": "None",
-                          "createOption": "Empty"
-                        },
-                        {
-                          "name": "datadisk3",
-                          "diskSizeGB": "[parameters('dataDiskSize')]",
-                          "lun": 2,
-                          "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data3.vhd')]"
-                          },
-                          "caching": "None",
-                          "createOption": "Empty"
-                        },
-                        {
-                          "name": "datadisk4",
-                          "diskSizeGB": "[parameters('dataDiskSize')]",
-                          "lun": 3,
-                          "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data4.vhd')]"
-                          },
-                          "caching": "None",
-                          "createOption": "Empty"
-                        }
-                      ]
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('dataNodeNic', copyindex(1)))]"
-                        }
-                    ]
-                }
-            }
-        },
-
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(parameters('dnsNameForLoadBalancerIP'), copyindex(1), '/installelasticsearch')]",
-            "apiVersion": "2015-06-15",
-            "location": "[parameters('region')]",
-            "copy": {
-                "name": "dataNodeLoop",
-                "count": "[parameters('dataNodeCount')]"
-            },
-            "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', parameters('dnsNameForLoadBalancerIP'), copyindex(1))]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.OSTCExtensions",
-                "type": "CustomScriptForLinux",
-                "typeHandlerVersion": "1.2",
-                "settings": {
-                    "fileUris": [
-                        "https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/es-ubuntu-install.sh",
-                        "https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/vm-disk-utils-0.1.sh"
-                    ],
-                    "commandToExecute": "[concat('bash es-ubuntu-install.sh ', ' -n ', parameters('esClusterName'), ' -d ', variables('dataNodesIpPrefix'), '4 -c ', parameters('dataNodeCount'), ' -v ', variables('esVersion'), ' -u ', parameters('esUserName'), ' -p ', parameters('esPassword'), ' -s ', variables('esClusterDnsName'))]"
-                }
-            }
-        },
-
-
-
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[variables('adminIpAddressName')]",
-            "location": "[parameters('region')]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic",
-                "dnsSettings": {
-                    "domainNameLabel": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]"
-                }
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/networkSecurityGroups",
-            "name": "[variables('adminSecurityGroupName')]",
-            "location": "[parameters('region')]",
-            "properties": {
-                "securityRules": [
-                    {
-                        "name": "SSH",
-                        "properties": {
-                            "description": "Allows SSH traffic",
-                            "protocol": "Tcp",
-                            "sourcePortRange": "22",
-                            "destinationPortRange": "22",
-                            "sourceAddressPrefix": "*",
-                            "destinationAddressPrefix": "*",
-                            "access": "Allow",
-                            "priority": 100,
-                            "direction": "Inbound"
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Network/networkInterfaces",
-            "name": "adminNodeNic",
-            "location": "[parameters('region')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/publicIPAddresses/', variables('adminIpAddressName'))]",
-                "[concat('Microsoft.Network/virtualNetworks/', variables('networkSettings').virtualNetworkName)]",
-                "[concat('Microsoft.Network/networkSecurityGroups/', variables('adminSecurityGroupName'))]"
-            ],
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig",
-                        "properties": {
-                            "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[concat(variables('dataNodesIpPrefix'), 99)]",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('adminIpAddressName'))]"
-                            },
-                            "subnet": {
-                                "id": "[variables('dataNodesSubnetRef')]"
-                            },
-                            "networkSecurityGroup": {
-                                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('adminSecurityGroupName'))]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-
-        {
-            "apiVersion": "2015-06-15",
-            "type": "Microsoft.Compute/virtualMachines",
-            "name": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]",
-            "location": "[parameters('region')]",
-            "dependsOn": [
-                "[concat('Microsoft.Network/networkInterfaces/', 'adminNodeNic')]",
-                "[concat('Microsoft.Compute/availabilitySets/', variables('esDataNodeAvailabilitySetName'))]",
-                "[concat('Microsoft.Storage/storageAccounts/', variables('sharedStorageAccountName'))]"
-            ],
-            "properties": {
-                "availabilitySet": {
-                    "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('esDataNodeAvailabilitySetName'))]"
-                },
-                "hardwareProfile": {
-                    "vmSize": "Standard_A1"
-                },
-                "osProfile": {
-                    "computerName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": "true",
-                        "ssh": {
-                            "publicKeys": [
-                                {
-                                    "path": "[variables('sshKeyPath')]",
-                                    "keyData": "[parameters('sshKeyData')]"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "[variables('imagePublisher')]",
-                        "offer": "[variables('imageOffer')]",
-                        "sku": "[variables('ubuntuOSVersion')]",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "name": "osdisk",
-                        "vhd": {
-                            "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), '-admin-osdisk.vhd')]"
-                        },
-                        "caching": "ReadWrite",
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'adminNodeNic')]"
-                        }
-                    ]
-                }
-            }
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIpAddressName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('dnsNameForLoadBalancerIP')]"
         }
+      }
+    },
 
-    ]
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('networkSettings').virtualNetworkName]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('networkSettings').addressPrefix]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('networkSettings').subnet.main.name]",
+            "properties": {
+              "addressPrefix": "[variables('networkSettings').subnet.main.prefix]"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[variables('loadBalancerName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('publicIpAddressName')]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LBFE",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIpAddressName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "LBBE"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "LBRule",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/frontendIPConfigurations/LBFE')]"
+              },
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/backendAddressPools/LBBE')]"
+              },
+              "protocol": "tcp",
+              "frontendPort": 80,
+              "backendPort": 80,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/probes/esProbe')]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "esProbe",
+            "properties": {
+              "protocol": "tcp",
+              "port": 80,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[concat('dataNodeNic', copyindex(1))]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "dataNodesNicLoop",
+        "count": "[parameters('dataNodeCount')]"
+      },
+      "dependsOn": [
+        "[variables('publicIpAddressName')]",
+        "[variables('networkSettings').virtualNetworkName]",
+        "[variables('loadBalancerName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(variables('dataNodesIpPrefix'),copyindex(4))]",
+              "subnet": {
+                "id": "[variables('dataNodesSubnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers',variables('loadBalancerName')),'/backendAddressPools/LBBE')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('dnsNameForLoadBalancerIP'), copyindex(1))]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "dataNodeLoop",
+        "count": "[parameters('dataNodeCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', 'dataNodeNic', copyindex(1))]",
+        "[variables('esDataNodeAvailabilitySetName')]",
+        "[variables('sharedStorageAccountName')]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('esDataNodeAvailabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmSizeDataNodes')]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('dnsNameForLoadBalancerIP'), copyIndex(1))]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('ubuntuOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "name": "datadisk1",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
+              "lun": 0,
+              "vhd": {
+                "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data1.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk2",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
+              "lun": 1,
+              "vhd": {
+                "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data2.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk3",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
+              "lun": 2,
+              "vhd": {
+                "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data3.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty"
+            },
+            {
+              "name": "datadisk4",
+              "diskSizeGB": "[parameters('dataDiskSize')]",
+              "lun": 3,
+              "vhd": {
+                "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), copyindex(1), '-data4.vhd')]"
+              },
+              "caching": "None",
+              "createOption": "Empty"
+            }
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat('dataNodeNic', copyindex(1)))]"
+            }
+          ]
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('dnsNameForLoadBalancerIP'), copyindex(1), '/installelasticsearch')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "dataNodeLoop",
+        "count": "[parameters('dataNodeCount')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('dnsNameForLoadBalancerIP'), copyindex(1))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.OSTCExtensions",
+        "type": "CustomScriptForLinux",
+        "typeHandlerVersion": "1.2",
+        "settings": {
+          "fileUris": [
+            "https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/es-ubuntu-install.sh",
+            "https://raw.githubusercontent.com/mspnp/semantic-logging/elk/ES-MultiNode/vm-disk-utils-0.1.sh"
+          ],
+          "commandToExecute": "[concat('bash es-ubuntu-install.sh ', ' -n ', parameters('dnsNameForLoadBalancerIP'), ' -d ', variables('dataNodesIpPrefix'), '4 -c ', parameters('dataNodeCount'), ' -v ', variables('esVersion'), ' -u ', parameters('esUserName'), ' -p ', parameters('esPassword'), ' -s ', variables('esClusterDnsName'))]"
+        }
+      }
+    },
+    
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('adminIpAddressName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]"
+        }
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('adminSecurityGroupName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "SSH",
+            "properties": {
+              "description": "Allows SSH traffic",
+              "protocol": "Tcp",
+              "sourcePortRange": "22",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('adminNodeNicName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('adminIpAddressName')]",
+        "[variables('networkSettings').virtualNetworkName]",
+        "[variables('adminSecurityGroupName')]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[concat(variables('dataNodesIpPrefix'), 99)]",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('adminIpAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('dataNodesSubnetRef')]"
+              },
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('adminSecurityGroupName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "apiVersion": "2015-06-15",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('adminNodeNicName')]",
+        "[variables('esDataNodeAvailabilitySetName')]",
+        "[variables('sharedStorageAccountName')]"
+      ],
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', variables('esDataNodeAvailabilitySetName'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_A1"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('dnsNameForLoadBalancerIP'), '-admin')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('imagePublisher')]",
+            "offer": "[variables('imageOffer')]",
+            "sku": "[variables('ubuntuOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "osdisk",
+            "vhd": {
+              "uri": "[concat('http://',variables('sharedStorageAccountName'),'.blob.core.windows.net/vhds/', parameters('dnsNameForLoadBalancerIP'), '-admin-osdisk.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('adminNodeNicName'))]"
+            }
+          ]
+        }
+      }
+    }
+
+  ]
 }

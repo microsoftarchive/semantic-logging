@@ -34,13 +34,13 @@ Parameters:
   -n <ElasticSearch cluster name>
   -d <Static discovery endpoint start address> e.g. 10.0.1.4
   -c <Count of cluster nodes>
-  -v <ElasticSearch version> e.g. 1.7.1
+  -v <ElasticSearch version> e.g. 2.2.1
   -k <Kibana version> e.g. 4.1.1. 
   -u <ElasticSearch user name>
   -p <ElasticSearch user password>
   -s <ElasticSearch cluster DNS name> (to configure nginx proxy)
   -h view this help content
-All parameters except -h are mandatory
+Elastic Search user name, user password and cluster DNS name are mandatory
 END
 }
 
@@ -70,8 +70,8 @@ get_discovery_endpoints()
 wait_for_elastic_svc()
 {
     declare cluster_health=''
-    declare HEALTHY='"status":"green"'
-    declare -i MAX_TRIES=30    # Keep trying for 5 minutes
+    declare -r HEALTHY='"status":"green"'
+    declare -ri MAX_TRIES=30    # Keep trying for 5 minutes
     declare -i i=0
 
     until [[ $cluster_health =~ $HEALTHY || $i -eq $MAX_TRIES ]]; do
@@ -97,10 +97,10 @@ fi
 echo "#################### Installing ElasticSearch on ${HOSTNAME} ####################"
 
 cluster_name="kocour"
-es_version="1.7.1"
-kibana_version="4.1.1"
+es_version="2.2.1"
+kibana_version="4.4.2"
 starting_discovery_endpoint="10.0.1.4"
-cluster_node_count=3
+declare -i cluster_node_count=3
 es_user_name=''
 es_user_password=''
 es_dns_name=''
@@ -151,18 +151,19 @@ fi
 echo "#################### Installing Java ####################"
 sudo apt-get update
 sudo apt-get -qy install openjdk-8-jre
+sudo update-ca-certificates -f
 
 echo "#################### Setting up data disks ####################"
 bash vm-disk-utils-0.1.sh
 
 echo "#################### Installing ES service ####################"
-sudo wget "https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-$es_version.deb" -O elasticsearch.deb
+sudo wget "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/$es_version/elasticsearch-$es_version.deb" -O elasticsearch.deb
 sudo dpkg -i elasticsearch.deb
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch.service
 
 echo "#################### Configuring data disks for ES ####################"
-DATAPATH_CONFIG=""
+datapath_config=""
 if [ -d '/datadisks' ]; then
     for disk_id in `find /datadisks/ -mindepth 1 -maxdepth 1 -type d`
     do
@@ -172,10 +173,10 @@ if [ -d '/datadisks' ]; then
         chown -R elasticsearch:elasticsearch "${disk_id}/elasticsearch"
         chmod 755 "${disk_id}/elasticsearch"
         # Add to list for elasticsearch configuration
-        DATAPATH_CONFIG+="${disk_id}/elasticsearch/data,"
+        datapath_config+="${disk_id}/elasticsearch/data,"
     done
     #Remove the extra trailing comma
-    DATAPATH_CONFIG="${DATAPATH_CONFIG%?}"
+    datapath_config="${datapath_config%?}"
 else
     echo "Data disk directory not found, cannot set up storage for ElasticSearch service"
     exit 4
@@ -189,8 +190,14 @@ echo 'discovery.zen.ping.multicast.enabled: false' >> /etc/elasticsearch/elastic
 discovery_endpoints=$(get_discovery_endpoints $starting_discovery_endpoint $cluster_node_count)
 echo "Setting ES discovery endpoints to $discovery_endpoints"
 echo "discovery.zen.ping.unicast.hosts: $discovery_endpoints" >> /etc/elasticsearch/elasticsearch.yml
-echo "path.data: $DATAPATH_CONFIG" >> /etc/elasticsearch/elasticsearch.yml
-
+echo "path.data: $datapath_config" >> /etc/elasticsearch/elasticsearch.yml
+declare -i minimum_master_nodes=$(((cluster_node_count / 2) + 1))
+echo "discovery.zen.minimum_master_nodes: $minimum_master_nodes" >> /etc/elasticsearch/elasticsearch.yml
+echo "gateway.recover_after_time: 1m" >> /etc/elasticsearch/elasticsearch.yml
+echo "bootstrap.mlockall: true" >> /etc/elasticsearch/elasticsearch.yml
+echo "node.master: true" >> /etc/elasticsearch/elasticsearch.yml
+echo "node.data: true" >> /etc/elasticsearch/elasticsearch.yml
+echo "network.host: [_site_, _local_]" >> /etc/elasticsearch/elasticsearch.yml
 
 echo "#################### Installing nginx ####################"
 sudo apt-get -qy install nginx
@@ -231,10 +238,8 @@ echo "#################### Optimizing the system ####################"
 es_heap_size=$(free -m |grep Mem | awk '{if ($2/2 >31744)  print 31744;else print $2/2;}')
 printf "\nES_HEAP_SIZE=%sm\n" $es_heap_size >> /etc/default/elasticseach
 printf "MAX_LOCKED_MEMORY=unlimited\n" >> /etc/default/elasticsearch
-
 echo "elasticsearch - nofile 65536" >> /etc/security/limits.conf
 echo "elasticsearch - memlock unlimited" >> /etc/security/limits.conf
-echo "bootstrap.mlockall: true" >> /etc/elasticsearch/elasticsearch.yml
 
 
 echo "#################### Starting services ####################"

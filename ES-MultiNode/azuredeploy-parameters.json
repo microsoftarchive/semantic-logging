@@ -2,31 +2,10 @@
     "dnsNameForLoadBalancerIP": {
         "value": "changeme"
     },
-    "storageAccountPrefix": {
-        "value": "changeme"
-    },
     "adminUsername": {
         "value": "changeme"
     },
-    "dataNodeCount": {
-        "value": 3
-    },
-    "dataDiskSize": {
-        "value":  "256"
-    },
-    "region": {
-        "value": "West US"
-    },
-    "esClusterName": {
-        "value": "fastes"
-    },
     "esUserName": {
         "value": "changeme"
-    },
-    "esPassword": {
-        "value": "changeme"
-    },
-    "vmSizeDataNodes": {
-        "value": "Standard_A2"
-    }
+    }    
 }
