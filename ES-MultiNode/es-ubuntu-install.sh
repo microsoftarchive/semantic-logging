@@ -104,6 +104,7 @@ declare -i cluster_node_count=3
 es_user_name=''
 es_user_password=''
 es_dns_name=''
+export DEBIAN_FRONTEND='noninteractive'
 
 while getopts n:d:c:v:u:p:s:k:h optname; do    
   case $optname in
