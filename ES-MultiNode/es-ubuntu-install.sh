@@ -77,7 +77,7 @@ wait_for_elastic_svc()
     until [[ $cluster_health =~ $HEALTHY || $i -eq $MAX_TRIES ]]; do
         sleep 10
         i+=1
-        cluster_health=$(curl -s http://localhost:9200/_cluster/health)
+        cluster_health=$(curl --max-time 10 -s http://localhost:9200/_cluster/health)
     done
 
     if [[ $i -eq $MAX_TRIES ]]; then
@@ -255,6 +255,6 @@ sudo systemctl start kibana4.service
 
 
 echo "#################### Installing ES head plugin ####################"
-sudo /usr/share/elasticsearch/bin/plugin --install mobz/elasticsearch-head
+sudo /usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
 
 exit 0
