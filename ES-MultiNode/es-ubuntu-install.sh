@@ -159,7 +159,7 @@ bash vm-disk-utils-0.1.sh
 
 echo "#################### Installing ES service ####################"
 sudo wget "https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/$es_version/elasticsearch-$es_version.deb" -O elasticsearch.deb
-sudo dpkg -i elasticsearch.deb
+sudo dpkg -i --force-all elasticsearch.deb
 sudo systemctl daemon-reload
 sudo systemctl enable elasticsearch.service
 
