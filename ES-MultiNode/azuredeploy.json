@@ -113,7 +113,7 @@
     "imageOffer": "UbuntuServer",
     "ubuntuOSVersion": "15.10",
     "sharedStorageAccountName": "[concat('storage', uniqueString(resourceGroup().id))]",
-    "esVersion": "1.7.1",
+    "esVersion": "2.2.1",
     "esClusterDnsName": "[concat(parameters('dnsNameForLoadBalancerIP'), '.', parameters('dnsDomainForLoadBalancerIP'))]",
     "adminNodeNicName": "adminNodeNic"
   },
