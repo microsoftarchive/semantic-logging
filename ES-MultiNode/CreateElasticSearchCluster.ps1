@@ -1,5 +1,5 @@
 ﻿param(
-[Parameter(Mandatory=$true)][string] $TemplateParameterFile,
+[string] $TemplateParameterFile = ".\azuredeploy.json",
 [Parameter(Mandatory=$true)][string] $ResourceGroupName,
 [Parameter(Mandatory=$true)][string] $Region,
 [Parameter(Mandatory=$true)][string] $EsPassword,
