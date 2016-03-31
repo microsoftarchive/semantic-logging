@@ -49,9 +49,9 @@ where
 
 |Script Parameter Name    |Description|
 |-----------------------  |--------------------------|
-|`<es-group-name>`        |the name of the Azure resource group that will contain all cluster resources|
-|`<azure-region>`         |the name of the Azure region where the cluster should be created|         
-|`<azure-region>`         |the name of the Azure region where the cluster should be created|
+|`<es-group-name>`        |the name of the Azure resource group that will contain all Elastic Search cluster resources|
+|`<azure-region>`         |the name of the Azure region where the Elastic Search cluster should be created|         
+|`<es-password>`          |the password for the Elastic Search user|
 
 > If you get a NullReferenceException from Test-AzureResourceGroup cmdlet, you have forgotten to log on to Azure (`Add-AzureRmAccount`).
 
