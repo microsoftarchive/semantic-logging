@@ -153,6 +153,7 @@
         <xs:attribute name="instanceName" type="NoEmptyString" use="required" />
         <xs:attribute name="connectionString" type="NoEmptyString" use="required" />
         <xs:attribute name="tableName" type="NoEmptyString" use="optional" />
+		<xs:attribute name="storedProcedureName" type="NoEmptyString" use="optional" />
         <xs:attribute name="bufferingIntervalInSeconds" type="PositiveAndMinusOneInteger" use="optional" />
         <xs:attribute name="bufferingCount" type="PositiveInteger" use="optional" />
         <xs:attribute name="maxBufferSize" type="PositiveInteger" use="optional" />
