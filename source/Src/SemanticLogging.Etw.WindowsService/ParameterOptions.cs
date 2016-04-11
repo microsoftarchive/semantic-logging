@@ -196,7 +196,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
             this.ExitCode = ApplicationExitCode.RuntimeError;
         }
 
-        private static void DisplayLoaderExceptionsOnConsole(ReflectionTypeLoadException e)
+        private void DisplayLoaderExceptionsOnConsole(ReflectionTypeLoadException e)
         {
             foreach (var loaderException in e.LoaderExceptions)
             {
