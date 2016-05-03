@@ -154,11 +154,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
-                Console.WriteLine();
-                Console.WriteLine(Resources.StopServiceMessage);
-                Console.ReadLine();
-                this.ExitCode = ApplicationExitCode.RuntimeError;
+                DisplayExceptionOnConsole(e);
             }
         }
 
@@ -183,6 +179,29 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
         private static ServiceController GetController()
         {
             return ServiceController.GetServices().FirstOrDefault(s => s.ServiceName.Equals(Constants.ServiceName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private void DisplayExceptionOnConsole(Exception e)
+        {
+            var rtle = e as ReflectionTypeLoadException;
+            if (rtle != null)
+            {
+                DisplayLoaderExceptionsOnConsole(rtle);
+            }
+
+            Console.WriteLine(e.ToString());
+            Console.WriteLine();
+            Console.WriteLine(Resources.StopServiceMessage);
+            Console.ReadLine();
+            this.ExitCode = ApplicationExitCode.RuntimeError;
+        }
+
+        private void DisplayLoaderExceptionsOnConsole(ReflectionTypeLoadException e)
+        {
+            foreach (var loaderException in e.LoaderExceptions)
+            {
+                Console.WriteLine(loaderException.ToString());
+            }
         }
 
         private bool IsAuthorized()

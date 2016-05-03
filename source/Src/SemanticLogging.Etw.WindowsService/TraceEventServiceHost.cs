@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Configuration;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service.Properties;
+using System.Reflection;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
 {
@@ -73,7 +74,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
                 // log and rethrow to notify SCM
                 if (!this.consoleMode)
                 {
-                    this.EventLog.WriteEntry(e.ToString(), EventLogEntryType.Error);
+                    LogException(e);
                 }
 
                 throw;
@@ -331,6 +332,25 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Etw.Service
             else
             {
                 this.EventLog.WriteEntry(error.ToString(), EventLogEntryType.Error);
+            }
+        }
+
+        private void LogException(Exception e)
+        {
+            var rtle = e as ReflectionTypeLoadException;
+            if (rtle != null)
+            {
+                LogLoaderExceptions(rtle);
+            }
+
+            this.EventLog.WriteEntry(e.ToString(), EventLogEntryType.Error);
+        }
+
+        private void LogLoaderExceptions(ReflectionTypeLoadException e)
+        {
+            foreach (var loaderException in e.LoaderExceptions)
+            {
+                this.EventLog.WriteEntry(loaderException.ToString(), EventLogEntryType.Error);
             }
         }
     }
