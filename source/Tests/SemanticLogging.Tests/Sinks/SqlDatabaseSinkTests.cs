@@ -25,19 +25,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         [TestMethod]
         public void when_creating_listener_for_null_instance_name_then_throws()
         {
-            AssertEx.Throws<ArgumentNullException>(() => new SqlDatabaseSink(null, "valid", "tableName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentNullException>(() => new SqlDatabaseSink(null, "valid", "tableName", "storedProcedureName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_listener_for_null_connection_string_then_throws()
         {
-            AssertEx.Throws<ArgumentNullException>(() => new SqlDatabaseSink("test", null, "tableName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentNullException>(() => new SqlDatabaseSink("test", null, "tableName", "storedProcedureName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
         public void when_creating_listener_with_invalid_connection_string_then_throws()
         {
-            AssertEx.Throws<ArgumentException>(() => new SqlDatabaseSink("test", InvalidConnectionString, "tableName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
+            AssertEx.Throws<ArgumentException>(() => new SqlDatabaseSink("test", InvalidConnectionString, "tableName", "storedProcedureName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan));
         }
 
         [TestMethod]
@@ -45,7 +45,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             const string ValidNotExisting = @"Data Source=(localdb)\v11.0; AttachDBFilename='|DataDirectory|\DoesNotExist.mdf';Initial Catalog=SemanticLoggingTests;Integrated Security=True";
 
-            using (var sink = new SqlDatabaseSink("test", ValidNotExisting, "tableName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, TimeSpan.FromSeconds(20)))
+            using (var sink = new SqlDatabaseSink("test", ValidNotExisting, "tableName", "storedProcedureName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, TimeSpan.FromSeconds(20)))
             using (var collectErrorsListener = new MockEventListener())
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
@@ -70,7 +70,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             const string ValidNotExisting = @"Data Source=(localdb)\v11.0; AttachDBFilename='|DataDirectory|\DoesNotExist.mdf';Initial Catalog=SemanticLoggingTests;Integrated Security=True";
 
-            using (var sink = new SqlDatabaseSink("test", ValidNotExisting, "tableName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, TimeSpan.FromSeconds(20)))
+            using (var sink = new SqlDatabaseSink("test", ValidNotExisting, "tableName", "storedProcedureName", Buffering.DefaultBufferingInterval, Buffering.DefaultBufferingCount, Buffering.DefaultMaxBufferSize, TimeSpan.FromSeconds(20)))
             using (var collectErrorsListener = new MockEventListener())
             {
                 collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
@@ -125,7 +125,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         protected override void Given()
         {
             base.Given();
-            this.sink = new SqlDatabaseSink(InstanceName, this.GetSqlConnectionString(), SqlDatabaseLog.DefaultTableName, Buffering.DefaultBufferingInterval, NumberOfEntries, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan);
+            this.sink = new SqlDatabaseSink(InstanceName, this.GetSqlConnectionString(), SqlDatabaseLog.DefaultTableName, SqlDatabaseLog.DefaultStoredProcedureName, Buffering.DefaultBufferingInterval, NumberOfEntries, Buffering.DefaultMaxBufferSize, Timeout.InfiniteTimeSpan);
             this.collectErrorsListener = new MockEventListener();
             this.collectErrorsListener.EnableEvents(SemanticLoggingEventSource.Log, EventLevel.Error, Keywords.All);
         }
@@ -332,6 +332,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
                 "TestInstanceName",
                 this.GetSqlConnectionString(),
                 SqlDatabaseLog.DefaultTableName,
+                SqlDatabaseLog.DefaultStoredProcedureName,
                 TimeSpan.FromMinutes(1),
                 BufferingCount,
                 Buffering.DefaultMaxBufferSize,

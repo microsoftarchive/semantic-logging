@@ -25,73 +25,7 @@ CREATE TYPE TracesType AS TABLE
 
 GO
 
-
-CREATE PROCEDURE [dbo].[WriteTrace]
-(
-	@InstanceName [nvarchar](1000),
-	@ProviderId [uniqueidentifier],
-	@ProviderName [nvarchar](500),
-	@EventId [int],
-	@EventKeywords [bigint],
-	@Level [int],
-	@Opcode [int],
-	@Task [int],
-	@Timestamp [datetimeoffset](7),
-	@Version [int],
-	@FormattedMessage [nvarchar](4000),
-	@Payload [nvarchar](4000),
-	@ActivityId [uniqueidentifier], 
-	@RelatedActivityId [uniqueidentifier],
-	@ProcessId [int],
-	@ThreadId [int],
-	@TraceId [bigint] OUTPUT
-)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-	INSERT INTO [Traces] (
-		[InstanceName],
-		[ProviderId],
-		[ProviderName],
-		[EventId],
-		[EventKeywords],
-		[Level],
-		[Opcode],
-		[Task],
-		[Timestamp],
-		[Version],
-		[FormattedMessage],
-		[Payload],
-		[ActivityId],
-		[RelatedActivityId],
-		[ProcessId],
-		[ThreadId]
-	)
-	VALUES (
-		@InstanceName,
-	    @ProviderId,
-	    @ProviderName,
-		@EventId,
-		@EventKeywords,
-		@Level,
-		@Opcode,
-		@Task,
-		@Timestamp,
-		@Version,
-		@FormattedMessage,
-		@Payload,
-		@ActivityId,
-		@RelatedActivityId,
-		@ProcessId,
-		@ThreadId)
-
-	SET @TraceId = @@IDENTITY
-	RETURN @TraceId
-END
-
-GO
-
+-- The name of this stored procedure should match to the storedProcedureName parameter when creating the sink
 CREATE PROCEDURE [dbo].[WriteTraces]
 (
   @InsertTraces TracesType READONLY
@@ -120,6 +54,8 @@ BEGIN
 END
 
 GO
+
+-- The name of this table should match to the tableName parameter when creating the sink
 CREATE TABLE [dbo].[Traces](
 	[id] [bigint] IDENTITY(1,1) NOT NULL,
 	[InstanceName] [nvarchar](1000) NOT NULL,
