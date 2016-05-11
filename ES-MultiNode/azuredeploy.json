@@ -55,7 +55,7 @@
     },
     "vmSizeDataNodes": {
       "type": "string",
-      "defaultValue": "Standard_D1",
+      "defaultValue": "Standard_D2",
       "metadata": {
         "description": "VM size"
       },
