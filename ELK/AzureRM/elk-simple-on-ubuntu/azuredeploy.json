@@ -74,7 +74,7 @@
         "imagePublisher": "Canonical",
         "imageOffer": "UbuntuServer",
         "OSDiskName": "osdiskforlinuxsimple",
-        "nicName": "myVMNic",
+        "nicName": "elk-simple-on-ubuntu-nic",
         "addressPrefix": "10.0.0.0/16",
         "subnetName": "Subnet",
         "subnetPrefix": "10.0.0.0/24",
