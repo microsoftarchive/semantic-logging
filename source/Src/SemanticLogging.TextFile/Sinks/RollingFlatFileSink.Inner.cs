@@ -237,7 +237,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                 {
                     // no roll will be actually performed: no timestamp pattern is available, and 
                     // the roll behavior is overwrite, so the original file will be truncated
-                    this.owner.writer.Close();
+                    this.owner.writer.Dispose();
                     File.WriteAllText(actualFileName, string.Empty);
                 }
                 else
@@ -246,7 +246,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
                     string archiveFileName = this.ComputeArchiveFileName(actualFileName, rollDateTime);
 
                     // close file
-                    this.owner.writer.Close();
+                    this.owner.writer.Dispose();
 
                     // move file
                     SafeMove(actualFileName, archiveFileName, rollDateTime);
@@ -308,7 +308,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
                     var actualFileName = ((FileStream)currentWriter.BaseStream).Name;
 
-                    currentWriter.Close();
+                    currentWriter.Dispose();
 
                     FileStream fileStream = null;
                     try
@@ -358,8 +358,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             private static Encoding GetEncodingWithFallback()
             {
                 Encoding encoding = (Encoding)new UTF8Encoding(false).Clone();
+
+#if !CORECLR
                 encoding.EncoderFallback = EncoderFallback.ReplacementFallback;
                 encoding.DecoderFallback = DecoderFallback.ReplacementFallback;
+#endif
+
                 return encoding;
             }
 
