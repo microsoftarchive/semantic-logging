@@ -10,6 +10,7 @@
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging {
     using System;
+    using System.Reflection;
     
     
     /// <summary>
@@ -40,7 +41,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.SemanticLoggingEventSourceR" +
-                            "esources", typeof(SemanticLoggingEventSourceResources).Assembly);
+                            "esources", typeof(SemanticLoggingEventSourceResources).GetTypeInfo().Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
