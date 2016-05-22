@@ -71,8 +71,15 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             if (!Path.IsPathRooted(rootedFileName))
             {
                 // GetFullPath will resolve any relative path in rootedFileName
-                // AppDomain.CurrentDomain.BaseDirectory will be used as root to decouple from Environment.CurrentDirectory value.                
-                rootedFileName = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, rootedFileName));
+                // AppDomain.CurrentDomain.BaseDirectory will be used as root to decouple from Environment.CurrentDirectory value.
+                string baseDirectory;
+
+#if !CORECLR
+                baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+#else
+                baseDirectory = AppContext.BaseDirectory;
+#endif
+                rootedFileName = Path.GetFullPath(Path.Combine(baseDirectory, rootedFileName));
             }
 
             string directory = Path.GetDirectoryName(rootedFileName);

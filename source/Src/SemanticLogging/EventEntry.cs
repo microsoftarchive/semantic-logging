@@ -248,7 +248,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 
             static ActivityIdPropertyAccess()
             {
-                var eventArgsType = typeof(EventWrittenEventArgs);
+                var eventArgsType = typeof(EventWrittenEventArgs).GetTypeInfo();
 
                 ActivityIdAccessor = BuildAccessor(eventArgsType.GetProperty("ActivityId"));
                 RelatedActivityIdAccessor = BuildAccessor(eventArgsType.GetProperty("RelatedActivityId"));
@@ -294,6 +294,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 
             static ProcessPropertyAccess()
             {
+#if !CORECLR
                 if (AppDomain.CurrentDomain.IsHomogenous && AppDomain.CurrentDomain.IsFullyTrusted)
                 {
                     ProcessIdAccessor = GetCurrentProcessIdSafe;
@@ -304,6 +305,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                     ProcessIdAccessor = null;
                     CurrentThreadIdAccessor = null;
                 }
+#else
+                ProcessIdAccessor = GetCurrentProcessIdSafe;
+                CurrentThreadIdAccessor = GetCurrentThreadIdSafe;
+#endif
             }
 
             public static int GetCurrentProcessId()
@@ -342,7 +347,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 }
             }
 
+#if !CORECLR
             [SuppressUnmanagedCodeSecurity]
+#endif
             [SecurityCritical]
             private static class SafeNativeMethods
             {
