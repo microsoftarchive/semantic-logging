@@ -136,6 +136,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
             return events;
         }
 
+        public static EventSchema GetDynamicSchema(EventWrittenEventArgs eventData)
+        {
+            // TODO: Validate that the only event id this method
+            // is used for is -1 (for dynamic events)?
+            return new EventSchema(
+                            eventData.EventId,
+                            eventData.EventSource.Guid,
+                            eventData.EventSource.Name,
+                            eventData.Level,
+                            eventData.Task,
+                            eventData.Task.ToString(),
+                            eventData.Opcode,
+                            eventData.Opcode.ToString(),
+                            ////message,
+                            eventData.Keywords,
+                            eventData.Keywords.ToString(),
+                            0, // Dynamic events don't have a version.
+                            eventData.PayloadNames);
+        }
+        
         private EventLevel ParseLevel(string level)
         {
             switch (level)
