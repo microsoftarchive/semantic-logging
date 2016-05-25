@@ -140,6 +140,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         {
             // TODO: Validate that the only event id this method
             // is used for is -1 (for dynamic events)?
+            
+#warning "IMPORTANT: Please swap the following lines when the project is updated to .NET 4.6."
+            //var payloadNames = eventData.PayloadNames;
+            var payloadNames = eventData.Payload.Select(p => ""); // Workaround to allow compilation in .NET 4.5.
+
             return new EventSchema(
                             eventData.EventId,
                             eventData.EventSource.Guid,
@@ -153,7 +158,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
                             eventData.Keywords,
                             eventData.Keywords.ToString(),
                             0, // Dynamic events don't have a version.
-                            eventData.PayloadNames);
+                            payloadNames);
         }
         
         private EventLevel ParseLevel(string level)
