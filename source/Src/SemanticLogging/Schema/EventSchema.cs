@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
+// Copyright (c) Microsoft Corporation. All rights reserved. See License.txt in the project root for license information.
 
 using System;
 using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         private readonly int id;
         private readonly Guid providerId;
         private readonly string providerName;
+        private readonly string eventName;
         private readonly string[] payload;
         private readonly EventTask task;
         private readonly string taskName;
@@ -28,6 +29,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         /// <summary>
         /// Initializes a new instance of the <see cref="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema.EventSchema"/> class with the specified values.
         /// </summary>
+        /// <remarks> 
+        /// This overload will cause the event name to be the concatenation of the task and operation code names. 
+        /// </remarks> 
         /// <param name="id">The event id.</param>
         /// <param name="providerId">The provider GUID.</param>
         /// <param name="providerName">The provider name.</param>
@@ -41,10 +45,32 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         /// <param name="version">The event version.</param>
         /// <param name="payload">The event payload.</param>
         public EventSchema(int id, Guid providerId, string providerName, EventLevel level, EventTask task, string taskName, EventOpcode opcode, string opcodeName, EventKeywords keywords, string keywordsDescription, int version, IEnumerable<string> payload)
+            : this(id, providerId, providerName, taskName + opcodeName, level, task, taskName, opcode, opcodeName, keywords, keywordsDescription, version, payload)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema.EventSchema"/> class with the specified values.
+        /// </summary>
+        /// <param name="id">The event id.</param>
+        /// <param name="providerId">The provider GUID.</param>
+        /// <param name="providerName">The provider name.</param>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="level">The event level.</param>
+        /// <param name="task">The event task.</param>
+        /// <param name="taskName">The event task name.</param>
+        /// <param name="opcode">The event operation code.</param>
+        /// <param name="opcodeName">The event operation code name.</param>
+        /// <param name="keywords">The event keywords.</param>
+        /// <param name="keywordsDescription">The event keywords description.</param>
+        /// <param name="version">The event version.</param>
+        /// <param name="payload">The event payload.</param>
+        public EventSchema(int id, Guid providerId, string providerName, string eventName, EventLevel level, EventTask task, string taskName, EventOpcode opcode, string opcodeName, EventKeywords keywords, string keywordsDescription, int version, IEnumerable<string> payload)
         {
             this.id = id;
             this.providerId = providerId;
             this.providerName = providerName;
+            this.eventName = eventName;
             this.level = level;
             this.task = task;
             this.taskName = taskName;
@@ -179,13 +205,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         /// <summary>
         /// Gets the name for the event.
         /// </summary>
-        /// <remarks>
-        /// This is simply the concatenation of the task and operation code names.
-        /// </remarks>
         /// <value>The event name.</value>
         public string EventName
         {
-            get { return this.TaskName + this.OpcodeName; }
+            get { return eventName; }
         }
     }
 }
