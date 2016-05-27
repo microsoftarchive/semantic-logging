@@ -141,15 +141,14 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
         /// </summary>
         /// <param name="eventData">The event arguments that describe the event.</param>
         /// <returns>The event schema.</returns>
-        public static EventSchema GetDynamicSchema(EventWrittenEventArgs eventData)
+public static EventSchema GetDynamicSchema(EventWrittenEventArgs eventData)
         {
             // TODO: Validate that the only event id this method
             // is used for is -1 (for dynamic events)?
-            
-#warning "IMPORTANT: Please swap the following lines when the project is updated to .NET 4.6."
-            //var payloadNames = eventData.PayloadNames;
-            var payloadNames = eventData.Payload.Select(p => string.Empty); // Workaround to allow compilation in .NET 4.5.
 
+#warning "IMPORTANT: Please swap the following code when the project is updated to .NET 4.6."
+            /**** REPLACE BELOW ****/
+            var payloadNames = eventData.Payload.Select(p => ""); // Workaround to allow compilation in .NET 4.5.
             return new EventSchema(
                             eventData.EventId,
                             eventData.EventSource.Guid,
@@ -164,6 +163,26 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema
                             eventData.Keywords.ToString(),
                             0, // Dynamic events don't have a version.
                             payloadNames);
+            /**** REPLACE ABOVE ****/
+
+            /**** ADD BELOW ****
+            return new EventSchema(
+                eventData.EventId,
+                eventData.EventSource.Guid,
+                eventData.EventSource.Name,
+                eventData.EventName,
+                eventData.Level,
+                eventData.Task,
+                eventData.Task.ToString(),
+                eventData.Opcode,
+                eventData.Opcode.ToString(),
+                ////message,
+                eventData.Keywords,
+                eventData.Keywords.ToString(),
+                0, // Dynamic events don't have a version.
+                eventData.PayloadNames);
+            **** ADD ABOVE ****/
+
         }
         
         private EventLevel ParseLevel(string level)
