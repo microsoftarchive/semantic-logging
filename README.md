@@ -1,7 +1,5 @@
 ![Microsoft patterns & practices](http://pnp.azurewebsites.net/images/pnp-logo.png)
 
-[![Join the chat at https://gitter.im/mspnp/semantic-logging](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mspnp/semantic-logging?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-
 ## What is Semantic Logging?
 
 Semantic Logging (formerly know at the Semantic Logging Application Block or SLAB) is designed by the
