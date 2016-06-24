@@ -138,6 +138,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             EventSourceAnalyzer.InspectAll(SemanticLoggingEventSource.Log);
         }
 
+        [TestMethod]
+        public void when_inspecting_eventSource_with_more_than_one_method_argument_use_nondefault_values()
+        {
+            EventSourceAnalyzer.InspectAll(NonDefaultArgumentValuesEventSource.Log);
+        }
+
         #region Test EventSource classes
 
         [EventSource]
@@ -370,6 +376,18 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             internal void IntMappedToEnum(int id)
             {
                 WriteEvent(1, EventKeywords.AuditFailure);
+            }
+        }
+
+        [EventSource]
+        private sealed class NonDefaultArgumentValuesEventSource : EventSource
+        {
+            internal static readonly NonDefaultArgumentValuesEventSource Log = new NonDefaultArgumentValuesEventSource();
+
+            [Event(1)]
+            public void AllValues(DateTime d, string s, Guid g, bool b)
+            {
+                WriteEvent(1, d, s, g, b);
             }
         }
 

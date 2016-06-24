@@ -17,7 +17,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             return Activator.CreateInstance(type);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.ComponentModel.TypeConverter.ConvertFromInvariantString(System.String)", Justification = "Converting numeri value")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1303:Do not pass literals as localized parameters", MessageId = "System.ComponentModel.TypeConverter.ConvertFromInvariantString(System.String)", Justification = "Converting numeric value")]
         public static object NotDefault(this Type type)
         {
             if (type == typeof(string))
@@ -33,6 +33,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             if (type == typeof(bool))
             {
                 return true;
+            }
+            
+            if (type == typeof(DateTime))
+            {
+                return DateTime.MaxValue;
             }
 
             TypeConverter tc = TypeDescriptor.GetConverter(type);
