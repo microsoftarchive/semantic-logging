@@ -36,3 +36,8 @@ Release notes each [release are available](https://github.com/mspnp/semantic-log
 
 [ETW]: https://msdn.microsoft.com/en-us/library/windows/desktop/bb968803(v=vs.85).aspx
 [EventSource]: https://msdn.microsoft.com/en-us/library/system.diagnostics.tracing.eventsource%28v=vs.110%29.aspx
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+
+
+
