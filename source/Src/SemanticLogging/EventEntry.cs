@@ -12,6 +12,8 @@ using System.Runtime.InteropServices;
 using System.Security;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Schema;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
+using System.Diagnostics;
+using System.Threading;
 
 namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 {
@@ -326,7 +328,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             {
                 try
                 {
+#if !CORECLR
                     return SafeNativeMethods.GetCurrentProcessId();
+#else
+                    return Process.GetCurrentProcess().Id;
+#endif
                 }
                 catch (SecurityException)
                 {
@@ -339,7 +345,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             {
                 try
                 {
+#if !CORECLR
                     return SafeNativeMethods.GetCurrentThreadId();
+#else
+                    return Thread.CurrentThread.ManagedThreadId;
+#endif
                 }
                 catch (SecurityException)
                 {
@@ -349,7 +359,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
 
 #if !CORECLR
             [SuppressUnmanagedCodeSecurity]
-#endif
             [SecurityCritical]
             private static class SafeNativeMethods
             {
@@ -359,6 +368,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
                 [DllImport("kernel32.dll")]
                 public static extern int GetCurrentThreadId();
             }
+#endif
         }
     }
 }

@@ -2,6 +2,8 @@
   "version": "6.0.1304-*",
 
   "name": "CoreCompat.EnterpriseLibrary.SemanticLogging",
+  "title": "Enterprise Library - Semantic Logging Application Block for .NET Core",
+  "description": "The Enterprise Library Logging Application Block simplifies logging to various destinations (file, database, event log, MSMQ etc.) and tracing.",
 
   "dependencies": {
     "Newtonsoft.Json": "9.0.1"
@@ -22,7 +24,9 @@
         "System.IO.FileSystem": "4.0.1",
         "System.Reflection": "4.1.0",
         "System.Reflection.TypeExtensions": "4.1.0",
-        "System.AppContext": "4.1.0"
+        "System.AppContext": "4.1.0",
+        "System.Threading.Thread": "4.0.0",
+        "System.Diagnostics.Process": "4.1.0"
       }
     },
     "net4.5": {
