@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0-*",
+
+  "dependencies": {
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netstandard1.5": {
+      "buildOptions": {
+        "define": [ "CORECLR" ]
+      },
+      "dependencies": {
+        "System.Threading.Tasks.Parallel": "4.0.1",
+        "System.ComponentModel.TypeConverter": "4.1.0",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.Diagnostics.Tracing": "4.1.0",
+        "System.Console": "4.0.0",
+        "System.Diagnostics.Tools": "4.0.1",
+        "System.Runtime.InteropServices": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
+        "System.Reflection": "4.1.0",
+        "System.Reflection.TypeExtensions": "4.1.0",
+        "System.AppContext": "4.1.0"
+      }
+    },
+    "net4.5": {
+      "frameworkAssemblies": {
+        "System.Xml": "4.0.0.0",
+        "System.Xml.Linq": "4.0.0.0"
+      }
+    }
+  }
+}
