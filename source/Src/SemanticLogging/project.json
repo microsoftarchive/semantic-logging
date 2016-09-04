@@ -1,6 +1,8 @@
 {
   "version": "1.0.0-*",
 
+  "name": "CoreCompat.SemanticLogging",
+
   "dependencies": {
     "Newtonsoft.Json": "9.0.1"
   },
