@@ -40,5 +40,5 @@ using System.Security;
 [assembly: InternalsVisibleTo("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.InProc.Tests")]
 [assembly: InternalsVisibleTo("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.OutProc.Tests")]
 [assembly: InternalsVisibleTo("Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Shared")]
-[assembly: InternalsVisibleTo("CoreCompat.SemanticLogging.TextFile")]
+[assembly: InternalsVisibleTo("CoreCompat.EnterpriseLibrary.SemanticLogging.TextFile")]
 #endif
