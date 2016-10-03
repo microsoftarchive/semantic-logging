@@ -66,7 +66,10 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
 
             this.instanceName = NormalizeInstanceName(instanceName);
             this.client = account.CreateCloudTableClient();
-            this.client.RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(5), 7);
+            this.client.DefaultRequestOptions = new TableRequestOptions
+            {
+                RetryPolicy = new ExponentialRetry(TimeSpan.FromSeconds(5), 7)
+            };
             this.table = this.client.GetTableReference(tableAddress);
             string sinkId = string.Format(CultureInfo.InvariantCulture, "WindowsAzureTableSink ({0})", instanceName);
             this.bufferedPublisher = BufferedEventPublisher<CloudEventEntry>.CreateAndStart(sinkId, this.PublishEventsAsync, bufferInterval, BufferCountTrigger, maxBufferSize, this.cancellationTokenSource.Token);
