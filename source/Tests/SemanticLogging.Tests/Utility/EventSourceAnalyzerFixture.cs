@@ -385,9 +385,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
             internal static readonly NonDefaultArgumentValuesEventSource Log = new NonDefaultArgumentValuesEventSource();
 
             [Event(1)]
-            public void AllValues(DateTime d, string s, Guid g, bool b)
+            public void AllValues(byte[] ba, DateTime d, string s, Guid g, bool b)
             {
-                WriteEvent(1, d, s, g, b);
+                WriteEvent(1, ba, d, s, g, b);
             }
         }
 
