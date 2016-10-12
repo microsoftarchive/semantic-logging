@@ -14,6 +14,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
                 return string.Empty;
             }
 
+            if (type == typeof(byte[]))
+            {
+                return new byte[] { };
+            }
+
             return Activator.CreateInstance(type);
         }
 
@@ -38,6 +43,11 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility
             if (type == typeof(DateTime))
             {
                 return DateTime.MaxValue;
+            }
+
+            if (type == typeof(byte[]))
+            {
+                return new byte[] { 1, 2, 3 };
             }
 
             TypeConverter tc = TypeDescriptor.GetConverter(type);
