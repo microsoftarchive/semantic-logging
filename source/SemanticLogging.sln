@@ -1,13 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging", "Src\SemanticLogging\SemanticLogging.csproj", "{2CD4105B-0DD6-4C18-9B37-05D8E8F57303}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Tests", "Tests\SemanticLogging.Tests\SemanticLogging.Tests.csproj", "{1735E7F3-65BA-4E29-B319-6C2CA03659D1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4B187511-187B-48B1-A593-18BA835B49C3} = {4B187511-187B-48B1-A593-18BA835B49C3}
+		{27EACC2A-EE11-420B-8760-4945412B0C4A} = {27EACC2A-EE11-420B-8760-4945412B0C4A}
+		{D7979E9B-7978-48FE-B345-3C767A20F9A1} = {D7979E9B-7978-48FE-B345-3C767A20F9A1}
+		{8440AEA2-CD55-42A0-8724-2ECCE2B32374} = {8440AEA2-CD55-42A0-8724-2ECCE2B32374}
+		{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569} = {AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Etw", "Src\SemanticLogging.Etw\SemanticLogging.Etw.csproj", "{8440AEA2-CD55-42A0-8724-2ECCE2B32374}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4B187511-187B-48B1-A593-18BA835B49C3} = {4B187511-187B-48B1-A593-18BA835B49C3}
+		{AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569} = {AC34C8E7-2A5B-412C-AFF7-CF7F52EE4569}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemanticLogging.Etw.WindowsService", "Src\SemanticLogging.Etw.WindowsService\SemanticLogging.Etw.WindowsService.csproj", "{0EBF89E7-D2B2-4968-BC17-0DA066029C46}"
 EndProject
