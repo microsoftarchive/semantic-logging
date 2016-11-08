@@ -63,12 +63,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+                AssertEx.Throws<Exception>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
+                AssertEx.Throws<Exception>(() => new RollingFlatFileSink(c.ToString(), 0, string.Empty, RollFileExistsBehavior.Increment, RollInterval.Day, 0, new SimpleMessageFormatter(), false));
             }
         }
 

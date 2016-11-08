@@ -55,12 +55,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Sinks
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
+                AssertEx.Throws<Exception>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
+                AssertEx.Throws<Exception>(() => new FlatFileSink(c.ToString(), new SimpleMessageFormatter(), false));
             }
         }
 

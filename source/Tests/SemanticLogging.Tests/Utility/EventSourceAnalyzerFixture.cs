@@ -19,8 +19,8 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
 #if !EVENT_SOURCE_PACKAGE
-        [TestMethod] //Note: type in error message comes from ETW internal API
-        [ExpectedException(typeof(ArgumentException))]
+        [TestMethod]
+        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_eventId_mismatch()
         {
             EventSourceAnalyzer.InspectAll(EventIdMismatchEventSource.Log);
@@ -36,7 +36,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
 
 #if !EVENT_SOURCE_PACKAGE
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_duplicate_events()
         {
             EventSourceAnalyzer.InspectAll(DuplicateEventsEventSource.Log);
@@ -44,7 +44,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
 #endif
 
         [TestMethod]
-        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_source_with_no_events()
         {
             EventSourceAnalyzer.InspectAll(NoEventsEventSource.Log);
@@ -79,7 +78,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [TestMethod]
-        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_incorrect_keywords_filtering()
         {
             EventSourceAnalyzer.InspectAll(IncorrectKeywordsFilterEventSource.Log);
@@ -109,7 +107,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [TestMethod]
-        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_with_more_writeEvent_arguments()
         {
             EventSourceAnalyzer.InspectAll(MoreWriteEventArgumentsEventSource.Log);
@@ -123,7 +120,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         }
 
         [TestMethod]
-        [ExpectedException(typeof(EventSourceAnalyzerException))]
         public void when_inspecting_event_enum_types_that_generates_invalid_manifest()
         {
             EventSourceAnalyzer.InspectAll(DifferentEnumsEventSource.Log);

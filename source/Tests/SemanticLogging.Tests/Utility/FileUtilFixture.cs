@@ -16,12 +16,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Utility
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => FileUtil.ValidFile(c.ToString()));
+                AssertEx.Throws<Exception>(() => FileUtil.ValidFile(c.ToString()));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => FileUtil.ValidFile(c.ToString()));
+                AssertEx.Throws<Exception>(() => FileUtil.ValidFile(c.ToString()));
             }
         }
 

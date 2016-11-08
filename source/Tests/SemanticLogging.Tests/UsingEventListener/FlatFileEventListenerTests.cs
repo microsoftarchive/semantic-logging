@@ -67,12 +67,12 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.EventListe
         {
             foreach (var c in Path.GetInvalidFileNameChars())
             {
-                AssertEx.Throws<ArgumentException>(() => listener.LogToFlatFile(c.ToString()));
+                AssertEx.Throws<Exception>(() => listener.LogToFlatFile(c.ToString()));
             }
 
             foreach (var c in Path.GetInvalidPathChars())
             {
-                AssertEx.Throws<ArgumentException>(() => listener.LogToFlatFile(c.ToString()));
+                AssertEx.Throws<Exception>(() => listener.LogToFlatFile(c.ToString()));
             }
         }
 
