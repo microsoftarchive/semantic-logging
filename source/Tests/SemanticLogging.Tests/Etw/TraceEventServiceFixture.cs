@@ -194,7 +194,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
                 this.processId = System.Diagnostics.Process.GetCurrentProcess().Id;
                 this.threadId = Utility.NativeMethods.GetCurrentThreadId();
 
-                MyCompanyEventSource.Log.PageStart(10, "test");
+                MyCompanyEventSource.Log.Startup();
             }
 
             [TestMethod]
@@ -209,9 +209,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Tests.Etw
 
                 Assert.AreEqual(MyCompanyEventSource.Log.Name, entry.Schema.ProviderName);
                 Assert.AreEqual(sourceSettings.EventSourceId, entry.ProviderId);
-                Assert.AreEqual("loading page test activityID=10", entry.FormattedMessage);
-                Assert.AreEqual(EventOpcode.Start, entry.Schema.Opcode);
-                Assert.AreEqual(3, entry.EventId);
+                Assert.AreEqual("Starting up.", entry.FormattedMessage);
+                Assert.AreEqual(EventOpcode.Info, entry.Schema.Opcode);
+                Assert.AreEqual(2, entry.EventId);
                 Assert.AreEqual(processId, entry.ProcessId);
                 Assert.AreEqual(threadId, entry.ThreadId);
                 Assert.AreEqual(Guid.Empty, entry.ActivityId);
