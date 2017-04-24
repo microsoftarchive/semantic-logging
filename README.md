@@ -1,3 +1,5 @@
+:warning: This project is no longer under development. A possible alternative, depending on use case, is [Microsoft.Diagnostic.EventFlow](https://github.com/Azure/diagnostics-eventflow).
+
 ## What is Semantic Logging?
 
 Semantic Logging (formerly know at the Semantic Logging Application Block or SLAB) is designed by the
