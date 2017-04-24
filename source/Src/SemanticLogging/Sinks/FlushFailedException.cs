@@ -9,7 +9,9 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
     /// <summary>
     /// Represents an error while doing a flush operation.
     /// </summary>
+#if !CORECLR
     [Serializable]
+#endif
     public class FlushFailedException : Exception
     {
         /// <summary>Initializes a new instance of the <see cref="FlushFailedException" /> class.</summary>
@@ -40,6 +42,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
         {
         }
 
+#if !CORECLR
         /// <summary>Initializes a new instance of the System.Exception class with serialized data.</summary>
         /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
@@ -47,5 +50,6 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Sinks
             : base(info, context) 
         {
         }
+#endif
     }
 }

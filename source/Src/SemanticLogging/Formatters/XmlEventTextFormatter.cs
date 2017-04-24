@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Xml;
 using Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Utility;
 
@@ -187,7 +188,7 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging.Formatters
             {
                 writer.WriteValue(XmlConvert.ToString((Guid)value));
             }
-            else if (valueType.IsEnum)
+            else if (valueType.GetTypeInfo().IsEnum)
             {
                 writer.WriteValue(((Enum)value).ToString("D"));
             }
