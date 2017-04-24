@@ -169,7 +169,19 @@ namespace Microsoft.Practices.EnterpriseLibrary.SemanticLogging
             EventSchema schema = null;
             try
             {
-                schema = this.schemaCache.GetSchema(eventData.EventId, eventData.EventSource);
+                if (eventData.EventId == -1)  
+                {  
+                    // Support for dynamic events introduced in .NET 4.6. Since the  
+                    // schema changes event by event, we need to generate the schema  
+                    // every time we encounter one. Caching is not possible at  
+                    // present since we have no way of ensuring that each event is  
+                    // uniquely defined (by event name).  
+                    schema = EventSourceSchemaReader.GetDynamicSchema(eventData);  
+                }  
+                else  
+                {  
+                    schema = this.schemaCache.GetSchema(eventData.EventId, eventData.EventSource);  
+                }
             }
             catch (Exception ex)
             {
