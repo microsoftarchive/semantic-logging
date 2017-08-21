@@ -1,4 +1,4 @@
-:warning: This project is no longer under development. A possible alternative, depending on use case, is [Microsoft.Diagnostic.EventFlow](https://github.com/Azure/diagnostics-eventflow).
+:warning: This project is no longer under development. A possible alternative, depending on use case, is [Microsoft.Diagnostic.EventFlow](https://github.com/Azure/diagnostics-eventflow). :warning:
 
 ## What is Semantic Logging?
 
